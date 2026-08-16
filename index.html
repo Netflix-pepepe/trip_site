@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-
 <title>🐺 人狼オンライン トリップ検索機</title>
 
 <style>
@@ -14,7 +13,6 @@
   --muted:#77748a;
   --line:#e8e1f0;
   --pink:#f6c9dc;
-  --pink-strong:#eaa8c7;
   --lav:#d9cef3;
   --blue:#cfe8f7;
   --mint:#d9f0e7;
@@ -22,1060 +20,494 @@
   --danger:#f8d5dc;
   --shadow:0 8px 24px rgba(94,72,116,.10);
 }
-
-*{
-  box-sizing:border-box
-}
-
+*{box-sizing:border-box}
 body{
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Hiragino Sans",
-    "Yu Gothic",
-    sans-serif;
-
-  background:
-    linear-gradient(
-      180deg,
-      #fbf8fd 0%,
-      var(--bg) 100%
-    );
-
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+  background:linear-gradient(180deg,#fbf8fd,var(--bg));
   color:var(--text);
   margin:0;
-  padding:18px 14px 36px;
+  padding:16px 12px 40px;
 }
-
-.wrap{
-  max-width:820px;
-  margin:auto
-}
-
+.wrap{max-width:850px;margin:auto}
 .hero{
-  background:
-    linear-gradient(
-      135deg,
-      #fff,
-      #f7effa 55%,
-      #edf6fb
-    );
-
+  background:linear-gradient(135deg,#fff,#f7effa,#edf6fb);
   border:1px solid #eee3f2;
   border-radius:24px;
-  padding:24px 20px;
+  padding:22px 18px;
   box-shadow:var(--shadow);
-  margin-bottom:16px;
 }
-
 .badge{
   display:inline-block;
   background:var(--pink);
   padding:6px 10px;
   border-radius:999px;
   font-size:12px;
-  font-weight:800
+  font-weight:800;
 }
-
-h1{
-  font-size:28px;
-  margin:10px 0 4px;
-  letter-spacing:.02em
-}
-
-.subtitle{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.7
-}
-
+h1{font-size:27px;margin:10px 0 4px}
+.subtitle{color:var(--muted);font-size:13px;line-height:1.7}
 .card{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:20px;
-  padding:18px;
+  padding:17px;
   margin:14px 0;
-  box-shadow:var(--shadow)
+  box-shadow:var(--shadow);
 }
-
-h2{
-  font-size:19px;
-  margin:0 0 8px
-}
-
-.section-note{
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.7;
-  margin:0 0 12px
-}
-
+h2{font-size:19px;margin:0 0 8px}
 label{
   display:block;
   font-weight:800;
-  margin:14px 0 6px;
-  font-size:14px
+  margin:13px 0 6px;
+  font-size:14px;
 }
-
-input,
-select,
-button{
-  font:inherit
-}
-
-input,
-select{
+input,select,button{font:inherit}
+input,select{
   width:100%;
-  padding:13px 14px;
+  padding:12px 13px;
   border:1px solid #ddd6e6;
   border-radius:13px;
   background:#fff;
   color:var(--text);
-  outline:none
 }
-
-input:focus,
-select:focus{
-  border-color:#c7b4df;
-  box-shadow:0 0 0 3px #efe7f8
-}
-
 button{
+  width:100%;
   border:0;
   border-radius:13px;
-  padding:13px 16px;
-  margin-top:12px;
+  padding:13px 15px;
+  margin-top:10px;
   font-weight:800;
   cursor:pointer;
-  transition:.15s transform,.15s opacity
 }
-
-button:active{
-  transform:scale(.98)
-}
-
-.primary{
-  background:
-    linear-gradient(
-      135deg,
-      #e9b8d1,
-      #d6c4ec
-    );
-  color:#30283a
-}
-
-.secondary{
-  background:#eef7fb;
-  color:#33404a
-}
-
-.danger{
-  background:var(--danger);
-  color:#63343e
-}
-
-.special{
-  background:#fff0bd;
-  color:#66521b
-}
-
-.row{
-  display:flex;
-  gap:9px
-}
-
-.row>*{
-  flex:1
-}
-
+.primary{background:linear-gradient(135deg,#e9b8d1,#d6c4ec)}
+.secondary{background:#eef7fb}
+.danger{background:var(--danger);color:#63343e}
 .trip{
   font-size:25px;
   font-weight:900;
   word-break:break-all;
-  margin:13px 0;
+  margin:12px 0;
   background:#faf6fc;
   border:1px dashed #d9c9e5;
   border-radius:14px;
-  padding:13px
+  padding:12px;
 }
-
-.ok{
-  color:#27825c
+.help{
+  background:linear-gradient(135deg,#eef8fc,#f7f1fb);
+  border-radius:14px;
+  padding:11px 13px;
+  font-size:13px;
+  color:#625c70;
+  line-height:1.7;
 }
-
-.bad{
-  color:#b23c50
-}
-
-.stat{
-  font-variant-numeric:tabular-nums;
-  color:#6f687c;
-  margin-top:10px
-}
-
 .cond{
   border:1px solid #e8deee;
   border-radius:15px;
   padding:11px;
   margin:9px 0;
-  background:#fdfaff
+  background:#fdfaff;
 }
-
-.cond .row{
-  align-items:center
+.row{
+  display:flex;
+  gap:8px;
 }
-
+.row>*{flex:1}
+.stat{
+  color:#6f687c;
+  margin-top:11px;
+  font-variant-numeric:tabular-nums;
+}
 .result{
   padding:12px;
-  margin-top:9px;
+  margin-top:8px;
   border:1px solid #e7dfef;
   border-radius:14px;
-  background:
-    linear-gradient(
-      90deg,
-      #fff,
-      #fbf7fd
-    )
+  background:linear-gradient(90deg,#fff,#fbf7fd);
 }
-
+.result.special{
+  border-color:#dfc37b;
+  background:linear-gradient(90deg,#fffdf2,#fff8dc);
+}
 .mono{
-  font-family:
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
 }
-
-.help{
-  background:
-    linear-gradient(
-      135deg,
-      #eef8fc,
-      #f7f1fb
-    );
-
-  border-radius:14px;
-  padding:11px 13px;
-  font-size:13px;
-  color:#625c70;
-  line-height:1.7
-}
-
-.special-box{
-  border:1px solid #eee1b5;
-  background:#fffdf2;
-  border-radius:15px;
-  padding:13px;
-  margin-top:12px
-}
-
+.ok{color:#27825c}
+.bad{color:#b23c50}
+.small{font-size:12px;color:var(--muted)}
 .special-grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:10px
-}
-
-.special-item{
-  background:#fff;
-  border:1px solid #eadfbf;
-  border-radius:11px;
-  padding:9px;
-}
-
-.special-item label{
-  display:flex;
-  align-items:center;
+  grid-template-columns:repeat(2,1fr);
   gap:7px;
+}
+.special-grid label{
   margin:0;
+  padding:9px;
+  border:1px solid #e7dfef;
+  border-radius:11px;
+  background:#fff;
   font-weight:700;
-  cursor:pointer
 }
-
-.special-item input{
-  width:auto
+.special-grid input{
+  width:auto;
+  margin-right:6px;
 }
-
-.regex-box{
-  border:1px solid #ddd5ed;
-  background:#faf8ff;
-  border-radius:15px;
-  padding:13px;
-  margin-top:12px
-}
-
-.notice{
-  padding:10px 12px;
-  border-radius:12px;
-  background:#eef8fc;
-  color:#526875;
-  font-size:13px;
-  line-height:1.6
-}
-
-hr{
-  border:0;
-  border-top:1px solid #eee8f2;
-  margin:12px 0
-}
-
 @media(max-width:600px){
-
-  body{
-    padding:12px 10px 28px
-  }
-
-  .hero{
-    padding:20px 16px
-  }
-
-  h1{
-    font-size:25px
-  }
-
-  .row{
-    flex-direction:column;
-    gap:0
-  }
-
-  .cond .row{
-    flex-direction:column
-  }
-
-  .special-grid{
-    grid-template-columns:1fr
-  }
-
-  button{
-    min-height:46px
-  }
+  .row{flex-direction:column}
+  .special-grid{grid-template-columns:1fr}
+  h1{font-size:24px}
 }
 </style>
 </head>
 
 <body>
-
 <div class="wrap">
 
 <section class="hero">
-
-<span class="badge">🐺 CPU版・iPad対応</span>
-
-<h1>
-🐺 人狼オンライン<br>
-トリップ検索機
-</h1>
-
-<div class="subtitle">
-10桁・12桁トリップ作成・正規表現・特殊トリップ検索
-</div>
-
+  <span class="badge">🐺 CPU版・iPad対応</span>
+  <h1>🐺 人狼オンライン<br>トリップ検索機</h1>
+  <div class="subtitle">
+    10桁・12桁トリップ生成 / 正規表現 / 特殊トリップ / 重複除外
+  </div>
 </section>
 
-
-<!-- =========================
-     トリップ生成
-========================= -->
-
+<!-- 生成 -->
 <div class="card">
+  <h2>🔑 トリップ生成</h2>
 
-<h2>🔑 トリップ生成</h2>
+  <label>トリップキー</label>
+  <input id="key" maxlength="12" value="passwordaa" autocomplete="off">
 
-<p class="section-note">
-トリップキーは <b>#を入れずに入力</b>
-</p>
+  <button class="primary" id="make">
+    ✨ トリップを生成
+  </button>
 
-<label>トリップキー</label>
+  <div class="trip" id="trip">◆—</div>
 
-<input
- id="key"
- maxlength="12"
- value="passwordaa"
- autocomplete="off"
->
-
-<button
- class="primary"
- id="make"
->
-✨ トリップを生成
-</button>
-
-<div
- class="trip"
- id="trip"
->
-◆—
+  <button class="secondary" id="copy">
+    📋 トリップをコピー
+  </button>
 </div>
 
-<button
- class="secondary"
- id="copy"
->
-📋 トリップをコピー
-</button>
-
-</div>
-
-
-<!-- =========================
-     自動検証
-========================= -->
-
+<!-- 検証 -->
 <div class="card">
+  <h2>🧪 自動検証</h2>
+  <div id="tests">未実行</div>
 
-<h2>🧪 自動検証</h2>
-
-<p class="section-note">
-既知のトリップと比較してcryptが正常か確認します。
-</p>
-
-<div id="tests">
-未実行
+  <button class="primary" id="runTests">
+    🧪 4件を検証
+  </button>
 </div>
 
-<button
- class="primary"
- id="runTests"
->
-🧪 4件を検証
-</button>
-
-</div>
-
-
-<!-- =========================
-     検索
-========================= -->
-
+<!-- 検索 -->
 <div class="card">
 
 <h2>🔎 トリップ検索</h2>
 
 <div class="help">
-
-複数の条件を設定すると、
-<b>すべての条件に一致するトリップ</b>
-を検索します。
-
-正規表現と特殊トリップを組み合わせることもできます。
-
+  複数条件を指定した場合は<strong>すべての条件</strong>に一致するものだけを検索します。<br>
+  検索結果は同じトリップを自動的に重複除外します。
 </div>
 
-
-<label>
-探索するキーの長さ
-</label>
-
+<label>キーの長さ</label>
 <select id="tripLen">
-
-<option value="10" selected>
-10文字
-</option>
-
-<option value="12">
-12文字
-</option>
-
+  <option value="10" selected>10文字</option>
+  <option value="12">12文字</option>
 </select>
 
-
-<label>
-検索モード
-</label>
-
+<label>検索方式</label>
 <select id="searchMode">
-
-<option value="unlimited" selected>
-♾️ 無制限
-</option>
-
-<option value="limit">
-🔢 指定回数
-</option>
-
+  <option value="random">ランダム探索</option>
+  <option value="sequential">順番に探索</option>
 </select>
 
-
-<div id="limitBox">
-
-<label>
-最大試行回数
-</label>
+<label>最大試行回数</label>
+<select id="attemptMode">
+  <option value="unlimited" selected>♾️ 制限なし（停止するまで）</option>
+  <option value="limited">回数を指定</option>
+</select>
 
 <input
- id="maxAttempts"
- type="number"
- min="1"
- value="1000000"
+  id="maxAttempts"
+  type="number"
+  min="1"
+  value="1000000"
+  style="display:none"
 >
 
-</div>
-
-
-<!-- =========================
-     通常条件
-========================= -->
-
-<label>
-一致条件
-</label>
-
+<label>一致条件</label>
 <div id="conditions"></div>
 
-<button
- class="secondary"
- id="add"
->
-＋ 条件を追加
+<button class="secondary" id="add">
+  ＋ 条件を追加
 </button>
 
-
-<!-- =========================
-     正規表現
-========================= -->
-
-<div class="regex-box">
-
-<h3>
-🧩 正規表現
-</h3>
-
-<div class="notice">
-
-正規表現を入力すると、
-トリップ全体に対して判定します。
-
-例：
-<code>^a+.{2}xyz$</code>
-
-</div>
-
-<label>
-正規表現
-</label>
+<!-- 正規表現 -->
+<label>正規表現</label>
 
 <input
- id="regex"
- placeholder="例：^(.)\1+$"
- autocomplete="off"
+  id="regex"
+  placeholder="例：^(.)\1{4,}$"
+  autocomplete="off"
 >
 
-<button
- class="secondary"
- id="testRegex"
->
-🧩 正規表現を確認
-</button>
-
-<div
- id="regexStatus"
- class="stat"
->
-未設定
+<div class="small">
+  . / [] / ? / * / + / {n,m} / () / | / \1 などJavaScript正規表現が使用できます。
 </div>
 
-</div>
-
-
-<!-- =========================
-     特殊トリップ
-========================= -->
-
-<div class="special-box">
-
-<h3>
-⭐ 特殊トリップ
-</h3>
-
-<div class="notice">
-
-選択した特殊トリップに一致するものだけを検索します。
-複数選択した場合は<b>すべて満たす</b>必要があります。
-
-</div>
+<!-- 特殊 -->
+<label>⭐ 特殊トリップ</label>
 
 <div class="special-grid">
 
-<div class="special-item">
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="pure"
->
-純n連
+<input type="checkbox" value="pure8" class="special">
+純8連
 </label>
 
-<select
- class="specialParam"
- data-for="pure"
->
-<option value="8">純8連以上</option>
-<option value="9">純9連以上</option>
-<option value="10">純10連</option>
-</select>
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="prep"
->
-準n連
+<input type="checkbox" value="pure9" class="special">
+純9連
 </label>
 
-<select
- class="specialParam"
- data-for="prep"
->
-<option value="8">準8連以上</option>
-<option value="9" selected>準9連以上</option>
-<option value="10">準10連</option>
-</select>
-
-</div>
-
-
-<div class="special-item">
+<label>
+<input type="checkbox" value="pure10" class="special">
+純10連
+</label>
 
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="two"
->
+<input type="checkbox" value="jun9" class="special">
+準9連
+</label>
+
+<label>
+<input type="checkbox" value="jun10" class="special">
+準10連
+</label>
+
+<label>
+<input type="checkbox" value="niko" class="special">
 二構
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="longest"
->
+<input type="checkbox" value="saicho" class="special">
 最長
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="shortest"
->
+<input type="checkbox" value="saitan" class="special">
 最短
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="yakumo"
->
+<input type="checkbox" value="yakumo" class="special">
 八雲
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="mirror"
->
+<input type="checkbox" value="kagami" class="special">
 鏡
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="palindrome"
->
+<input type="checkbox" value="kaibun" class="special">
 回文
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="echo"
->
+<input type="checkbox" value="yamahiko" class="special">
 山彦
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="double"
->
+<input type="checkbox" value="soren" class="special">
 双連
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="numbers"
->
+<input type="checkbox" value="zensu" class="special">
 全数
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="stepping"
->
+<input type="checkbox" value="tobiishi" class="special">
 飛石
 </label>
 
-</div>
-
-
-<div class="special-item">
-
 <label>
-<input
- type="checkbox"
- class="specialCheck"
- value="expanded"
->
+<input type="checkbox" value="kakuhi" class="special">
 拡飛
 </label>
 
 </div>
 
+<div class="row" style="margin-top:12px">
+  <button class="primary" id="start">
+    🔍 検索開始
+  </button>
+
+  <button class="danger" id="stop">
+    ⏹ 検索停止
+  </button>
 </div>
 
-</div>
-
-
-<!-- =========================
-     操作
-========================= -->
-
-<div class="row">
-
-<button
- class="primary"
- id="start"
->
-🔍 検索開始
-</button>
-
-<button
- class="danger"
- id="stop"
->
-⏹ 検索停止
-</button>
-
-</div>
-
-
-<div
- class="stat"
- id="status"
->
-待機中
+<div class="stat" id="status">
+  待機中
 </div>
 
 <div id="results"></div>
 
 </div>
-
 </div>
 
-
-<!-- ======================================================
-     crypt
-====================================================== -->
-
+<!-- unixCrypt -->
 <script src="./unix-crypt-td.min.js"></script>
 
-
 <script>
-
 "use strict";
 
-
-/* ======================================================
-   DOM
-====================================================== */
-
-const $ = id =>
-  document.getElementById(id);
-
-
-/* ======================================================
-   Trip
-====================================================== */
+/* =========================================================
+   基本トリップ
+========================================================= */
 
 function saltForTrip(key){
+  let s=(key+"H.").slice(1,3);
 
-  let s = (key + "H.").slice(1,3);
+  s=s.replace(/[^\.-z]/g,'.');
 
-  s = s.replace(/[^\\.-z]/g,'.');
+  const table={
+    ":":"A",
+    ";":"B",
+    "<":"C",
+    "=":"D",
+    ">":"E",
+    "?":"F",
+    "@":"G",
+    "[":"a",
+    "\\":"b",
+    "]":"c",
+    "^":"d",
+    "_":"e",
+    "`":"f"
+  };
 
-  s = s.replace(
-    /[\\:;<=>?@[\\\\\\]^_`]/g,
-    c => {
-
-      const table = {
-
-        ':':'A',
-        ';':'B',
-        '<':'C',
-        '=':'D',
-        '>':'E',
-        '?':'F',
-        '@':'G',
-
-        '[':'a',
-        '\\':'b',
-        ']':'c',
-        '^':'d',
-        '_':'e',
-        '`':'f'
-
-      };
-
-      return table[c] || c;
-
-    }
-  );
+  s=s.replace(/[:;<=>?@[\\\]^_`]/g,c=>table[c]||c);
 
   return s;
 }
 
+function cryptAvailable(){
+  return typeof unixCryptTD==="function";
+}
 
 function makeTrip(key){
-
-  if(
-    typeof window.unixCryptTD !== "function"
-  ){
-
+  if(!cryptAvailable()){
     throw new Error(
-      "unixCryptTDを読み込めません。unix-crypt-td.min.jsをindex.htmlと同じフォルダに置いてください。"
+      "unixCryptTD が読み込まれていません。unix-crypt-td.min.js を確認してください。"
     );
-
   }
 
-  return "◆" +
-    window.unixCryptTD(
-      key,
-      saltForTrip(key)
-    ).slice(-10);
-
+  return "◆"+unixCryptTD(
+    key,
+    saltForTrip(key)
+  ).slice(-10);
 }
 
+/* =========================================================
+   生成
+========================================================= */
 
-/* ======================================================
-   Generator
-====================================================== */
-
-$("make").onclick = () => {
-
+document.getElementById("make").onclick=()=>{
   try{
-
-    $("trip").textContent =
-      makeTrip(
-        $("key").value
-      );
-
+    document.getElementById("trip").textContent=
+      makeTrip(document.getElementById("key").value);
   }catch(e){
-
-    $("trip").textContent =
-      "❌ " + e.message;
-
+    document.getElementById("trip").textContent="❌ "+e.message;
   }
-
 };
-
 
 try{
+  document.getElementById("trip").textContent=
+    makeTrip(document.getElementById("key").value);
+}catch(e){}
 
-  $("trip").textContent =
-    makeTrip(
-      $("key").value
-    );
+/* コピー */
 
-}catch(e){
+document.getElementById("copy").onclick=async()=>{
+  const t=document.getElementById("trip").textContent;
 
-  $("trip").textContent =
-    "◆—";
-
-}
-
-
-/* ======================================================
-   Copy
-====================================================== */
-
-$("copy").onclick = async () => {
-
-  const t =
-    $("trip").textContent;
-
-  if(
-    !t ||
-    t === "◆—" ||
-    t.startsWith("❌")
-  ){
-    return;
-  }
+  if(!t.startsWith("◆")) return;
 
   try{
-
     await navigator.clipboard.writeText(t);
-
   }catch(e){
-
-    alert("コピーできませんでした。");
-
+    alert("コピーできませんでした");
   }
-
 };
 
+/* =========================================================
+   テスト
+========================================================= */
 
-/* ======================================================
-   Tests
-====================================================== */
-
-const expected = [
-
+const expected=[
   ["test123456","◆o9CDijBNYE"],
   ["hello12345","◆FQWl9PgQwg"],
   ["abcdef1234","◆E4hSdx1q4w"],
   ["passwordaa","◆ozOtJW9BFA"]
-
 ];
 
+document.getElementById("runTests").onclick=()=>{
+  const box=document.getElementById("tests");
 
-$("runTests").onclick = () => {
+  box.innerHTML="";
 
-  const box =
-    $("tests");
+  let ok=0;
 
-  box.innerHTML = "";
-
-  let ok = 0;
-
-  for(
-    const [key,want]
-    of expected
-  ){
+  for(const [k,want] of expected){
 
     let got;
 
     try{
-
-      got =
-        makeTrip(key);
-
+      got=makeTrip(k);
     }catch(e){
-
-      got =
-        e.message;
-
+      got=e.message;
     }
 
-    const good =
-      got === want;
+    const good=got===want;
 
-    if(good){
-      ok++;
-    }
+    if(good)ok++;
 
-    const div =
-      document.createElement("div");
+    const div=document.createElement("div");
 
-    div.className =
-      good ? "ok" : "bad";
+    div.className=good?"ok":"bad";
 
-    div.innerHTML =
-      `<b>${good ? "✅" : "❌"}</b>
-       ${key}
-       → ${got}
+    div.innerHTML=
+      `<b>${good?"✅":"❌"}</b>
+       ${k} → ${got}
        / 正解 ${want}`;
 
     box.appendChild(div);
-
   }
 
-  box.innerHTML +=
-    `<hr><b>${ok}/4 一致</b>`;
-
+  box.insertAdjacentHTML(
+    "beforeend",
+    `<hr><b>${ok}/4 一致</b>`
+  );
 };
 
+/* =========================================================
+   通常条件
+========================================================= */
 
-/* ======================================================
-   Conditions
-====================================================== */
-
-const conds =
-  $("conditions");
-
+const conds=document.getElementById("conditions");
 
 function addCondition(){
 
-  const d =
-    document.createElement("div");
+  const d=document.createElement("div");
 
-  d.className =
-    "cond";
+  d.className="cond";
 
-  d.innerHTML = `
-
+  d.innerHTML=`
     <div class="row">
 
       <input
@@ -1085,19 +517,9 @@ function addCondition(){
       >
 
       <select class="mode">
-
-        <option value="contains">
-          部分一致
-        </option>
-
-        <option value="prefix">
-          前方一致
-        </option>
-
-        <option value="suffix">
-          後方一致
-        </option>
-
+        <option value="contains">部分一致</option>
+        <option value="prefix">前方一致</option>
+        <option value="suffix">後方一致</option>
       </select>
 
     </div>
@@ -1110,1061 +532,553 @@ function addCondition(){
     </button>
   `;
 
-
-  d.querySelector(
-    ".deleteCondition"
-  ).onclick = () => {
-
+  d.querySelector(".deleteCondition").onclick=()=>{
     d.remove();
-
   };
 
-
   conds.appendChild(d);
-
 }
-
 
 addCondition();
+addCondition();
 
+document.getElementById("add").onclick=addCondition;
 
-$("add").onclick =
-  addCondition;
+/* =========================================================
+   正規表現
+========================================================= */
 
+function regexMatches(trip,pattern){
 
-/* ======================================================
-   Search mode
-====================================================== */
-
-function updateLimitBox(){
-
-  $("limitBox").style.display =
-    $("searchMode").value === "limit"
-      ? "block"
-      : "none";
-
-}
-
-$("searchMode").onchange =
-  updateLimitBox;
-
-updateLimitBox();
-
-
-/* ======================================================
-   Regex validation
-====================================================== */
-
-$("testRegex").onclick = () => {
-
-  const text =
-    $("regex").value.trim();
-
-  if(!text){
-
-    $("regexStatus").textContent =
-      "正規表現なし";
-
-    return;
-
-  }
+  if(!pattern) return true;
 
   try{
 
-    new RegExp(text);
+    const re=new RegExp(pattern);
 
-    $("regexStatus").textContent =
-      "✅ 正規表現は有効です";
+    return re.test(trip);
 
   }catch(e){
 
-    $("regexStatus").textContent =
-      "❌ 正規表現エラー：" +
-      e.message;
+    throw new Error(
+      "正規表現エラー："+e.message
+    );
+  }
+}
 
+/* =========================================================
+   特殊トリップ判定
+========================================================= */
+
+function hasRun(t,n,ignoreCase=false){
+
+  if(ignoreCase){
+
+    t=t.toLowerCase();
   }
 
-};
+  for(let i=0;i<=t.length-n;i++){
 
+    const s=t.slice(i,i+n);
 
-/* ======================================================
-   Special trip functions
-====================================================== */
-
-
-/* 純n連 */
-
-function isPureN(t,n){
-
-  for(
-    let i=0;
-    i<=t.length-n;
-    i++
-  ){
-
-    const part =
-      t.slice(i,i+n);
-
-    if(
-      part.split("").every(
-        c => c === part[0]
-      )
-    ){
+    if(new Set(s).size===1){
       return true;
     }
-
   }
 
   return false;
 }
 
-
-/* 準n連 */
-
-function isPrepN(t,n){
-
-  for(
-    let i=0;
-    i<=t.length-n;
-    i++
-  ){
-
-    const part =
-      t.slice(i,i+n);
-
-    const x =
-      part.toLowerCase();
-
-    if(
-      x.split("").every(
-        c => c === x[0]
-      )
-    ){
-      return true;
-    }
-
-  }
-
-  return false;
+function isPure(t,n){
+  return hasRun(t,n,false);
 }
 
-
-/* 二構 */
-
-function isTwo(t){
-
-  return new Set(t).size <= 2;
-
+function isJun(t,n){
+  return hasRun(t,n,true);
 }
 
-
-/* 最長 */
-
-function isLongest(t){
-
-  return /^[MmW]+$/.test(t);
-
+function isNiko(t){
+  return new Set(t).size===2;
 }
 
-
-/* 最短 */
-
-function isShortest(t){
-
-  return /^[li.]+$/.test(t);
-
+function onlyChars(t,chars){
+  return [...t].every(c=>chars.includes(c));
 }
 
+function isSaicho(t){
+  return onlyChars(t,"MmW") &&
+         new Set(t).size<=3;
+}
 
-/* 八雲 */
+function isSaitan(t){
+  return onlyChars(t,"li.");
+}
 
 function isYakumo(t){
 
-  /*
-   * 3文字ずつ同じ文字が並ぶ。
-   * 10桁の場合は先頭または末尾の1文字を
-   * 余りとして許容。
-   */
-
-  const check =
-    s => {
-
-      if(s.length % 3 !== 0){
-        return false;
-      }
-
-      for(
-        let i=0;
-        i<s.length;
-        i+=3
-      ){
-
-        if(
-          !(
-            s[i] ===
-            s[i+1] &&
-            s[i] ===
-            s[i+2]
-          )
-        ){
-          return false;
-        }
-
-      }
-
-      return true;
-
-    };
-
-
-  if(check(t)){
-    return true;
+  if(t.length!==10 && t.length!==12){
+    return false;
   }
 
-  if(
-    t.length === 10 &&
-    check(t.slice(1))
-  ){
-    return true;
+  const groups=[];
+
+  for(let i=0;i+2<t.length;i+=3){
+
+    const s=t.slice(i,i+3);
+
+    if(s.length===3 &&
+       new Set(s.toLowerCase()).size===1){
+
+      groups.push(s.toLowerCase());
+
+    }else{
+
+      return false;
+    }
   }
 
-  if(
-    t.length === 10 &&
-    check(t.slice(0,-1))
-  ){
-    return true;
-  }
-
-  return false;
-
+  return groups.length>=3 &&
+         new Set(groups).size===groups.length;
 }
 
+function isKagami(t){
 
-/* 鏡 */
+  const mirrorMap={
+    ".":".",
+    "0":"0",
+    "8":"8",
+    "A":"A",
+    "H":"H",
+    "I":"I",
+    "M":"M",
+    "O":"O",
+    "T":"T",
+    "U":"U",
+    "V":"V",
+    "W":"W",
+    "X":"X",
+    "Y":"Y",
 
-const mirrorPairs = {
+    "b":"d",
+    "d":"b",
 
-  ".":".",
-  "0":"0",
-  "8":"8",
-  "A":"A",
-  "H":"H",
-  "I":"I",
-  "M":"M",
-  "O":"O",
-  "T":"T",
-  "U":"U",
-  "V":"V",
-  "W":"W",
-  "X":"X",
-  "Y":"Y",
+    "i":"i",
+    "l":"l",
+    "o":"o",
+    "p":"q",
+    "q":"p",
+    "v":"v",
+    "w":"w",
+    "x":"x"
+  };
 
-  "b":"q",
-  "d":"p",
-  "i":"i",
-  "l":"l",
-  "o":"o",
-  "p":"d",
-  "q":"b",
-  "v":"v",
-  "w":"w",
-  "x":"x"
+  for(let i=0;i<t.length;i++){
 
+    const a=t[i];
+    const b=t[t.length-1-i];
+
+    if(!mirrorMap[a] || mirrorMap[a]!==b){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isKaibun(t){
+
+  for(let i=0;i<t.length;i++){
+
+    if(t[i]!==t[t.length-1-i]){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isYamahiko(t){
+
+  if(t.length%2!==0){
+    return false;
+  }
+
+  const half=t.length/2;
+
+  return t.slice(0,half)===
+         t.slice(half);
+}
+
+function isSoren(t){
+
+  if(t.length%2!==0){
+    return false;
+  }
+
+  for(let i=0;i<t.length;i+=2){
+
+    if(t[i]!==t[i+1]){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isZensu(t){
+  return /^[0-9]+$/.test(t);
+}
+
+function isTobiishi(t){
+
+  for(let i=1;i<t.length;i+=2){
+
+    if(t[i]!=="." && t[i]!=="/"){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isKakuhi(t){
+
+  for(let i=1;i<t.length;i+=2){
+
+    if(t[i]!==t[1]){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function specialMatch(t,type){
+
+  switch(type){
+
+    case "pure8":
+      return isPure(t,8);
+
+    case "pure9":
+      return isPure(t,9);
+
+    case "pure10":
+      return isPure(t,10);
+
+    case "jun9":
+      return isJun(t,9);
+
+    case "jun10":
+      return isJun(t,10);
+
+    case "niko":
+      return isNiko(t);
+
+    case "saicho":
+      return isSaicho(t);
+
+    case "saitan":
+      return isSaitan(t);
+
+    case "yakumo":
+      return isYakumo(t);
+
+    case "kagami":
+      return isKagami(t);
+
+    case "kaibun":
+      return isKaibun(t);
+
+    case "yamahiko":
+      return isYamahiko(t);
+
+    case "soren":
+      return isSoren(t);
+
+    case "zensu":
+      return isZensu(t);
+
+    case "tobiishi":
+      return isTobiishi(t);
+
+    case "kakuhi":
+      return isKakuhi(t);
+
+    default:
+      return false;
+  }
+}
+
+/* =========================================================
+   条件収集
+========================================================= */
+
+function collectConditions(){
+
+  return [...document.querySelectorAll(".cond")]
+    .map(c=>({
+
+      text:c.querySelector(".needle").value
+        .trim()
+        .replace(/^◆/,""),
+
+      mode:c.querySelector(".mode").value
+
+    }))
+    .filter(x=>x.text);
+}
+
+function getSpecials(){
+
+  return [...document.querySelectorAll(".special:checked")]
+    .map(x=>x.value);
+}
+
+/* =========================================================
+   UI
+========================================================= */
+
+document.getElementById("attemptMode").onchange=()=>{
+
+  const limited=
+    document.getElementById("attemptMode").value==="limited";
+
+  document.getElementById("maxAttempts").style.display=
+    limited?"block":"none";
 };
 
+/* =========================================================
+   Worker
+========================================================= */
 
-function isMirror(t){
+let worker=null;
+let running=false;
 
-  for(
-    let i=0;
-    i<t.length;
-    i++
-  ){
+document.getElementById("stop").onclick=()=>{
 
-    const a =
-      t[i];
+  if(worker){
 
-    const b =
-      t[t.length-1-i];
+    worker.postMessage({
+      cmd:"stop"
+    });
 
-    if(
-      mirrorPairs[a] !== b
-    ){
-      return false;
-    }
+    setTimeout(()=>{
 
+      if(worker){
+
+        worker.terminate();
+        worker=null;
+      }
+
+    },100);
   }
 
-  return true;
+  running=false;
 
-}
+  document.getElementById("status").textContent=
+    "⏹ 停止しました";
+};
 
+/* =========================================================
+   検索開始
+========================================================= */
 
-/* 回文 */
+document.getElementById("start").onclick=()=>{
 
-function isPalindrome(t){
+  if(running) return;
 
-  return (
-    t ===
-    t.split("").reverse().join("")
-  );
+  const conditions=collectConditions();
+  const specials=getSpecials();
 
-}
-
-
-/* 山彦 */
-
-function isEcho(t){
+  const regexText=
+    document.getElementById("regex").value.trim();
 
   if(
-    t.length % 2 !== 0
-  ){
-    return false;
-  }
-
-  const half =
-    t.length / 2;
-
-  return (
-    t.slice(0,half) ===
-    t.slice(half)
-  );
-
-}
-
-
-/* 双連 */
-
-function isDouble(t){
-
-  if(
-    t.length % 2 !== 0
-  ){
-    return false;
-  }
-
-  for(
-    let i=0;
-    i<t.length;
-    i+=2
+    !conditions.length &&
+    !specials.length &&
+    !regexText
   ){
 
-    if(
-      t[i] !== t[i+1]
-    ){
-      return false;
-    }
+    alert(
+      "通常条件・正規表現・特殊トリップのいずれかを指定してください"
+    );
 
-  }
-
-  return true;
-
-}
-
-
-/* 全数 */
-
-function isNumbers(t){
-
-  return /^[0-9]+$/.test(t);
-
-}
-
-
-/* 飛石 */
-
-function isStepping(t){
-
-  /*
-   * / と . が交互
-   */
-
-  return /^[.\/](?:[^.\/][.\/])+$/.test(t) ||
-         /^[^./](?:[.\/][^./])*$/.test(t);
-
-}
-
-
-/* 拡飛 */
-
-function isExpanded(t){
-
-  /*
-   * 偶数位置・奇数位置がそれぞれ
-   * 同一文字になるタイプ
-   *
-   * 例:
-   * o U l U E U D U D U
-   *
-   * を広く判定
-   */
-
-  if(t.length < 4){
-    return false;
-  }
-
-  for(
-    let i=2;
-    i<t.length;
-    i+=2
-  ){
-
-    if(
-      t[i] !== t[0]
-    ){
-      /*
-       * 完全固定型ではないため
-       * ここではペア区切りを判定
-       */
-    }
-
-  }
-
-  /*
-   * 2文字単位の境界で
-   * 各ペアの後半が同一文字
-   */
-
-  const odd =
-    t[1];
-
-  for(
-    let i=1;
-    i<t.length;
-    i+=2
-  ){
-
-    if(t[i] !== odd){
-      return false;
-    }
-
-  }
-
-  return true;
-
-}
-
-
-/* ======================================================
-   Special matcher
-====================================================== */
-
-function checkSpecial(
-  t,
-  selected
-){
-
-  for(
-    const type of selected
-  ){
-
-    if(
-      type === "pure"
-    ){
-
-      const n =
-        Number(
-          document.querySelector(
-            '.specialParam[data-for="pure"]'
-          ).value
-        );
-
-      if(
-        !isPureN(t,n)
-      ){
-        return false;
-      }
-
-    }
-
-
-    if(
-      type === "prep"
-    ){
-
-      const n =
-        Number(
-          document.querySelector(
-            '.specialParam[data-for="prep"]'
-          ).value
-        );
-
-      if(
-        !isPrepN(t,n)
-      ){
-        return false;
-      }
-
-    }
-
-
-    if(
-      type === "two" &&
-      !isTwo(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "longest" &&
-      !isLongest(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "shortest" &&
-      !isShortest(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "yakumo" &&
-      !isYakumo(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "mirror" &&
-      !isMirror(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "palindrome" &&
-      !isPalindrome(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "echo" &&
-      !isEcho(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "double" &&
-      !isDouble(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "numbers" &&
-      !isNumbers(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "stepping" &&
-      !isStepping(t)
-    ){
-      return false;
-    }
-
-
-    if(
-      type === "expanded" &&
-      !isExpanded(t)
-    ){
-      return false;
-    }
-
-  }
-
-  return true;
-
-}
-
-
-/* ======================================================
-   Search
-====================================================== */
-
-let searching = false;
-
-let timer = null;
-
-let attempts = 0;
-
-let hits = 0;
-
-
-/*
- * ここではWorkerにcryptを依存させない。
- *
- * GitHub Pages / file:// / CDN Worker問題を回避するため、
- * 検索キー生成とcrypt計算をメイン側で行う。
- *
- * requestIdleCallback / setTimeoutを使って
- * ブラウザが固まらないように分割する。
- */
-
-
-const CHARS =
-  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
-
-
-function keyFromIndex(
-  index,
-  len
-){
-
-  let out = "";
-
-  for(
-    let i=0;
-    i<len;
-    i++
-  ){
-
-    out =
-      CHARS[
-        index %
-        CHARS.length
-      ] +
-      out;
-
-    index =
-      Math.floor(
-        index /
-        CHARS.length
-      );
-
-  }
-
-  return out;
-
-}
-
-
-/* ======================================================
-   Search condition
-====================================================== */
-
-function readConditions(){
-
-  return [
-    ...document.querySelectorAll(
-      ".cond"
-    )
-  ]
-  .map(c => ({
-    text:
-      c.querySelector(
-        ".needle"
-      ).value.trim(),
-
-    mode:
-      c.querySelector(
-        ".mode"
-      ).value
-  }))
-  .filter(x => x.text);
-
-}
-
-
-function matchConditions(
-  trip,
-  conditions
-){
-
-  const t =
-    trip.replace(/^◆/,"");
-
-  return conditions.every(
-    c => {
-
-      const n =
-        c.text.replace(/^◆/,"");
-
-      if(
-        c.mode === "prefix"
-      ){
-        return t.startsWith(n);
-      }
-
-      if(
-        c.mode === "suffix"
-      ){
-        return t.endsWith(n);
-      }
-
-      return t.includes(n);
-
-    }
-  );
-
-}
-
-
-/* ======================================================
-   Search start
-====================================================== */
-
-$("start").onclick = () => {
-
-  if(searching){
     return;
   }
-
-
-  const conditions =
-    readConditions();
-
-
-  const regexText =
-    $("regex").value.trim();
-
-
-  let regex =
-    null;
-
 
   if(regexText){
 
     try{
-
-      regex =
-        new RegExp(
-          regexText
-        );
-
+      new RegExp(regexText);
     }catch(e){
-
-      alert(
-        "正規表現が正しくありません。\n\n" +
-        e.message
-      );
-
+      alert("正規表現エラー："+e.message);
       return;
-
     }
-
   }
 
+  const tripLen=
+    Number(document.getElementById("tripLen").value);
 
-  const selectedSpecials =
-    [
-      ...document.querySelectorAll(
-        ".specialCheck:checked"
-      )
-    ]
-    .map(x => x.value);
+  const attemptMode=
+    document.getElementById("attemptMode").value;
 
+  const maxAttempts=
+    Number(document.getElementById("maxAttempts").value);
 
   if(
-    !conditions.length &&
-    !regex &&
-    !selectedSpecials.length
+    attemptMode==="limited" &&
+    (!Number.isInteger(maxAttempts)||maxAttempts<1)
   ){
 
-    alert(
-      "条件を1つ以上設定してください。"
-    );
+    alert("最大試行回数を確認してください");
 
     return;
-
   }
 
+  if(worker){
 
-  const len =
-    Number(
-      $("tripLen").value
-    );
-
-
-  const unlimited =
-    $("searchMode").value ===
-    "unlimited";
-
-
-  let maxAttempts =
-    Infinity;
-
-
-  if(!unlimited){
-
-    maxAttempts =
-      Number(
-        $("maxAttempts").value
-      );
-
-    if(
-      !Number.isInteger(maxAttempts) ||
-      maxAttempts < 1
-    ){
-
-      alert(
-        "最大試行回数を確認してください。"
-      );
-
-      return;
-
-    }
-
+    worker.terminate();
+    worker=null;
   }
 
+  document.getElementById("results").innerHTML="";
 
-  $("results").innerHTML = "";
+  running=true;
 
-  attempts = 0;
-
-  hits = 0;
-
-  searching = true;
-
-
-  $("status").textContent =
+  document.getElementById("status").textContent=
     "🔎 検索開始…";
 
-
-  const started =
-    performance.now();
-
-
   /*
-   * 1回のイベントループで処理する数。
-   *
-   * 大きくすると速くなるが、
-   * UIが固まりやすくなる。
-   */
+    Workerは外部CDNをimportしない。
+    同じGitHub Pages上のtrip-worker.jsを使う。
+  */
 
-  const BATCH =
-    500;
+  worker=new Worker("./trip-worker.js");
 
+  worker.onmessage=e=>{
 
-  let index = 0;
+    const d=e.data;
 
+    if(d.type==="progress"){
 
-  function process(){
-
-    if(!searching){
-      return;
+      document.getElementById("status").textContent=
+        `🔎 ${d.attempts.toLocaleString()} keys`+
+        ` / ${d.rate.toLocaleString()} keys/sec`+
+        ` / ユニーク ${d.unique.toLocaleString()}`+
+        ` / 重複 ${d.duplicate.toLocaleString()}`;
     }
 
+    if(d.type==="hit"){
 
-    const batchStart =
-      performance.now();
+      const r=document.createElement("div");
 
+      r.className=
+        "result"+(d.special?" special":"");
 
-    for(
-      let n=0;
-      n<BATCH;
-      n++
-    ){
+      r.innerHTML=`
 
-      if(
-        attempts >=
-        maxAttempts
-      ){
+        <div class="mono">
+          ${escapeHTML(d.trip)}
+        </div>
 
-        finish();
+        <div>
+          キー：
+          <span class="mono">
+            ${escapeHTML(d.key)}
+          </span>
+        </div>
 
-        return;
+        ${
+          d.special
+          ?
+          `<div class="small">⭐ ${escapeHTML(d.special)}</div>`
+          :
+          ""
+        }
 
-      }
+      `;
 
-
-      const key =
-        keyFromIndex(
-          index,
-          len
-        );
-
-
-      index++;
-
-      attempts++;
-
-
-      let trip;
-
-      try{
-
-        trip =
-          makeTrip(key);
-
-      }catch(e){
-
-        finishError(e);
-
-        return;
-
-      }
-
-
-      const t =
-        trip.slice(1);
-
-
-      /*
-       * 通常条件
-       */
-
-      if(
-        !matchConditions(
-          trip,
-          conditions
-        )
-      ){
-        continue;
-      }
-
-
-      /*
-       * 正規表現
-       */
-
-      if(
-        regex &&
-        !regex.test(t)
-      ){
-        continue;
-      }
-
-
-      /*
-       * 特殊トリップ
-       */
-
-      if(
-        selectedSpecials.length &&
-        !checkSpecial(
-          t,
-          selectedSpecials
-        )
-      ){
-        continue;
-      }
-
-
-      /*
-       * HIT
-       */
-
-      hits++;
-
-
-      addResult(
-        key,
-        trip,
-        selectedSpecials
-      );
-
+      document.getElementById("results")
+        .appendChild(r);
     }
 
+    if(d.type==="done"){
 
-    const elapsed =
-      (
-        performance.now() -
-        started
-      ) / 1000;
+      running=false;
 
+      document.getElementById("status").textContent=
+        `✅ 完了 / ${d.attempts.toLocaleString()} keys`+
+        ` / ${d.rate.toLocaleString()} keys/sec`+
+        ` / ユニーク ${d.unique.toLocaleString()}`+
+        ` / 重複 ${d.duplicate.toLocaleString()}`;
 
-    const rate =
-      Math.round(
-        attempts /
-        Math.max(
-          elapsed,
-          .001
-        )
-      );
+      if(worker){
 
+        worker.terminate();
+        worker=null;
+      }
+    }
 
-    $("status").textContent =
-      `🔎 検索中…
-       ${attempts.toLocaleString()} keys /
-       ${rate.toLocaleString()} keys/sec /
-       ヒット ${hits}`;
+    if(d.type==="error"){
 
+      running=false;
 
-    /*
-     * setTimeoutでUIへ制御を戻す
-     */
+      document.getElementById("status").textContent=
+        "❌ Workerエラー："+d.message;
 
-    timer =
-      setTimeout(
-        process,
-        0
-      );
+      if(worker){
 
-  }
+        worker.terminate();
+        worker=null;
+      }
+    }
+  };
 
+  worker.onerror=e=>{
 
-  process();
+    running=false;
 
+    console.error("Worker error:",e);
+
+    document.getElementById("status").textContent=
+      "❌ Workerエラー："+e.message;
+
+    if(worker){
+
+      worker.terminate();
+      worker=null;
+    }
+  };
+
+  worker.postMessage({
+
+    cmd:"start",
+
+    tripLen,
+
+    searchMode:
+      document.getElementById("searchMode").value,
+
+    unlimited:
+      attemptMode==="unlimited",
+
+    maxAttempts:
+      attemptMode==="unlimited"
+      ?0
+      :maxAttempts,
+
+    conditions,
+
+    regexText,
+
+    specials
+  });
 };
 
-
-/* ======================================================
-   Result
-====================================================== */
-
-function addResult(
-  key,
-  trip,
-  specials
-){
-
-  const r =
-    document.createElement(
-      "div"
-    );
-
-  r.className =
-    "result";
-
-
-  const specialText =
-    specials.length
-      ? `<div>⭐ ${specials.join(" / ")}</div>`
-      : "";
-
-
-  r.innerHTML = `
-
-    <div class="mono">
-      ${escapeHTML(trip)}
-    </div>
-
-    <div>
-      キー：
-      <span class="mono">
-        ${escapeHTML(key)}
-      </span>
-    </div>
-
-    ${specialText}
-
-  `;
-
-
-  $("results")
-    .appendChild(r);
-
-}
-
-
-/* ======================================================
-   Escape
-====================================================== */
+/* =========================================================
+   HTMLエスケープ
+========================================================= */
 
 function escapeHTML(s){
 
@@ -2174,80 +1088,7 @@ function escapeHTML(s){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
-
 }
-
-
-/* ======================================================
-   Stop
-====================================================== */
-
-$("stop").onclick = () => {
-
-  if(!searching){
-    return;
-  }
-
-
-  searching = false;
-
-
-  if(timer){
-
-    clearTimeout(timer);
-
-    timer = null;
-
-  }
-
-
-  $("status").textContent =
-    `⏹ 停止：
-     ${attempts.toLocaleString()} keys /
-     ヒット ${hits}`;
-
-};
-
-
-/* ======================================================
-   Finish
-====================================================== */
-
-function finish(){
-
-  searching = false;
-
-  timer = null;
-
-
-  $("status").textContent =
-    `✅ 完了：
-     ${attempts.toLocaleString()} keys /
-     ヒット ${hits}`;
-
-}
-
-
-/* ======================================================
-   Error
-====================================================== */
-
-function finishError(e){
-
-  searching = false;
-
-  timer = null;
-
-
-  $("status").textContent =
-    "❌ エラー：" +
-    e.message;
-
-  console.error(e);
-
-}
-
-
 </script>
 
 </body>
