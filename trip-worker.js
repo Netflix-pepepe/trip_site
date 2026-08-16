@@ -1,107 +1,149 @@
 /*
  * trip-worker.js
- * GitHub Pages / Web Worker対応
+ * GitHub Pages対応
+ *
+ * unix-crypt-td.min.jsをfetchしてWorker内で読み込む
  */
+
+let unixCryptTD = null;
+let stopped = false;
 
 
 /* =====================================================
-   unix-crypt-td-js 読み込み
+   cryptライブラリ読み込み
 ===================================================== */
 
-let unixCryptTD = null;
+async function loadCrypt() {
 
-try {
-
-  /*
-   * index.htmlと同じ場所から読み込む
-   */
-  const libURL =
+  const url =
     new URL(
       "./unix-crypt-td.min.js",
       self.location.href
     ).href;
 
-  importScripts(libURL);
+  console.log(
+    "[Worker] loading:",
+    url
+  );
 
 
-  /*
-   * 重要：
-   *
-   * unix-crypt-td.min.js は
-   *
-   * window.unixCryptTD = z
-   *
-   * という形式になっています。
-   *
-   * Web Workerにはwindowがないため、
-   * グローバル変数 z を取得します。
-   */
+  const response =
+    await fetch(
+      url,
+      {
+        cache: "no-store"
+      }
+    );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "unix-crypt-td.min.js HTTP " +
+      response.status
+    );
+
+  }
+
+
+  const source =
+    await response.text();
+
 
   if (
-    typeof self.z === "function"
+    !source ||
+    source.length < 100
   ) {
 
-    unixCryptTD =
-      self.z;
+    throw new Error(
+      "unix-crypt-td.min.jsの内容が空です"
+    );
 
   }
 
 
   /*
-   * 念のためunixCryptTD自身も確認
+   * ライブラリ本体は
+   *
+   * var z = function(){...}();
+   *
+   * という形式。
+   *
+   * Workerにはwindowがないので、
+   * new Function()で実行して
+   * zを直接取得する。
    */
 
+  const getCrypt =
+    new Function(
+      source +
+      "\nreturn z;"
+    );
+
+
+  const crypt =
+    getCrypt();
+
+
   if (
-    typeof self.unixCryptTD === "function"
+    typeof crypt !== "function"
   ) {
 
-    unixCryptTD =
-      self.unixCryptTD;
+    throw new Error(
+      "crypt関数の取得に失敗しました"
+    );
 
   }
 
 
-} catch (error) {
+  unixCryptTD =
+    crypt;
 
-  self.postMessage({
 
-    type: "error",
-
-    message:
-      "cryptライブラリ読み込みエラー: " +
-      error.message
-
-  });
+  console.log(
+    "[Worker] unixCryptTD ready"
+  );
 
 }
 
 
 /* =====================================================
-   読み込み確認
+   起動時ロード
 ===================================================== */
 
-if (
-  typeof unixCryptTD !== "function"
-) {
+const cryptReady =
+  loadCrypt()
+    .then(() => {
 
-  self.postMessage({
+      self.postMessage({
 
-    type: "error",
+        type: "ready"
 
-    message:
-      "unixCryptTD unavailable"
+      });
 
-  });
+    })
+    .catch(error => {
 
-} else {
+      console.error(
+        "[Worker] crypt load error:",
+        error
+      );
 
-  self.postMessage({
 
-    type: "ready"
+      self.postMessage({
 
-  });
+        type: "error",
 
-}
+        message:
+          "unix-crypt-td.min.jsの読み込み失敗: " +
+          error.message
+
+      });
+
+
+      throw error;
+
+    });
 
 
 /* =====================================================
@@ -144,6 +186,7 @@ function saltForTrip(key) {
           "`": "f"
 
         };
+
 
         return table[c] || c;
 
@@ -225,7 +268,7 @@ function keyFromIndex(
 
 
 /* =====================================================
-   MATCHER
+   MATCHER作成
 ===================================================== */
 
 function buildMatchers(
@@ -260,11 +303,14 @@ function buildMatchers(
           condition.mode,
 
         text:
-          condition.text
-            .replace(
-              /^◆/,
-              ""
-            )
+          String(
+            condition.text
+          )
+          .trim()
+          .replace(
+            /^◆/,
+            ""
+          )
 
       };
 
@@ -390,27 +436,17 @@ function matches(
 
 
 /* =====================================================
-   STATE
-===================================================== */
-
-let stopped =
-  false;
-
-
-/* =====================================================
-   MESSAGE
+   Worker
 ===================================================== */
 
 self.onmessage =
-  event => {
+  async event => {
 
     const data =
       event.data;
 
 
-    /* ================================
-       STOP
-    ================================= */
+    /* STOP */
 
     if (
       data.cmd === "stop"
@@ -424,9 +460,7 @@ self.onmessage =
     }
 
 
-    /* ================================
-       START以外
-    ================================= */
+    /* START */
 
     if (
       data.cmd !== "start"
@@ -437,9 +471,34 @@ self.onmessage =
     }
 
 
-    /* ================================
-       crypt確認
-    ================================= */
+    /*
+     * cryptライブラリの読み込みが
+     * 完了するまで待つ
+     */
+
+    try {
+
+      await cryptReady;
+
+    } catch (error) {
+
+      self.postMessage({
+
+        type: "error",
+
+        workerId:
+          data.workerId,
+
+        message:
+          "cryptライブラリを読み込めませんでした: " +
+          error.message
+
+      });
+
+      return;
+
+    }
+
 
     if (
       typeof unixCryptTD !==
@@ -454,7 +513,7 @@ self.onmessage =
           data.workerId,
 
         message:
-          "Worker内でunixCryptTDが使用できません。"
+          "unixCryptTD unavailable"
 
       });
 
@@ -495,9 +554,7 @@ self.onmessage =
       );
 
 
-    /* ================================
-       matcher
-    ================================= */
+    /* matcher */
 
     let matchers;
 
@@ -506,8 +563,7 @@ self.onmessage =
 
       matchers =
         buildMatchers(
-          data.conditions ||
-          []
+          data.conditions || []
         );
 
     } catch (error) {
@@ -529,21 +585,7 @@ self.onmessage =
     }
 
 
-    /* ================================
-       counter
-    ================================= */
-
-    let attempts =
-      0;
-
-
-    let found =
-      0;
-
-
-    /* ================================
-       search range
-    ================================= */
+    /* 検索範囲 */
 
     const total =
       Math.pow(
@@ -559,31 +601,33 @@ self.onmessage =
       );
 
 
-    /*
-     * Workerごとに分散
-     *
-     * Worker 0:
-     * 0, 4, 8, 12...
-     *
-     * Worker 1:
-     * 1, 5, 9, 13...
-     */
+    let attempts =
+      0;
 
-    let index =
-      workerId;
+
+    let found =
+      0;
 
 
     const started =
       performance.now();
 
 
+    /*
+     * Workerごとに分散
+     */
+
+    let index =
+      workerId;
+
+
     const PROGRESS_INTERVAL =
       5000;
 
 
-    /* ================================
-       search
-    ================================= */
+    /* =================================================
+       SEARCH
+    ================================================= */
 
     while (
       index < limit &&
@@ -605,9 +649,7 @@ self.onmessage =
       attempts++;
 
 
-      /* ==============================
-         match
-      =============================== */
+      /* MATCH */
 
       if (
         matches(
@@ -634,9 +676,7 @@ self.onmessage =
       }
 
 
-      /* ==============================
-         progress
-      =============================== */
+      /* PROGRESS */
 
       if (
         attempts %
@@ -659,15 +699,19 @@ self.onmessage =
       }
 
 
+      /*
+       * 次のWorker担当位置
+       */
+
       index +=
         workerCount;
 
     }
 
 
-    /* ================================
-       done
-    ================================= */
+    /* =================================================
+       DONE
+    ================================================= */
 
     const elapsed =
       (
