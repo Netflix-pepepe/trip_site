@@ -1,794 +1,672 @@
+/* =========================================================
+   人狼オンライン トリップ検索 Worker
+   ========================================================= */
+
 "use strict";
 
+let cryptReady = false;
+
 /*
-  trip-worker.js
-
-  index.html
-  trip-worker.js
-  unix-crypt-td.min.js
-
-  この3つを同じフォルダに置く。
-*/
-
-
-/* ========================================
-   unix-crypt-td.min.js を読み込む
-======================================== */
-
+ * 同じフォルダの unix-crypt-td.min.js を読み込む
+ * GitHub Pages / localhost の HTTP 配信なら正常に動作します。
+ */
 try {
+    importScripts("./unix-crypt-td.min.js");
 
-  const libUrl = new URL(
-    "./unix-crypt-td.min.js",
-    self.location.href
-  ).href;
-
-  console.log("Loading:", libUrl);
-
-  importScripts(libUrl);
+    if (typeof unixCryptTD === "function") {
+        cryptReady = true;
+        postMessage({
+            type: "ready"
+        });
+    } else {
+        throw new Error("unixCryptTD が定義されていません");
+    }
 
 } catch (e) {
 
-  postMessage({
-    type: "error",
-    message:
-      "unix-crypt-td.min.js の読み込み失敗: " +
-      e.message
-  });
-
+    postMessage({
+        type: "error",
+        message:
+            "unix-crypt-td.min.js の読み込みに失敗しました。\n" +
+            "Workerの場所: " + self.location.href + "\n" +
+            "エラー: " + e.message
+    });
 }
 
 
-/* ========================================
-   ライブラリ確認
-======================================== */
-
-if (typeof unixCryptTD !== "function") {
-
-  postMessage({
-    type: "error",
-    message:
-      "unixCryptTD unavailable。" +
-      "unix-crypt-td.min.js が正しく読み込まれていません。"
-  });
-
-} else {
-
-  postMessage({
-    type: "ready"
-  });
-
-}
-
-
-/* ========================================
-   停止フラグ
-======================================== */
-
-let stopped = false;
-
-
-/* ========================================
-   salt
-======================================== */
+/* =========================================================
+   トリップ生成
+   ========================================================= */
 
 function saltForTrip(key) {
+    let s = (key + "H.").slice(1, 3);
 
-  let s = (key + "H.").slice(1, 3);
+    s = s.replace(/[^\.-z]/g, ".");
 
-  s = s.replace(/[^\.-z]/g, ".");
+    s = s.replace(/[\:;<=>?@[\\\]^_`]/g, function (c) {
 
-  s = s.replace(
-    /[\:;<=>?@[\\\]^_`]/g,
-    function(c) {
+        const table = {
+            ":": "A",
+            ";": "B",
+            "<": "C",
+            "=": "D",
+            ">": "E",
+            "?": "F",
+            "@": "G",
+            "[": "a",
+            "\\": "b",
+            "]": "c",
+            "^": "d",
+            "_": "e",
+            "`": "f"
+        };
 
-      const table = {
-        ":": "A",
-        ";": "B",
-        "<": "C",
-        "=": "D",
-        ">": "E",
-        "?": "F",
-        "@": "G",
-        "[": "a",
-        "\\": "b",
-        "]": "c",
-        "^": "d",
-        "_": "e",
-        "`": "f"
-      };
+        return table[c] || c;
+    });
 
-      return table[c] || c;
-    }
-  );
-
-  return s;
+    return s;
 }
 
-
-/* ========================================
-   トリップ生成
-======================================== */
 
 function makeTrip(key) {
 
-  if (typeof unixCryptTD !== "function") {
-    throw new Error(
-      "unixCryptTD unavailable"
-    );
-  }
+    if (!cryptReady || typeof unixCryptTD !== "function") {
+        throw new Error("unixCryptTD unavailable");
+    }
 
-  return "◆" +
-    unixCryptTD(
-      key,
-      saltForTrip(key)
-    ).slice(-10);
+    return "◆" +
+        unixCryptTD(
+            key,
+            saltForTrip(key)
+        ).slice(-10);
 }
 
 
-/* ========================================
-   文字
-======================================== */
-
-const CHARS =
-  "abcdefghijklmnopqrstuvwxyz" +
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-  "0123456789./";
-
-
-/* ========================================
-   インデックス → キー
-======================================== */
-
-function keyFromIndex(index, len) {
-
-  let out = "";
-
-  for (let i = 0; i < len; i++) {
-
-    out =
-      CHARS[index % CHARS.length] +
-      out;
-
-    index =
-      Math.floor(index / CHARS.length);
-  }
-
-  return out;
-}
-
-
-/* ========================================
-   通常条件
-======================================== */
-
-function normalMatches(trip, needles) {
-
-  const t = trip.slice(1);
-
-  return needles.every(function(n) {
-
-    if (n.mode === "prefix") {
-      return t.startsWith(n.text);
-    }
-
-    if (n.mode === "suffix") {
-      return t.endsWith(n.text);
-    }
-
-    if (n.mode === "exact") {
-      return t === n.text;
-    }
-
-    return t.includes(n.text);
-  });
-}
-
-
-/* ========================================
-   正規表現
-======================================== */
-
-function regexMatches(trip, needles) {
-
-  const t = trip.slice(1);
-
-  return needles.every(function(n) {
-
-    try {
-
-      return new RegExp(n.text).test(t);
-
-    } catch (e) {
-
-      return false;
-
-    }
-
-  });
-}
-
-
-/* ========================================
-   純n連
-======================================== */
+/* =========================================================
+   特殊トリップ判定
+   ========================================================= */
 
 function pureN(t) {
 
-  for (let i = 0; i < t.length; i++) {
+    let max = 1;
+    let current = 1;
 
-    let count = 1;
+    for (let i = 1; i < t.length; i++) {
 
-    for (
-      let j = i + 1;
-      j < t.length && t[j] === t[i];
-      j++
-    ) {
-
-      count++;
-
+        if (t[i] === t[i - 1]) {
+            current++;
+            if (current > max) max = current;
+        } else {
+            current = 1;
+        }
     }
 
-    if (count >= 8) {
-      return true;
-    }
-  }
-
-  return false;
+    return max;
 }
 
 
-/* ========================================
-   準n連
-======================================== */
+function quasiN(t) {
 
-function semiN(t) {
+    let max = 1;
+    let current = 1;
 
-  for (let i = 0; i < t.length; i++) {
+    for (let i = 1; i < t.length; i++) {
 
-    let count = 1;
-
-    const c =
-      t[i].toLowerCase();
-
-    for (
-      let j = i + 1;
-      j < t.length &&
-      t[j].toLowerCase() === c;
-      j++
-    ) {
-
-      count++;
-
+        if (
+            t[i].toLowerCase() ===
+            t[i - 1].toLowerCase()
+        ) {
+            current++;
+            if (current > max) max = current;
+        } else {
+            current = 1;
+        }
     }
 
-    if (count >= 9) {
-      return true;
+    return max;
+}
+
+
+function isNStructure(t) {
+
+    return new Set(t.split("")).size <= 2;
+}
+
+
+function isLongest(t) {
+
+    return /^[MmW]+$/.test(t);
+}
+
+
+function isShortest(t) {
+
+    return /^[li.]+$/.test(t);
+}
+
+
+function isYakumo(t) {
+
+    /*
+     * 3文字ずつ同じ文字
+     *
+     * 例:
+     * aaa
+     * ttt
+     * www
+     * + 余り1文字
+     */
+
+    const usable = t.length - (t.length % 3);
+
+    if (usable < 3) return false;
+
+    for (let i = 0; i < usable; i += 3) {
+
+        if (
+            t[i] !== t[i + 1] ||
+            t[i] !== t[i + 2]
+        ) {
+            return false;
+        }
     }
-  }
 
-  return false;
+    return true;
 }
 
 
-/* ========================================
-   二構
-======================================== */
+function isMirror(t) {
 
-function twoStructure(t) {
+    const pairs = {
+        "a": "a",
+        "b": "d",
+        "d": "b",
+        "o": "o",
+        "p": "q",
+        "q": "p",
+        "v": "v",
+        "w": "w",
+        "x": "x",
+        ".": ".",
+        "0": "0",
+        "8": "8",
+        "A": "A",
+        "H": "H",
+        "I": "I",
+        "M": "M",
+        "O": "O",
+        "T": "T",
+        "U": "U",
+        "V": "V",
+        "W": "W",
+        "X": "X",
+        "Y": "Y",
+        "l": "l",
+        "i": "i"
+    };
 
-  return new Set(t).size === 2;
-}
+    for (let i = 0; i < Math.floor(t.length / 2); i++) {
 
+        const a = t[i];
+        const b = t[t.length - 1 - i];
 
-/* ========================================
-   最長
-======================================== */
-
-function longest(t) {
-
-  return /^[MmW]+$/.test(t);
-}
-
-
-/* ========================================
-   最短
-======================================== */
-
-function shortest(t) {
-
-  return /^[li.]+$/.test(t);
-}
-
-
-/* ========================================
-   八雲
-======================================== */
-
-function yakumo(t) {
-
-  if (t.length !== 10) {
-    return false;
-  }
-
-  for (let i = 0; i < 9; i += 3) {
-
-    if (
-      t[i] !== t[i + 1] ||
-      t[i] !== t[i + 2]
-    ) {
-
-      return false;
-
+        if (pairs[a] !== b) {
+            return false;
+        }
     }
-  }
 
-  return true;
+    return true;
 }
 
 
-/* ========================================
-   鏡
-======================================== */
+function isPalindrome(t) {
 
-function mirror(t) {
+    for (let i = 0; i < Math.floor(t.length / 2); i++) {
 
-  const map = {
-
-    ".": ".",
-    "0": "0",
-    "8": "8",
-
-    "A": "A",
-    "H": "H",
-    "I": "I",
-    "M": "M",
-    "O": "O",
-    "T": "T",
-    "U": "U",
-    "V": "V",
-    "W": "W",
-    "X": "X",
-    "Y": "Y",
-
-    "b": "d",
-    "d": "b",
-
-    "i": "i",
-    "l": "l",
-    "o": "o",
-
-    "p": "q",
-    "q": "p",
-
-    "v": "v",
-    "w": "w",
-    "x": "x"
-  };
-
-  for (let i = 0; i < t.length; i++) {
-
-    const a = t[i];
-
-    const b =
-      t[t.length - 1 - i];
-
-    if (map[a] !== b) {
-      return false;
+        if (
+            t[i] !==
+            t[t.length - 1 - i]
+        ) {
+            return false;
+        }
     }
-  }
 
-  return true;
+    return true;
 }
 
 
-/* ========================================
-   回文
-======================================== */
+function isEcho(t) {
 
-function palindrome(t) {
-
-  for (
-    let i = 0;
-    i < t.length / 2;
-    i++
-  ) {
-
-    if (
-      t[i] !==
-      t[t.length - 1 - i]
-    ) {
-
-      return false;
-
-    }
-  }
-
-  return true;
-}
-
-
-/* ========================================
-   山彦
-======================================== */
-
-function echo(t) {
-
-  if (t.length % 2 !== 0) {
-    return false;
-  }
-
-  const half =
-    t.length / 2;
-
-  return (
-    t.slice(0, half) ===
-    t.slice(half)
-  );
-}
-
-
-/* ========================================
-   双連
-======================================== */
-
-function doublePair(t) {
-
-  if (t.length % 2 !== 0) {
-    return false;
-  }
-
-  for (
-    let i = 0;
-    i < t.length;
-    i += 2
-  ) {
-
-    if (t[i] !== t[i + 1]) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-/* ========================================
-   全数
-======================================== */
-
-function numberOnly(t) {
-
-  return /^[0-9]+$/.test(t);
-}
-
-
-/* ========================================
-   飛石
-======================================== */
-
-function stepping(t) {
-
-  for (let i = 0; i < t.length; i++) {
-
-    if (i % 2 === 0) {
-
-      if (!/[\/.]/.test(t[i])) {
+    if (t.length % 2 !== 0) {
         return false;
-      }
+    }
+
+    const half = t.length / 2;
+
+    return (
+        t.slice(0, half) ===
+        t.slice(half)
+    );
+}
+
+
+function isDoublePair(t) {
+
+    for (let i = 0; i < t.length; i += 2) {
+
+        if (
+            t[i] !== t[i + 1]
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+function isAllNumber(t) {
+
+    return /^[0-9]+$/.test(t);
+}
+
+
+function isTobiishi(t) {
+
+    for (let i = 0; i < t.length; i++) {
+
+        if (
+            i % 2 === 0
+        ) {
+            continue;
+        }
+
+        if (
+            t[i] !== "." &&
+            t[i] !== "/"
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+function isKakutobi(t) {
+
+    /*
+     * 奇数位置に区切りとして
+     * 同じ文字が入るタイプ
+     */
+
+    if (t.length < 4) return false;
+
+    const separator = t[1];
+
+    for (let i = 1; i < t.length; i += 2) {
+
+        if (t[i] !== separator) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+/* =========================================================
+   特殊トリップ総合判定
+   ========================================================= */
+
+function specialMatches(t, type) {
+
+    switch (type) {
+
+        case "pure8":
+            return pureN(t) >= 8;
+
+        case "pure9":
+            return pureN(t) >= 9;
+
+        case "pure10":
+            return pureN(t) >= 10;
+
+        case "quasi9":
+            return quasiN(t) >= 9;
+
+        case "quasi10":
+            return quasiN(t) >= 10;
+
+        case "two":
+            return isNStructure(t);
+
+        case "longest":
+            return isLongest(t);
+
+        case "shortest":
+            return isShortest(t);
+
+        case "yakumo":
+            return isYakumo(t);
+
+        case "mirror":
+            return isMirror(t);
+
+        case "palindrome":
+            return isPalindrome(t);
+
+        case "echo":
+            return isEcho(t);
+
+        case "double":
+            return isDoublePair(t);
+
+        case "number":
+            return isAllNumber(t);
+
+        case "tobiishi":
+            return isTobiishi(t);
+
+        case "kakutobi":
+            return isKakutobi(t);
+
+        default:
+            return true;
+    }
+}
+
+
+/* =========================================================
+   正規表現
+   ========================================================= */
+
+function regexMatches(t, pattern) {
+
+    try {
+
+        const re = new RegExp(pattern);
+
+        return re.test(t);
+
+    } catch (e) {
+
+        return false;
+    }
+}
+
+
+/* =========================================================
+   通常条件
+   ========================================================= */
+
+function normalMatches(t, needles) {
+
+    return needles.every(function (n) {
+
+        if (!n.text) {
+            return true;
+        }
+
+        if (n.regex) {
+            return regexMatches(
+                t,
+                n.text
+            );
+        }
+
+        if (n.mode === "prefix") {
+            return t.startsWith(n.text);
+        }
+
+        if (n.mode === "suffix") {
+            return t.endsWith(n.text);
+        }
+
+        return t.includes(n.text);
+    });
+}
+
+
+/* =========================================================
+   Worker
+   ========================================================= */
+
+let stopped = false;
+
+self.onmessage = function (event) {
+
+    const data = event.data;
+
+    if (data.cmd === "stop") {
+
+        stopped = true;
+
+        return;
+    }
+
+    if (data.cmd !== "start") {
+        return;
+    }
+
+    if (!cryptReady) {
+
+        postMessage({
+            type: "error",
+            message:
+                "unixCryptTD unavailable"
+        });
+
+        return;
+    }
+
+    stopped = false;
+
+    const chars =
+        data.chars;
+
+    const len =
+        data.remainingLen;
+
+    const prefix =
+        data.prefix || "";
+
+    const maxAttempts =
+        data.maxAttempts;
+
+    const unlimited =
+        data.unlimited === true;
+
+    const needles =
+        data.needles || [];
+
+    const special =
+        data.special || "none";
+
+    let attempts = 0;
+    let found = 0;
+
+    const startTime =
+        performance.now();
+
+
+    function keyFromIndex(index) {
+
+        let out = "";
+
+        for (
+            let i = 0;
+            i < len;
+            i++
+        ) {
+
+            out =
+                chars[index % chars.length] +
+                out;
+
+            index =
+                Math.floor(
+                    index / chars.length
+                );
+        }
+
+        return out;
+    }
+
+
+    /*
+     * 全探索空間
+     *
+     * 10^10 などは Number の
+     * 安全整数を超える可能性があるため
+     * 実際の停止条件は unlimited /
+     * maxAttempts で管理する。
+     */
+
+    let limit;
+
+    if (unlimited) {
+
+        limit = Number.MAX_SAFE_INTEGER;
 
     } else {
 
-      if (/[\/.]/.test(t[i])) {
-        return false;
-      }
-
+        limit =
+            Math.min(
+                Number.MAX_SAFE_INTEGER,
+                Math.max(1, maxAttempts)
+            );
     }
-  }
 
-  return true;
-}
-
-
-/* ========================================
-   拡飛
-======================================== */
-
-function wideStepping(t) {
-
-  if (t.length < 3) {
-    return false;
-  }
-
-  /*
-    例:
-
-    oUlUEUDUDU
-
-    のように、
-    1文字ごとに同じ区切り文字が
-    入るタイプを判定。
-  */
-
-  const separator = t[1];
-
-  for (
-    let i = 1;
-    i < t.length;
-    i += 2
-  ) {
-
-    if (t[i] !== separator) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-/* ========================================
-   特殊判定
-======================================== */
-
-function specialMatches(trip, type) {
-
-  if (!type) {
-    return true;
-  }
-
-  const t = trip.slice(1);
-
-  switch (type) {
-
-    case "pure":
-      return pureN(t);
-
-    case "semi":
-      return semiN(t);
-
-    case "two":
-      return twoStructure(t);
-
-    case "long":
-      return longest(t);
-
-    case "short":
-      return shortest(t);
-
-    case "yakumo":
-      return yakumo(t);
-
-    case "mirror":
-      return mirror(t);
-
-    case "palindrome":
-      return palindrome(t);
-
-    case "echo":
-      return echo(t);
-
-    case "double":
-      return doublePair(t);
-
-    case "number":
-      return numberOnly(t);
-
-    case "stepping":
-      return stepping(t);
-
-    case "wideStepping":
-      return wideStepping(t);
-
-    default:
-      return true;
-  }
-}
-
-
-/* ========================================
-   Worker
-======================================== */
-
-self.onmessage = function(e) {
-
-  const data = e.data;
-
-  if (data.cmd === "stop") {
-
-    stopped = true;
-
-    return;
-  }
-
-
-  if (data.cmd !== "start") {
-    return;
-  }
-
-
-  if (typeof unixCryptTD !== "function") {
-
-    postMessage({
-
-      type: "error",
-
-      message:
-        "unixCryptTD unavailable"
-
-    });
-
-    return;
-  }
-
-
-  stopped = false;
-
-
-  const tripLen =
-    Number(data.tripLen);
-
-  const needles =
-    data.needles || [];
-
-  const searchMode =
-    data.searchMode || "normal";
-
-  const special =
-    data.special || "";
-
-
-  let attempts = 0;
-
-  let found = 0;
-
-  let index = 0;
-
-
-  const started =
-    performance.now();
-
-
-  /*
-    最大試行回数なし。
-    条件にヒットするか、
-    停止するまで続ける。
-  */
-
-  const total =
-    Math.pow(
-      CHARS.length,
-      tripLen
-    );
-
-
-  const BATCH = 1000;
-
-
-  while (
-    index < total &&
-    !stopped
-  ) {
 
     for (
-      let i = 0;
-      i < BATCH &&
-      index < total &&
-      !stopped;
-      i++
+        let index = 0;
+        index < limit;
+        index++
     ) {
 
-      const key =
-        keyFromIndex(
-          index,
-          tripLen
+        if (stopped) {
+            break;
+        }
+
+        const key =
+            prefix +
+            keyFromIndex(index);
+
+        let trip;
+
+        try {
+
+            trip =
+                makeTrip(key);
+
+        } catch (e) {
+
+            postMessage({
+                type: "error",
+                message: e.message
+            });
+
+            return;
+        }
+
+        attempts++;
+
+
+        /*
+         * 通常条件
+         */
+
+        let normalOK =
+            normalMatches(
+                trip.slice(1),
+                needles
+            );
+
+
+        /*
+         * 特殊トリップ
+         */
+
+        let specialOK = true;
+
+        if (special !== "none") {
+
+            specialOK =
+                specialMatches(
+                    trip.slice(1),
+                    special
+                );
+        }
+
+
+        if (
+            normalOK &&
+            specialOK
+        ) {
+
+            found++;
+
+            postMessage({
+                type: "hit",
+                item: {
+                    key: key,
+                    trip: trip
+                }
+            });
+        }
+
+
+        /*
+         * 進捗
+         */
+
+        if (
+            attempts % 1000 === 0
+        ) {
+
+            const seconds =
+                (performance.now() -
+                    startTime) / 1000;
+
+            const rate =
+                Math.round(
+                    attempts /
+                    Math.max(
+                        seconds,
+                        0.001
+                    )
+                );
+
+            postMessage({
+                type: "progress",
+                attempts: attempts,
+                rate: rate,
+                found: found
+            });
+        }
+    }
+
+
+    const seconds =
+        (performance.now() -
+            startTime) / 1000;
+
+    const rate =
+        Math.round(
+            attempts /
+            Math.max(
+                seconds,
+                0.001
+            )
         );
 
 
-      const trip =
-        makeTrip(key);
-
-
-      attempts++;
-
-
-      let matched;
-
-
-      if (searchMode === "regex") {
-
-        matched =
-          regexMatches(
-            trip,
-            needles
-          );
-
-      } else {
-
-        matched =
-          normalMatches(
-            trip,
-            needles
-          );
-      }
-
-
-      if (
-        matched &&
-        specialMatches(
-          trip,
-          special
-        )
-      ) {
-
-        found++;
-
-
-        postMessage({
-
-          type: "hit",
-
-          item: {
-            key: key,
-            trip: trip
-          }
-
-        });
-      }
-
-
-      index++;
-
-    }
-
-
-    if (
-      attempts % 1000 === 0
-    ) {
-
-      const sec =
-        (performance.now() - started) / 1000;
-
-
-      postMessage({
-
-        type: "progress",
-
+    postMessage({
+        type: "done",
         attempts: attempts,
-
-        rate:
-          Math.round(
-            attempts /
-            Math.max(sec, 0.001)
-          ),
-
-        found: found
-
-      });
-
-    }
-  }
-
-
-  const sec =
-    (performance.now() - started) / 1000;
-
-
-  postMessage({
-
-    type: "done",
-
-    attempts: attempts,
-
-    rate:
-      Math.round(
-        attempts /
-        Math.max(sec, 0.001)
-      ),
-
-    found: found,
-
-    stopped: stopped
-
-  });
-
+        rate: rate,
+        found: found,
+        stopped: stopped
+    });
 };
