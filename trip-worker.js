@@ -1,26 +1,50 @@
 "use strict";
 
-
 /*
-============================================================
   IMPORTANT
 
-  CDNは使わない。
+  このファイルと同じフォルダに
 
-  GitHub Pages上の
+  unix-crypt-td.min.js
 
-  ./unix-crypt-td.min.js
+  を置く。
 
-  をWorkerから直接読み込む。
-============================================================
+  CDNは使用しない。
 */
 
-importScripts("./unix-crypt-td.min.js");
+
+const LIB =
+  new URL(
+    "./unix-crypt-td.min.js",
+    self.location.href
+  ).href;
 
 
-/* ==========================================================
-   初期確認
-========================================================== */
+/* =========================
+   ライブラリ読み込み
+========================= */
+
+try{
+
+  importScripts(LIB);
+
+}catch(e){
+
+  postMessage({
+
+    type:"error",
+
+    message:
+      "unix-crypt-td.min.js の読み込みに失敗しました。"
+
+  });
+
+}
+
+
+/* =========================
+   確認
+========================= */
 
 if(typeof unixCryptTD !== "function"){
 
@@ -29,8 +53,7 @@ if(typeof unixCryptTD !== "function"){
     type:"error",
 
     message:
-      "unixCryptTD unavailable。"+
-      "unix-crypt-td.min.js が同じフォルダにあるか確認してください。"
+      "unixCryptTD unavailable"
 
   });
 
@@ -43,57 +66,51 @@ if(typeof unixCryptTD !== "function"){
 }
 
 
-/* ==========================================================
-   Trip生成
-========================================================== */
+/* =========================
+   トリップ
+========================= */
 
 function saltForTrip(key){
 
-  let s=
-    (key+"H.")
-    .slice(1,3);
+  let s=(key+"H.").slice(1,3);
 
-  s=
-    s.replace(/[^\x2e-\x7a]/g,".");
+  s=s.replace(/[^\.-z]/g,".");
 
-  s=
-    s.replace(
-      /[\x3a-\x40\x5b-\x60]/g,
-      function(c){
+  s=s.replace(
+    /[\:;<=>?@[\\\]^_`]/g,
+    c=>{
 
-        const table={
+      const table={
 
-          ":":"A",
-          ";":"B",
-          "<":"C",
-          "=":"D",
-          ">":"E",
-          "?":"F",
-          "@":"G",
+        ":":"A",
+        ";":"B",
+        "<":"C",
+        "=":"D",
+        ">":"E",
+        "?":"F",
+        "@":"G",
+        "[":"a",
+        "\\":"b",
+        "]":"c",
+        "^":"d",
+        "_":"e",
+        "`":"f"
 
-          "[":"a",
-          "\\":"b",
-          "]":"c",
-          "^":"d",
-          "_":"e",
-          "`":"f"
+      };
 
-        };
+      return table[c] || c;
 
-        return table[c] || c;
-
-      }
-    );
+    }
+  );
 
   return s;
+
 }
 
 
 function makeTrip(key){
 
-  if(
-    typeof unixCryptTD !== "function"
-  ){
+  if(typeof unixCryptTD !== "function"){
 
     throw new Error(
       "unixCryptTD unavailable"
@@ -110,42 +127,33 @@ function makeTrip(key){
 }
 
 
-/* ==========================================================
-   キー文字
-========================================================== */
+/* =========================
+   キー生成
+========================= */
 
-const CHARS=
-  "abcdefghijklmnopqrstuvwxyz"+
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"+
+const CHARS =
+  "abcdefghijklmnopqrstuvwxyz" +
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
   "0123456789./";
 
 
-/* ==========================================================
-   順番探索用
-========================================================== */
-
 function keyFromIndex(
   index,
+  chars,
   len
 ){
 
   let out="";
 
-  for(
-    let i=0;
-    i<len;
-    i++
-  ){
+  for(let i=0;i<len;i++){
 
-    out=
-      CHARS[
-        index % CHARS.length
-      ]+
+    out =
+      chars[index % chars.length] +
       out;
 
-    index=
+    index =
       Math.floor(
-        index/CHARS.length
+        index / chars.length
       );
 
   }
@@ -155,145 +163,86 @@ function keyFromIndex(
 }
 
 
-/* ==========================================================
-   ランダムキー
-========================================================== */
+/* =========================
+   通常条件
+========================= */
 
-function randomKey(len){
-
-  let out="";
-
-  for(
-    let i=0;
-    i<len;
-    i++
-  ){
-
-    out+=
-      CHARS[
-        Math.floor(
-          Math.random()*CHARS.length
-        )
-      ];
-
-  }
-
-  return out;
-
-}
-
-
-/* ==========================================================
-   条件判定
-========================================================== */
-
-function basicMatches(
+function normalMatches(
   trip,
   needles
 ){
 
-  const t=
-    trip.replace(/^◆/,"");
+  const t=trip.slice(1);
 
-  return needles.every(
-    function(n){
+  return needles.every(n=>{
 
-      const text=
-        String(n.text)
-        .replace(/^◆/,"");
+    if(n.mode==="prefix")
+      return t.startsWith(n.text);
 
-      if(
-        n.mode==="prefix"
-      ){
+    if(n.mode==="suffix")
+      return t.endsWith(n.text);
 
-        return t.startsWith(text);
+    if(n.mode==="exact")
+      return t===n.text;
 
-      }
+    return t.includes(n.text);
 
-      if(
-        n.mode==="suffix"
-      ){
-
-        return t.endsWith(text);
-
-      }
-
-      return t.includes(text);
-
-    }
-  );
+  });
 
 }
 
 
-/* ==========================================================
+/* =========================
    正規表現
-========================================================== */
+========================= */
 
 function regexMatches(
   trip,
-  regex
+  needles
 ){
 
-  if(!regex){
-    return true;
-  }
+  const t=trip.slice(1);
 
-  try{
+  return needles.every(n=>{
 
-    return new RegExp(
-      regex
-    ).test(
-      trip.replace(/^◆/,"")
-    );
+    try{
 
-  }catch(e){
+      const re =
+        new RegExp(n.text);
 
-    return false;
+      return re.test(t);
 
-  }
+    }catch(e){
+
+      return false;
+
+    }
+
+  });
 
 }
 
 
-/* ==========================================================
-   純n連
+/* =========================
+   特殊トリップ
+========================= */
 
-   同じ文字がn回以上連続
-========================================================== */
+function pureN(t){
 
-function pureN(
-  t,
-  n
-){
+  for(let n=10;n>=8;n--){
 
-  for(
-    let i=0;
-    i<=t.length-n;
-    i++
-  ){
-
-    let good=true;
-
-    for(
-      let j=1;
-      j<n;
-      j++
-    ){
+    for(let i=0;i<=t.length-n;i++){
 
       if(
-        t[i]!==t[i+j]
+        t.slice(i,i+n)
+        .split("")
+        .every(c=>c===t[i])
       ){
 
-        good=false;
-        break;
+        return true;
 
       }
 
-    }
-
-    if(good){
-      return true;
     }
 
   }
@@ -303,112 +252,121 @@ function pureN(
 }
 
 
-/* ==========================================================
-   準n連
+function semiN(t){
 
-   大文字小文字を無視
-========================================================== */
+  for(let n=10;n>=9;n--){
 
-function junN(
-  t,
-  n
-){
+    for(let i=0;i<=t.length-n;i++){
 
-  const s=
-    t.toLowerCase();
+      const x=t[i].toLowerCase();
 
-  return pureN(
-    s,
-    n
-  );
+      if(
+        t.slice(i,i+n)
+        .split("")
+        .every(
+          c=>c.toLowerCase()===x
+        )
+      ){
+
+        return true;
+
+      }
+
+    }
+
+  }
+
+  return false;
 
 }
 
 
-/* ==========================================================
-   二構
-
-   2種類以下
-========================================================== */
-
-function doubleType(t){
+function twoStructure(t){
 
   return new Set(t).size===2;
 
 }
 
 
-/* ==========================================================
-   最長
-
-   [MmW]
-========================================================== */
-
-function saicho(t){
+function longest(t){
 
   return /^[MmW]+$/.test(t);
 
 }
 
 
-/* ==========================================================
-   最短
-
-   [li.]
-========================================================== */
-
-function saitan(t){
+function shortest(t){
 
   return /^[li.]+$/.test(t);
 
 }
 
 
-/* ==========================================================
-   八雲
-
-   3文字ずつ同じ文字
-
-   10桁:
-   AAA BBB CCC X
-
-   12桁:
-   AAA BBB CCC DDD
-========================================================== */
-
 function yakumo(t){
 
-  let count=0;
+  if(t.length===10){
 
-  for(
-    let i=0;
-    i+2<t.length;
-    i+=3
-  ){
-
-    if(
-      t[i]===t[i+1] &&
-      t[i]===t[i+2]
-    ){
-
-      count++;
-
-    }else{
-
-      return false;
-
-    }
+    return /^(.)(\1){2}(.)(\2){2}(.)(\3){2}.$/.test(t);
 
   }
 
-  return count>=3;
+  return false;
 
 }
 
 
-/* ==========================================================
-   回文
-========================================================== */
+function mirror(t){
+
+  const map={
+
+    ".":".",
+    "0":"0",
+    "8":"8",
+    "A":"A",
+    "H":"H",
+    "I":"I",
+    "M":"M",
+    "O":"O",
+    "T":"T",
+    "U":"U",
+    "V":"V",
+    "W":"W",
+    "X":"X",
+    "Y":"Y",
+
+    "b":"d",
+    "d":"b",
+
+    "i":"i",
+    "l":"l",
+    "o":"o",
+    "p":"q",
+    "q":"p",
+    "v":"v",
+    "w":"w",
+    "x":"x"
+
+  };
+
+  for(
+    let i=0;
+    i<t.length;
+    i++
+  ){
+
+    const a=t[i];
+
+    const b=t[t.length-1-i];
+
+    if(map[a]!==b)
+      return false;
+
+  }
+
+  return true;
+
+}
+
 
 function palindrome(t){
 
@@ -419,7 +377,8 @@ function palindrome(t){
   ){
 
     if(
-      t[i]!==t[t.length-1-i]
+      t[i] !==
+      t[t.length-1-i]
     ){
 
       return false;
@@ -432,121 +391,26 @@ function palindrome(t){
 
 }
 
-
-/* ==========================================================
-   鏡
-
-   文字そのものではなく、
-   左右反転して同じに見える文字を対応させる。
-
-   対応は一般的な鏡文字を採用。
-========================================================== */
-
-const MIRROR_MAP={
-
-  ".":".",
-
-  "0":"0",
-  "8":"8",
-
-  "A":"A",
-  "H":"H",
-  "I":"I",
-  "M":"M",
-  "O":"O",
-  "T":"T",
-  "U":"U",
-  "V":"V",
-  "W":"W",
-  "X":"X",
-  "Y":"Y",
-
-  "b":"d",
-  "d":"b",
-
-  "p":"q",
-  "q":"p",
-
-  "l":"l",
-  "i":"i",
-
-  "o":"o",
-  "v":"v",
-  "w":"w"
-};
-
-
-function mirror(t){
-
-  for(
-    let i=0;
-    i<t.length;
-    i++
-  ){
-
-    const a=
-      t[i];
-
-    const b=
-      t[t.length-1-i];
-
-    if(
-      MIRROR_MAP[a]!==b
-    ){
-
-      return false;
-
-    }
-
-  }
-
-  return true;
-
-}
-
-
-/* ==========================================================
-   山彦
-
-   前半 = 後半
-========================================================== */
 
 function echo(t){
 
-  if(
-    t.length%2!==0
-  ){
-
+  if(t.length%2!==0)
     return false;
 
-  }
-
-  const half=
-    t.length/2;
+  const half=t.length/2;
 
   return(
-    t.slice(0,half)===
+    t.slice(0,half) ===
     t.slice(half)
   );
 
 }
 
 
-/* ==========================================================
-   双連
+function doublePair(t){
 
-   AA BB CC DD ...
-========================================================== */
-
-function pair(t){
-
-  if(
-    t.length%2!==0
-  ){
-
+  if(t.length%2!==0)
     return false;
-
-  }
 
   for(
     let i=0;
@@ -555,7 +419,8 @@ function pair(t){
   ){
 
     if(
-      t[i]!==t[i+1]
+      t[i] !==
+      t[i+1]
     ){
 
       return false;
@@ -568,10 +433,6 @@ function pair(t){
 
 }
 
-
-/* ==========================================================
-   全数
-========================================================== */
 
 function numberOnly(t){
 
@@ -580,31 +441,14 @@ function numberOnly(t){
 }
 
 
-/* ==========================================================
-   飛石
-
-   / と . を交互に使用
-
-   例:
-   Z.y.O.6.0.
-
-========================================================== */
-
 function stepping(t){
 
-  for(
-    let i=0;
-    i<t.length;
-    i++
-  ){
-
-    const expected=
-      i%2===1
-      ? /[/.]/
-      : /[^/.]/;
+  for(let i=0;i<t.length;i++){
 
     if(
-      !expected.test(t[i])
+      i%2===0
+        ? !/[\/.]/.test(t[i])
+        : /[\/.]/.test(t[i])
     ){
 
       return false;
@@ -618,36 +462,18 @@ function stepping(t){
 }
 
 
-/* ==========================================================
-   拡飛
+function wideStepping(t){
 
-   同じ文字で区切る
-
-   例:
-   oUlUEUDUDU
-
-   位置 1,3,5... が同じ文字
-   ==========================================================
-*/
-
-function expanded(t){
-
-  if(t.length<3){
+  if(t.length<2)
     return false;
-  }
-
-  const separator=
-    t[1];
 
   for(
     let i=1;
     i<t.length;
-    i+=2
+    i++
   ){
 
-    if(
-      t[i]!==separator
-    ){
+    if(t[i]!==t[i-2] && i>=2){
 
       return false;
 
@@ -660,36 +486,32 @@ function expanded(t){
 }
 
 
-/* ==========================================================
-   特殊判定
-========================================================== */
-
 function specialMatches(
   trip,
-  type,
-  n
+  type
 ){
 
-  const t=
-    trip.replace(/^◆/,"");
+  if(!type)
+    return true;
 
+  const t=trip.slice(1);
 
   switch(type){
 
     case "pure":
-      return pureN(t,n||8);
+      return pureN(t);
 
-    case "jun":
-      return junN(t,n||8);
+    case "semi":
+      return semiN(t);
 
-    case "double":
-      return doubleType(t);
+    case "two":
+      return twoStructure(t);
 
-    case "saicho":
-      return saicho(t);
+    case "long":
+      return longest(t);
 
-    case "saitan":
-      return saitan(t);
+    case "short":
+      return shortest(t);
 
     case "yakumo":
       return yakumo(t);
@@ -703,8 +525,8 @@ function specialMatches(
     case "echo":
       return echo(t);
 
-    case "pair":
-      return pair(t);
+    case "double":
+      return doublePair(t);
 
     case "number":
       return numberOnly(t);
@@ -712,8 +534,8 @@ function specialMatches(
     case "stepping":
       return stepping(t);
 
-    case "expanded":
-      return expanded(t);
+    case "wideStepping":
+      return wideStepping(t);
 
     default:
       return true;
@@ -723,73 +545,19 @@ function specialMatches(
 }
 
 
-/* ==========================================================
-   全条件
-========================================================== */
-
-function matchesAll(
-  trip,
-  data
-){
-
-  if(
-    !basicMatches(
-      trip,
-      data.needles
-    )
-  ){
-
-    return false;
-
-  }
-
-
-  if(
-    !regexMatches(
-      trip,
-      data.regexSource
-    )
-  ){
-
-    return false;
-
-  }
-
-
-  if(
-    data.special &&
-    !specialMatches(
-      trip,
-      data.special,
-      data.specialN
-    )
-  ){
-
-    return false;
-
-  }
-
-
-  return true;
-
-}
-
-
-/* ==========================================================
-   検索
-========================================================== */
+/* =========================
+   停止
+========================= */
 
 let stopped=false;
 
 
-self.onmessage=function(e){
+self.onmessage=e=>{
 
   const data=e.data;
 
 
-  if(
-    data.cmd==="stop"
-  ){
+  if(data.cmd==="stop"){
 
     stopped=true;
 
@@ -798,201 +566,110 @@ self.onmessage=function(e){
   }
 
 
-  if(
-    data.cmd!=="start"
-  ){
-
+  if(data.cmd!=="start")
     return;
-
-  }
-
-
-  if(
-    typeof unixCryptTD !== "function"
-  ){
-
-    postMessage({
-
-      type:"error",
-
-      message:
-        "unixCryptTD unavailable"
-
-    });
-
-    return;
-
-  }
 
 
   stopped=false;
 
 
-  const len=
-    Number(data.tripLen);
+  const {
 
+    tripLen,
+    needles,
+    searchMode,
+    special
 
-  const unlimited=
-    Boolean(data.unlimited);
-
-
-  const maxAttempts=
-    Number(data.maxAttempts);
-
-
-  const sequential=
-    data.searchMode==="sequential";
-
-
-  const needles=
-    data.needles || [];
-
-
-  const regexSource=
-    data.regexSource || "";
-
-
-  const special=
-    data.special || "";
-
-
-  const specialN=
-    Number(data.specialN || 0);
+  }=data;
 
 
   let attempts=0;
 
   let found=0;
 
-  let lastProgress=0;
-
-  const seenTrips=
-    new Set();
-
-
   const started=
     performance.now();
+
+
+  /*
+    最大試行回数なし。
+
+    JavaScriptの安全な整数範囲まで
+    理論上探索可能。
+  */
+
+  const total =
+    Math.pow(
+      CHARS.length,
+      tripLen
+    );
 
 
   let index=0;
 
 
-  /*
-    順番探索の場合の総数
-
-    64^10 / 64^12 は非常に大きいため、
-    「制限なし」なら実質的に停止するまで探索。
-  */
-
-  const total=
-    Math.pow(
-      CHARS.length,
-      len
-    );
+  const BATCH=1000;
 
 
-  while(!stopped){
+  while(
+    index<total &&
+    !stopped
+  ){
 
-    /*
-      回数制限あり
-    */
-
-    if(
-      !unlimited &&
-      attempts>=maxAttempts
+    for(
+      let j=0;
+      j<BATCH &&
+      index<total &&
+      !stopped;
+      j++,index++
     ){
 
-      break;
-
-    }
-
-
-    let key;
-
-
-    if(sequential){
-
-      /*
-        JavaScript Numberでは
-        64^12 が安全整数を超えるので、
-        実用上は循環させる。
-      */
-
-      const safeIndex=
-        index % total;
-
-      key=
+      const key =
         keyFromIndex(
-          safeIndex,
-          len
+          index,
+          CHARS,
+          tripLen
         );
 
-      index++;
 
-    }else{
-
-      key=
-        randomKey(len);
-
-    }
-
-
-    let trip;
-
-    try{
-
-      trip=
+      const trip =
         makeTrip(key);
 
-    }catch(error){
 
-      postMessage({
-
-        type:"error",
-
-        message:error.message
-
-      });
-
-      return;
-
-    }
+      attempts++;
 
 
-    attempts++;
+      let matched;
 
 
-    /*
-      条件判定
-    */
+      if(searchMode==="regex"){
 
-    if(
-      matchesAll(
-        trip,
-        {
-          needles,
-          regexSource,
-          special,
-          specialN
-        }
-      )
-    ){
+        matched =
+          regexMatches(
+            trip,
+            needles
+          );
 
-      found++;
+      }else{
 
+        matched =
+          normalMatches(
+            trip,
+            needles
+          );
 
-      /*
-        同じトリップを何度も表示しない。
+      }
 
-        Unix cryptでは10桁キーの後半が
-       同じトリップになるケースがあるため重要。
-      */
 
       if(
-        !seenTrips.has(trip)
+        matched &&
+        specialMatches(
+          trip,
+          special
+        )
       ){
 
-        seenTrips.add(trip);
+        found++;
 
 
         postMessage({
@@ -1011,43 +688,12 @@ self.onmessage=function(e){
     }
 
 
-    /*
-      1000回ごとに進捗
-    */
-
     if(
-      attempts-lastProgress>=1000
+      attempts%1000===0
     ){
 
-      lastProgress=
-        attempts;
-
-
-      const sec=
-        Math.max(
-          (performance.now()-started)/1000,
-          0.001
-        );
-
-
-      const rate=
-        Math.round(
-          attempts/sec
-        );
-
-
-      let progress=-1;
-
-
-      if(
-        !unlimited &&
-        maxAttempts>0
-      ){
-
-        progress=
-          attempts/maxAttempts*100;
-
-      }
+      const sec =
+        (performance.now()-started)/1000;
 
 
       postMessage({
@@ -1056,11 +702,13 @@ self.onmessage=function(e){
 
         attempts,
 
-        rate,
+        rate:
+          Math.round(
+            attempts/
+            Math.max(sec,.001)
+          ),
 
-        found,
-
-        progress
+        found
 
       });
 
@@ -1069,17 +717,8 @@ self.onmessage=function(e){
   }
 
 
-  const sec=
-    Math.max(
-      (performance.now()-started)/1000,
-      0.001
-    );
-
-
-  const rate=
-    Math.round(
-      attempts/sec
-    );
+  const sec =
+    (performance.now()-started)/1000;
 
 
   postMessage({
@@ -1088,7 +727,11 @@ self.onmessage=function(e){
 
     attempts,
 
-    rate,
+    rate:
+      Math.round(
+        attempts/
+        Math.max(sec,.001)
+      ),
 
     found,
 
