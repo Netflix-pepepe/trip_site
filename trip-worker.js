@@ -1,88 +1,95 @@
 /*
  * trip-worker.js
- * GitHub Pages対応版
+ * GitHub Pages / Web Worker対応
  */
 
-let unixCryptReady = false;
 
-/*
- * 自分自身のURLを基準にライブラリを読み込む
- */
+/* =====================================================
+   unix-crypt-td-js 読み込み
+===================================================== */
+
+let unixCryptTD = null;
+
 try {
-  const base = new URL(".", self.location.href);
 
-  const localLib =
+  /*
+   * index.htmlと同じ場所から読み込む
+   */
+  const libURL =
     new URL(
-      "unix-crypt-td.min.js",
-      base
+      "./unix-crypt-td.min.js",
+      self.location.href
     ).href;
 
-  console.log(
-    "Worker library:",
-    localLib
-  );
+  importScripts(libURL);
 
-  importScripts(localLib);
+
+  /*
+   * 重要：
+   *
+   * unix-crypt-td.min.js は
+   *
+   * window.unixCryptTD = z
+   *
+   * という形式になっています。
+   *
+   * Web Workerにはwindowがないため、
+   * グローバル変数 z を取得します。
+   */
+
+  if (
+    typeof self.z === "function"
+  ) {
+
+    unixCryptTD =
+      self.z;
+
+  }
+
+
+  /*
+   * 念のためunixCryptTD自身も確認
+   */
 
   if (
     typeof self.unixCryptTD === "function"
   ) {
-    unixCryptReady = true;
+
+    unixCryptTD =
+      self.unixCryptTD;
+
   }
+
 
 } catch (error) {
-
-  console.error(
-    "Local unix-crypt load failed:",
-    error
-  );
-
-}
-
-
-/*
- * ローカル読み込みに失敗した場合、
- * CDNを予備として試す
- */
-
-if (!unixCryptReady) {
-
-  try {
-
-    importScripts(
-      "https://cdn.jsdelivr.net/npm/unix-crypt-td-js@1.1.4/unix-crypt-td.min.js"
-    );
-
-    if (
-      typeof self.unixCryptTD === "function"
-    ) {
-      unixCryptReady = true;
-    }
-
-  } catch (error) {
-
-    console.error(
-      "CDN unix-crypt load failed:",
-      error
-    );
-
-  }
-
-}
-
-
-/*
- * 読み込み結果を通知
- */
-
-if (!unixCryptReady) {
 
   self.postMessage({
 
     type: "error",
 
     message:
-      "unixCryptTDをWorkerから読み込めませんでした。"
+      "cryptライブラリ読み込みエラー: " +
+      error.message
+
+  });
+
+}
+
+
+/* =====================================================
+   読み込み確認
+===================================================== */
+
+if (
+  typeof unixCryptTD !== "function"
+) {
+
+  self.postMessage({
+
+    type: "error",
+
+    message:
+      "unixCryptTD unavailable"
 
   });
 
@@ -106,11 +113,13 @@ function saltForTrip(key) {
   let s =
     (key + "H.").slice(1, 3);
 
+
   s =
     s.replace(
       /[^\.-z]/g,
       "."
     );
+
 
   s =
     s.replace(
@@ -141,7 +150,9 @@ function saltForTrip(key) {
       }
     );
 
+
   return s;
+
 }
 
 
@@ -152,7 +163,8 @@ function saltForTrip(key) {
 function makeTrip(key) {
 
   if (
-    typeof self.unixCryptTD !== "function"
+    typeof unixCryptTD !==
+    "function"
   ) {
 
     throw new Error(
@@ -161,9 +173,10 @@ function makeTrip(key) {
 
   }
 
+
   return (
     "◆" +
-    self.unixCryptTD(
+    unixCryptTD(
       key,
       saltForTrip(key)
     ).slice(-10)
@@ -184,6 +197,7 @@ function keyFromIndex(
 
   let result = "";
 
+
   for (
     let i = 0;
     i < length;
@@ -193,7 +207,9 @@ function keyFromIndex(
     result =
       chars[
         index % chars.length
-      ] + result;
+      ] +
+      result;
+
 
     index =
       Math.floor(
@@ -202,7 +218,9 @@ function keyFromIndex(
 
   }
 
+
   return result;
+
 }
 
 
@@ -218,7 +236,8 @@ function buildMatchers(
     condition => {
 
       if (
-        condition.mode === "regex"
+        condition.mode ===
+        "regex"
       ) {
 
         return {
@@ -233,6 +252,7 @@ function buildMatchers(
         };
 
       }
+
 
       return {
 
@@ -275,21 +295,28 @@ function matches(
     of matchers
   ) {
 
+
     /* 正規表現 */
 
     if (
-      matcher.mode === "regex"
+      matcher.mode ===
+      "regex"
     ) {
 
-      matcher.regex.lastIndex = 0;
+      matcher.regex.lastIndex =
+        0;
+
 
       if (
-        !matcher.regex.test(text)
+        !matcher.regex.test(
+          text
+        )
       ) {
 
         return false;
 
       }
+
 
       continue;
 
@@ -299,7 +326,8 @@ function matches(
     /* 前方一致 */
 
     if (
-      matcher.mode === "prefix"
+      matcher.mode ===
+      "prefix"
     ) {
 
       if (
@@ -312,6 +340,7 @@ function matches(
 
       }
 
+
       continue;
 
     }
@@ -320,7 +349,8 @@ function matches(
     /* 後方一致 */
 
     if (
-      matcher.mode === "suffix"
+      matcher.mode ===
+      "suffix"
     ) {
 
       if (
@@ -332,6 +362,7 @@ function matches(
         return false;
 
       }
+
 
       continue;
 
@@ -352,7 +383,9 @@ function matches(
 
   }
 
+
   return true;
+
 }
 
 
@@ -360,263 +393,313 @@ function matches(
    STATE
 ===================================================== */
 
-let stopped = false;
+let stopped =
+  false;
 
 
 /* =====================================================
    MESSAGE
 ===================================================== */
 
-self.onmessage = event => {
+self.onmessage =
+  event => {
 
-  const data =
-    event.data;
-
-
-  /* STOP */
-
-  if (
-    data.cmd === "stop"
-  ) {
-
-    stopped = true;
-
-    return;
-
-  }
+    const data =
+      event.data;
 
 
-  /* START以外 */
+    /* ================================
+       STOP
+    ================================= */
 
-  if (
-    data.cmd !== "start"
-  ) {
+    if (
+      data.cmd === "stop"
+    ) {
 
-    return;
+      stopped =
+        true;
 
-  }
+      return;
 
-
-  /* crypt確認 */
-
-  if (
-    typeof self.unixCryptTD !== "function"
-  ) {
-
-    self.postMessage({
-
-      type: "error",
-
-      workerId:
-        data.workerId,
-
-      message:
-        "Worker内でunixCryptTDが使用できません。"
-
-    });
-
-    return;
-
-  }
+    }
 
 
-  stopped = false;
+    /* ================================
+       START以外
+    ================================= */
+
+    if (
+      data.cmd !== "start"
+    ) {
+
+      return;
+
+    }
 
 
-  const chars =
-    data.chars;
+    /* ================================
+       crypt確認
+    ================================= */
+
+    if (
+      typeof unixCryptTD !==
+      "function"
+    ) {
+
+      self.postMessage({
+
+        type: "error",
+
+        workerId:
+          data.workerId,
+
+        message:
+          "Worker内でunixCryptTDが使用できません。"
+
+      });
+
+      return;
+
+    }
 
 
-  const length =
-    Number(data.length);
+    stopped =
+      false;
 
 
-  const maxAttempts =
-    Number(data.maxAttempts);
+    const chars =
+      data.chars;
 
 
-  const workerId =
-    Number(data.workerId);
-
-
-  const workerCount =
-    Number(data.workerCount);
-
-
-  let matchers;
-
-  try {
-
-    matchers =
-      buildMatchers(
-        data.conditions || []
+    const length =
+      Number(
+        data.length
       );
 
-  } catch (error) {
 
-    self.postMessage({
-
-      type: "error",
-
-      workerId,
-
-      message:
-        "正規表現エラー: " +
-        error.message
-
-    });
-
-    return;
-
-  }
+    const maxAttempts =
+      Number(
+        data.maxAttempts
+      );
 
 
-  let attempts = 0;
-
-  let found = 0;
-
-
-  /*
-   * 検索範囲
-   */
-
-  const total =
-    Math.pow(
-      chars.length,
-      length
-    );
+    const workerId =
+      Number(
+        data.workerId
+      );
 
 
-  const limit =
-    Math.min(
-      total,
-      maxAttempts
-    );
+    const workerCount =
+      Number(
+        data.workerCount
+      );
 
 
-  /*
-   * Workerごとに分散
-   *
-   * Worker 0:
-   * 0, 4, 8, 12...
-   *
-   * Worker 1:
-   * 1, 5, 9, 13...
-   */
+    /* ================================
+       matcher
+    ================================= */
 
-  let index =
-    workerId;
+    let matchers;
 
 
-  const started =
-    performance.now();
+    try {
+
+      matchers =
+        buildMatchers(
+          data.conditions ||
+          []
+        );
+
+    } catch (error) {
+
+      self.postMessage({
+
+        type: "error",
+
+        workerId,
+
+        message:
+          "正規表現エラー: " +
+          error.message
+
+      });
+
+      return;
+
+    }
 
 
-  const PROGRESS_INTERVAL =
-    5000;
+    /* ================================
+       counter
+    ================================= */
+
+    let attempts =
+      0;
 
 
-  while (
-    index < limit &&
-    !stopped
-  ) {
+    let found =
+      0;
 
-    const key =
-      keyFromIndex(
-        index,
-        chars,
+
+    /* ================================
+       search range
+    ================================= */
+
+    const total =
+      Math.pow(
+        chars.length,
         length
       );
 
 
-    const trip =
-      makeTrip(key);
+    const limit =
+      Math.min(
+        total,
+        maxAttempts
+      );
 
 
-    attempts++;
+    /*
+     * Workerごとに分散
+     *
+     * Worker 0:
+     * 0, 4, 8, 12...
+     *
+     * Worker 1:
+     * 1, 5, 9, 13...
+     */
+
+    let index =
+      workerId;
 
 
-    if (
-      matches(
-        trip,
-        matchers
-      )
+    const started =
+      performance.now();
+
+
+    const PROGRESS_INTERVAL =
+      5000;
+
+
+    /* ================================
+       search
+    ================================= */
+
+    while (
+      index < limit &&
+      !stopped
     ) {
 
-      found++;
+      const key =
+        keyFromIndex(
+          index,
+          chars,
+          length
+        );
 
-      self.postMessage({
 
-        type: "hit",
+      const trip =
+        makeTrip(key);
 
-        workerId,
 
-        key,
+      attempts++;
 
-        trip
 
-      });
+      /* ==============================
+         match
+      =============================== */
+
+      if (
+        matches(
+          trip,
+          matchers
+        )
+      ) {
+
+        found++;
+
+
+        self.postMessage({
+
+          type: "hit",
+
+          workerId,
+
+          key,
+
+          trip
+
+        });
+
+      }
+
+
+      /* ==============================
+         progress
+      =============================== */
+
+      if (
+        attempts %
+        PROGRESS_INTERVAL ===
+        0
+      ) {
+
+        self.postMessage({
+
+          type: "progress",
+
+          workerId,
+
+          attempts,
+
+          found
+
+        });
+
+      }
+
+
+      index +=
+        workerCount;
 
     }
 
 
-    if (
-      attempts %
-      PROGRESS_INTERVAL === 0
-    ) {
+    /* ================================
+       done
+    ================================= */
 
-      self.postMessage({
-
-        type: "progress",
-
-        workerId,
-
-        attempts,
-
-        found
-
-      });
-
-    }
+    const elapsed =
+      (
+        performance.now() -
+        started
+      ) / 1000;
 
 
-    index +=
-      workerCount;
-
-  }
-
-
-  const elapsed =
-    (
-      performance.now() -
-      started
-    ) / 1000;
+    const rate =
+      Math.round(
+        attempts /
+        Math.max(
+          elapsed,
+          0.001
+        )
+      );
 
 
-  const rate =
-    Math.round(
-      attempts /
-      Math.max(
-        elapsed,
-        0.001
-      )
-    );
+    self.postMessage({
 
+      type: "done",
 
-  self.postMessage({
+      workerId,
 
-    type: "done",
+      attempts,
 
-    workerId,
+      found,
 
-    attempts,
+      rate,
 
-    found,
+      stopped
 
-    rate,
+    });
 
-    stopped
-
-  });
-
-};
+  };
