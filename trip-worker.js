@@ -7,7 +7,7 @@
 importScripts("./unix-crypt-td.min.js");
 
 if (typeof unixCryptTD !== "function") {
-    throw new Error("unixCryptTD unavailable");
+  throw new Error("unixCryptTD unavailable");
 }
 
 const CHARS =
