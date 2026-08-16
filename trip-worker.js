@@ -1,137 +1,63 @@
-/*
- * trip-worker.js
- * 人狼オンライン トリップ検索機
- *
- * ・unix-crypt-td.min.jsをWorker内で読み込み
- * ・複数Worker対応
- * ・正規表現対応
- * ・特殊トリップ対応
- * ・最大試行回数なし
- */
+"use strict";
 
-let unixCryptTD = null;
+/*
+============================================================
+  トリップ検索 Worker
+============================================================
+*/
+
+importScripts("./unix-crypt-td.min.js");
+
+
+/* =========================================================
+   文字セット
+========================================================= */
+
+const CHARS =
+  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
+
+
+/* =========================================================
+   停止
+========================================================= */
+
 let stopped = false;
 
 
 /* =========================================================
-   unixCryptTD 読み込み
+   salt
 ========================================================= */
 
-async function loadCrypt() {
-
-  const url =
-    new URL(
-      "./unix-crypt-td.min.js",
-      self.location.href
-    ).href;
-
-  const response = await fetch(url, {
-    cache: "no-store"
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      "unix-crypt-td.min.js HTTP " +
-      response.status
-    );
-  }
-
-  const source = await response.text();
-
-  if (!source || source.length < 100) {
-    throw new Error(
-      "unix-crypt-td.min.jsの内容が空です"
-    );
-  }
-
-  /*
-   * unix-crypt-td.min.js は最後に
-   *
-   * window.unixCryptTD = z
-   *
-   * としている。
-   *
-   * Workerにはwindowがないので、
-   * new Function()で実行してzを直接取得する。
-   */
-
-  const getCrypt = new Function(
-    source +
-    "\nreturn z;"
-  );
-
-  const crypt = getCrypt();
-
-  if (typeof crypt !== "function") {
-    throw new Error(
-      "unixCryptTD関数を取得できませんでした"
-    );
-  }
-
-  unixCryptTD = crypt;
-}
-
-
-/* =========================================================
-   起動時読み込み
-========================================================= */
-
-const cryptReady = loadCrypt()
-  .then(() => {
-
-    self.postMessage({
-      type: "ready"
-    });
-
-  })
-  .catch(error => {
-
-    self.postMessage({
-      type: "error",
-      message:
-        "cryptライブラリ読み込み失敗: " +
-        error.message
-    });
-
-    throw error;
-  });
-
-
-/* =========================================================
-   SALT
-========================================================= */
-
-function saltForTrip(key) {
+function saltForTrip(key){
 
   let s =
-    (key + "H.").slice(1, 3);
+    (key + "H.").slice(1,3);
+
+  s =
+    s.replace(/[^\x2e-\x7a]/g,".");
 
   s =
     s.replace(
-      /[^\.-z]/g,
-      "."
-    );
-
-  s =
-    s.replace(
-      /[\:;<=>?@[\\\]^_`]/g,
+      /[:;<=>?@[\\\]^_`]/g,
       c => {
 
         const table = {
-          ":": "A",
-          ";": "B",
-          "<": "C",
-          "=": "D",
-          ">": "E",
-          "?": "F",
-          "@": "G",
 
-          "[": "a",
-          "\\": "b",
-          "]": "c",
-          "^": "d",
-          "_": "e",
-          "`": "f"
+          ":":"A",
+          ";":"B",
+          "<":"C",
+          "=":"D",
+          ">":"E",
+          "?":"F",
+          "@":"G",
+
+          "[":"a",
+          "\\":"b",
+          "]":"c",
+          "^":"d",
+          "_":"e",
+          "`":"f"
+
         };
 
         return table[c] || c;
@@ -146,9 +72,13 @@ function saltForTrip(key) {
    トリップ生成
 ========================================================= */
 
-function makeTrip(key) {
+function makeTrip(key){
 
-  if (typeof unixCryptTD !== "function") {
+  if(
+    typeof unixCryptTD !==
+    "function"
+  ){
+
     throw new Error(
       "unixCryptTD unavailable"
     );
@@ -163,118 +93,37 @@ function makeTrip(key) {
 
 
 /* =========================================================
-   INDEX → KEY
+   インデックス → キー
 ========================================================= */
 
 function keyFromIndex(
   index,
-  chars,
-  length
-) {
+  len
+){
 
-  let result = "";
+  let out = "";
 
-  for (
+  for(
     let i = 0;
-    i < length;
+    i < len;
     i++
-  ) {
+  ){
 
-    result =
-      chars[
-        index % chars.length
+    out =
+      CHARS[
+        index %
+        CHARS.length
       ] +
-      result;
+      out;
 
     index =
       Math.floor(
-        index / chars.length
+        index /
+        CHARS.length
       );
   }
 
-  return result;
-}
-
-
-/* =========================================================
-   鏡用の文字対応
-========================================================= */
-
-/*
- * 左右反転したときに対応する文字。
- *
- * 自己対称:
- * . 0 8 A H I M O T U V W X Y
- *
- * 左右反転:
- * b <-> d
- *
- * i <-> l
- *
- * o / p / q などはフォント依存になるため、
- * 一般的な分類で扱いやすい対応を設定。
- */
-
-const MIRROR_MAP = {
-
-  ".": ".",
-  "0": "0",
-  "8": "8",
-
-  "A": "A",
-  "H": "H",
-  "I": "I",
-  "M": "M",
-  "O": "O",
-  "T": "T",
-  "U": "U",
-  "V": "V",
-  "W": "W",
-  "X": "X",
-  "Y": "Y",
-
-  "b": "d",
-  "d": "b",
-
-  "i": "l",
-  "l": "i",
-
-  "o": "o",
-  "p": "q",
-  "q": "p",
-
-  "v": "v",
-  "w": "w",
-  "x": "x"
-};
-
-
-/* =========================================================
-   鏡
-========================================================= */
-
-function isKagami(text) {
-
-  for (
-    let i = 0;
-    i < text.length;
-    i++
-  ) {
-
-    const a = text[i];
-    const b =
-      text[
-        text.length - 1 - i
-      ];
-
-    if (
-      MIRROR_MAP[a] !== b
-    ) {
-      return false;
-    }
-  }
-
-  return true;
+  return out;
 }
 
 
@@ -282,36 +131,38 @@ function isKagami(text) {
    純n連
 ========================================================= */
 
-function isJunRen(
-  text,
+function pureN(
+  trip,
   n
-) {
+){
 
-  for (
+  const t =
+    trip.slice(1);
+
+  for(
     let i = 0;
-    i <= text.length - n;
+    i <= t.length - n;
     i++
-  ) {
+  ){
 
-    let good = true;
+    let ok = true;
 
-    for (
+    for(
       let j = 1;
       j < n;
       j++
-    ) {
+    ){
 
-      if (
-        text[i] !==
-        text[i + j]
-      ) {
+      if(
+        t[i] !== t[i+j]
+      ){
 
-        good = false;
+        ok = false;
         break;
       }
     }
 
-    if (good) {
+    if(ok){
       return true;
     }
   }
@@ -324,39 +175,40 @@ function isJunRen(
    準n連
 ========================================================= */
 
-function isJunRenLower(
-  text,
+function semiN(
+  trip,
   n
-) {
+){
 
   const t =
-    text.toLowerCase();
+    trip
+      .slice(1)
+      .toLowerCase();
 
-  for (
+  for(
     let i = 0;
     i <= t.length - n;
     i++
-  ) {
+  ){
 
-    let good = true;
+    let ok = true;
 
-    for (
+    for(
       let j = 1;
       j < n;
       j++
-    ) {
+    ){
 
-      if (
-        t[i] !==
-        t[i + j]
-      ) {
+      if(
+        t[i] !== t[i+j]
+      ){
 
-        good = false;
+        ok = false;
         break;
       }
     }
 
-    if (good) {
+    if(ok){
       return true;
     }
   }
@@ -369,11 +221,14 @@ function isJunRenLower(
    二構
 ========================================================= */
 
-function isNiko(
-  text
-) {
+function isDouble(
+  trip
+){
 
-  return new Set(text).size === 2;
+  const t =
+    trip.slice(1);
+
+  return new Set(t).size <= 2;
 }
 
 
@@ -381,16 +236,12 @@ function isNiko(
    最長
 ========================================================= */
 
-function isSaicho(
-  text
-) {
+function isLongest(
+  trip
+){
 
-  return (
-    text.length > 0 &&
-    [...new Set(text)]
-      .every(c =>
-        "MmW".includes(c)
-      )
+  return /^[MmW]+$/.test(
+    trip.slice(1)
   );
 }
 
@@ -399,16 +250,12 @@ function isSaicho(
    最短
 ========================================================= */
 
-function isSaitan(
-  text
-) {
+function isShortest(
+  trip
+){
 
-  return (
-    text.length > 0 &&
-    [...new Set(text)]
-      .every(c =>
-        "li.".includes(c)
-      )
+  return /^[li.]+$/.test(
+    trip.slice(1)
   );
 }
 
@@ -417,49 +264,129 @@ function isSaitan(
    八雲
 ========================================================= */
 
-/*
- * 10文字:
- *
- * 1文字 + 3文字 + 3文字 + 3文字
- *
- * 例:
- *
- * 2aaatttwww
- */
-
 function isYakumo(
-  text
-) {
+  trip
+){
 
-  if (text.length < 4) {
+  const t =
+    trip.slice(1);
+
+  /*
+   * 10桁:
+   *
+   * aaa ttt www x
+   *
+   * 最後の1文字は自由
+   */
+
+  if(t.length !== 10){
     return false;
   }
 
-  const remainder =
-    text.length % 3;
-
-  /*
-   * 残り1文字を先頭に置く。
-   * 10桁なら
-   *
-   * 1 + 3 + 3 + 3
-   */
-
-  const offset =
-    remainder === 0
-      ? 0
-      : remainder;
-
-  for (
-    let i = offset;
-    i + 2 < text.length;
+  for(
+    let i = 0;
+    i < 9;
     i += 3
-  ) {
+  ){
 
-    if (
-      text[i] !== text[i + 1] ||
-      text[i] !== text[i + 2]
-    ) {
+    if(
+      t[i] !== t[i+1] ||
+      t[i] !== t[i+2]
+    ){
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* =========================================================
+   鏡
+========================================================= */
+
+/*
+   鏡で対になる文字。
+
+   例:
+
+   o ↔ o
+   8 ↔ 8
+   A ↔ A
+   l ↔ l
+   b ↔ d
+   p ↔ q
+   M ↔ W
+   etc.
+
+   必要に応じて追加可能。
+*/
+
+const MIRROR = {
+
+  ".":".",
+
+  "0":"0",
+  "8":"8",
+
+  "A":"A",
+  "H":"H",
+  "I":"I",
+  "M":"M",
+  "O":"O",
+  "T":"T",
+  "U":"U",
+  "V":"V",
+  "W":"M",
+  "X":"X",
+  "Y":"Y",
+
+  "b":"d",
+  "d":"b",
+
+  "i":"i",
+  "l":"l",
+
+  "o":"o",
+
+  "p":"q",
+  "q":"p",
+
+  "v":"v",
+  "w":"w",
+
+  "a":"a"
+};
+
+
+function isMirror(
+  trip
+){
+
+  const t =
+    trip.slice(1);
+
+  for(
+    let i = 0;
+    i < Math.floor(t.length / 2);
+    i++
+  ){
+
+    const left =
+      t[i];
+
+    const right =
+      t[
+        t.length -
+        1 -
+        i
+      ];
+
+    if(
+      MIRROR[left] !==
+      right
+    ){
 
       return false;
     }
@@ -473,20 +400,27 @@ function isYakumo(
    回文
 ========================================================= */
 
-function isKaibun(
-  text
-) {
+function isPalindrome(
+  trip
+){
 
-  for (
+  const t =
+    trip.slice(1);
+
+  for(
     let i = 0;
-    i < Math.floor(text.length / 2);
+    i < Math.floor(t.length / 2);
     i++
-  ) {
+  ){
 
-    if (
-      text[i] !==
-      text[text.length - 1 - i]
-    ) {
+    if(
+      t[i] !==
+      t[
+        t.length -
+        1 -
+        i
+      ]
+    ){
 
       return false;
     }
@@ -500,23 +434,26 @@ function isKaibun(
    山彦
 ========================================================= */
 
-function isYamabiko(
-  text
-) {
+function isEcho(
+  trip
+){
 
-  if (
-    text.length % 2 !== 0
-  ) {
+  const t =
+    trip.slice(1);
+
+  if(
+    t.length % 2 !== 0
+  ){
 
     return false;
   }
 
   const half =
-    text.length / 2;
+    t.length / 2;
 
   return (
-    text.slice(0, half) ===
-    text.slice(half)
+    t.slice(0,half) ===
+    t.slice(half)
   );
 }
 
@@ -525,27 +462,30 @@ function isYamabiko(
    双連
 ========================================================= */
 
-function isSoren(
-  text
-) {
+function isDoublePair(
+  trip
+){
 
-  if (
-    text.length % 2 !== 0
-  ) {
+  const t =
+    trip.slice(1);
+
+  if(
+    t.length % 2 !== 0
+  ){
 
     return false;
   }
 
-  for (
+  for(
     let i = 0;
-    i < text.length;
+    i < t.length;
     i += 2
-  ) {
+  ){
 
-    if (
-      text[i] !==
-      text[i + 1]
-    ) {
+    if(
+      t[i] !==
+      t[i+1]
+    ){
 
       return false;
     }
@@ -559,11 +499,13 @@ function isSoren(
    全数
 ========================================================= */
 
-function isZensu(
-  text
-) {
+function isNumbers(
+  trip
+){
 
-  return /^[0-9]+$/.test(text);
+  return /^[0-9]+$/.test(
+    trip.slice(1)
+  );
 }
 
 
@@ -571,28 +513,31 @@ function isZensu(
    飛石
 ========================================================= */
 
-/*
- * 1文字ごとに / または .
- *
- * 例:
- *
- * Z.y.O.6.0.
- */
+function isStepping(
+  trip
+){
 
-function isTobiishi(
-  text
-) {
+  const t =
+    trip.slice(1);
 
-  for (
+  /*
+   * 例:
+   *
+   * Z.y.O.6.0.
+   *
+   * 奇数位置が . または /
+   */
+
+  for(
     let i = 1;
-    i < text.length;
+    i < t.length;
     i += 2
-  ) {
+  ){
 
-    if (
-      text[i] !== "." &&
-      text[i] !== "/"
-    ) {
+    if(
+      t[i] !== "." &&
+      t[i] !== "/"
+    ){
 
       return false;
     }
@@ -606,38 +551,36 @@ function isTobiishi(
    拡飛
 ========================================================= */
 
-/*
- * 偶数位置が全部同じ文字
- *
- * 例:
- *
- * oUlUEUDUDU
- *
- * U U U U U
- * ↑ ↑ ↑ ↑ ↑
- */
+function isExpandStepping(
+  trip
+){
 
-function isKakutobi(
-  text
-) {
+  const t =
+    trip.slice(1);
 
-  if (text.length < 2) {
+  if(
+    t.length < 2
+  ){
+
     return false;
   }
 
+  /*
+   * 奇数位置が同じ文字
+   */
+
   const separator =
-    text[1];
+    t[1];
 
-  for (
+  for(
     let i = 1;
-    i < text.length;
+    i < t.length;
     i += 2
-  ) {
+  ){
 
-    if (
-      text[i] !==
-      separator
-    ) {
+    if(
+      t[i] !== separator
+    ){
 
       return false;
     }
@@ -648,55 +591,63 @@ function isKakutobi(
 
 
 /* =========================================================
-   特殊トリップ判定
+   特殊判定
 ========================================================= */
 
-function matchesSpecial(
-  text,
-  type,
-  n
-) {
+function specialMatch(
+  trip,
+  type
+){
 
-  switch (type) {
+  switch(type){
 
-    case "junren":
-      return isJunRen(text, n);
+    case "pure8":
+      return pureN(trip,8);
 
-    case "junren2":
-      return isJunRenLower(text, n);
+    case "pure9":
+      return pureN(trip,9);
 
-    case "niko":
-      return isNiko(text);
+    case "pure10":
+      return pureN(trip,10);
 
-    case "saicho":
-      return isSaicho(text);
+    case "semi9":
+      return semiN(trip,9);
 
-    case "saitan":
-      return isSaitan(text);
+    case "semi10":
+      return semiN(trip,10);
+
+    case "double":
+      return isDouble(trip);
+
+    case "longest":
+      return isLongest(trip);
+
+    case "shortest":
+      return isShortest(trip);
 
     case "yakumo":
-      return isYakumo(text);
+      return isYakumo(trip);
 
-    case "kagami":
-      return isKagami(text);
+    case "mirror":
+      return isMirror(trip);
 
-    case "kaibun":
-      return isKaibun(text);
+    case "palindrome":
+      return isPalindrome(trip);
 
-    case "yamabiko":
-      return isYamabiko(text);
+    case "echo":
+      return isEcho(trip);
 
-    case "soren":
-      return isSoren(text);
+    case "doublePair":
+      return isDoublePair(trip);
 
-    case "zensu":
-      return isZensu(text);
+    case "numbers":
+      return isNumbers(trip);
 
-    case "tobiishi":
-      return isTobiishi(text);
+    case "stepping":
+      return isStepping(trip);
 
-    case "kakutobi":
-      return isKakutobi(text);
+    case "expandStepping":
+      return isExpandStepping(trip);
 
     default:
       return false;
@@ -705,178 +656,164 @@ function matchesSpecial(
 
 
 /* =========================================================
-   条件判定
+   正規表現
 ========================================================= */
 
-function matches(
+function regexMatch(
   trip,
-  conditions
-) {
+  pattern
+){
 
-  const text =
-    trip.replace(/^◆/, "");
+  try{
 
+    const re =
+      new RegExp(pattern);
 
-  for (
-    const condition
-    of conditions
-  ) {
+    return re.test(
+      trip.slice(1)
+    );
 
-    /* ---------------------------------------------
-       正規表現
-    --------------------------------------------- */
+  }catch{
 
-    if (
-      condition.mode === "regex"
-    ) {
-
-      const regex =
-        new RegExp(
-          condition.text
-        );
-
-      if (
-        !regex.test(text)
-      ) {
-
-        return false;
-      }
-
-      continue;
-    }
-
-
-    /* ---------------------------------------------
-       特殊トリップ
-    --------------------------------------------- */
-
-    if (
-      condition.mode ===
-      "special"
-    ) {
-
-      if (
-        !matchesSpecial(
-          text,
-          condition.type,
-          Number(condition.n)
-        )
-      ) {
-
-        return false;
-      }
-
-      continue;
-    }
-
-
-    const needle =
-      String(
-        condition.text
-      )
-      .trim()
-      .replace(/^◆/, "");
-
-
-    /* ---------------------------------------------
-       前方一致
-    --------------------------------------------- */
-
-    if (
-      condition.mode === "prefix"
-    ) {
-
-      if (
-        !text.startsWith(needle)
-      ) {
-
-        return false;
-      }
-
-      continue;
-    }
-
-
-    /* ---------------------------------------------
-       後方一致
-    --------------------------------------------- */
-
-    if (
-      condition.mode === "suffix"
-    ) {
-
-      if (
-        !text.endsWith(needle)
-      ) {
-
-        return false;
-      }
-
-      continue;
-    }
-
-
-    /* ---------------------------------------------
-       部分一致
-    --------------------------------------------- */
-
-    if (
-      !text.includes(needle)
-    ) {
-
-      return false;
-    }
+    return false;
   }
-
-
-  return true;
 }
 
 
 /* =========================================================
-   Worker開始
+   全条件判定
+========================================================= */
+
+function matches(
+  trip,
+  needles
+){
+
+  const t =
+    trip.slice(1);
+
+  return needles.every(
+    n => {
+
+      if(!n.text){
+        return true;
+      }
+
+
+      /* 通常 */
+
+      if(
+        n.mode ===
+        "contains"
+      ){
+
+        return t.includes(
+          n.text.replace(
+            /^◆/,
+            ""
+          )
+        );
+      }
+
+
+      /* 前方 */
+
+      if(
+        n.mode ===
+        "prefix"
+      ){
+
+        return t.startsWith(
+          n.text.replace(
+            /^◆/,
+            ""
+          )
+        );
+      }
+
+
+      /* 後方 */
+
+      if(
+        n.mode ===
+        "suffix"
+      ){
+
+        return t.endsWith(
+          n.text.replace(
+            /^◆/,
+            ""
+          )
+        );
+      }
+
+
+      /* 正規表現 */
+
+      if(
+        n.mode ===
+        "regex"
+      ){
+
+        return regexMatch(
+          trip,
+          n.text
+        );
+      }
+
+
+      /* 特殊 */
+
+      if(
+        n.mode ===
+        "special"
+      ){
+
+        return specialMatch(
+          trip,
+          n.text
+        );
+      }
+
+
+      return true;
+    }
+  );
+}
+
+
+/* =========================================================
+   Workerメッセージ
 ========================================================= */
 
 self.onmessage =
-  async event => {
+  event => {
 
     const data =
       event.data;
 
 
-    /* STOP */
+    /* =========================
+       停止
+    ========================== */
 
-    if (
+    if(
       data.cmd === "stop"
-    ) {
+    ){
 
       stopped = true;
+
       return;
     }
 
 
-    if (
+    /* =========================
+       開始
+    ========================== */
+
+    if(
       data.cmd !== "start"
-    ) {
-
-      return;
-    }
-
-
-    try {
-
-      await cryptReady;
-
-    } catch (error) {
-
-      self.postMessage({
-
-        type: "error",
-
-        message:
-          error.message
-
-      });
+    ){
 
       return;
     }
@@ -885,78 +822,28 @@ self.onmessage =
     stopped = false;
 
 
-    const chars =
-      data.chars;
-
-    const length =
-      Number(data.length);
-
-    const workerId =
-      Number(data.workerId);
-
-    const workerCount =
-      Number(data.workerCount);
-
-
-    let conditions;
-
-    try {
-
-      conditions =
-        data.conditions || [];
-
-      /*
-       * 正規表現を事前コンパイルして
-       * 入力ミスを早期検出
-       */
-
-      for (
-        const c of conditions
-      ) {
-
-        if (
-          c.mode === "regex"
-        ) {
-
-          new RegExp(c.text);
-
-        }
-
-      }
-
-    } catch (error) {
-
-      self.postMessage({
-
-        type: "error",
-
-        message:
-          "正規表現エラー: " +
-          error.message
-
-      });
-
-      return;
-    }
-
-
-    /*
-     * 最大試行回数は設定しない。
-     *
-     * 全キー空間を最後まで検索する。
-     *
-     * ただし現実的には
-     * 「⏹停止」を押して止める。
-     */
-
-    const total =
-      Math.pow(
-        chars.length,
-        length
+    const tripLen =
+      Number(
+        data.tripLen
       );
 
 
+    const maxAttempts =
+      data.maxAttempts;
+
+
+    const needles =
+      Array.isArray(
+        data.needles
+      )
+        ? data.needles
+        : [];
+
+
+    let index = 0;
+
     let attempts = 0;
+
     let found = 0;
 
 
@@ -964,142 +851,218 @@ self.onmessage =
       performance.now();
 
 
-    /*
-     * Workerごとに
-     *
-     * 0,1,2,3...
-     *
-     * と担当を分ける。
-     */
-
-    let index =
-      workerId;
-
-
-    const progressInterval =
-      5000;
-
-
-    while (
-      index < total &&
-      !stopped
-    ) {
-
-      const key =
-        keyFromIndex(
-          index,
-          chars,
-          length
-        );
-
-
-      const trip =
-        makeTrip(key);
-
-
-      attempts++;
-
-
-      if (
-        matches(
-          trip,
-          conditions
-        )
-      ) {
-
-        found++;
-
-
-        self.postMessage({
-
-          type: "hit",
-
-          key,
-          trip,
-
-          workerId
-
-        });
-
-      }
-
-
-      if (
-        attempts %
-        progressInterval ===
-        0
-      ) {
-
-        const elapsed =
-          (
-            performance.now() -
-            started
-          ) / 1000;
-
-
-        const rate =
-          Math.round(
-            attempts /
-            Math.max(
-              elapsed,
-              0.001
-            )
-          );
-
-
-        self.postMessage({
-
-          type: "progress",
-
-          workerId,
-
-          attempts,
-
-          found,
-
-          rate
-
-        });
-
-      }
-
-
-      index +=
-        workerCount;
-    }
-
-
-    const elapsed =
-      (
-        performance.now() -
-        started
-      ) / 1000;
-
-
-    const rate =
-      Math.round(
-        attempts /
-        Math.max(
-          elapsed,
-          0.001
-        )
+    const total =
+      Math.pow(
+        CHARS.length,
+        tripLen
       );
 
 
-    self.postMessage({
+    const unlimited =
+      maxAttempts === null ||
+      maxAttempts === undefined ||
+      maxAttempts === "";
 
-      type: "done",
 
-      workerId,
+    const limit =
+      unlimited
+        ? total
+        : Math.min(
+            total,
+            Number(maxAttempts)
+          );
 
-      attempts,
 
-      found,
+    /*
+     * 一度に処理する数
+     */
 
-      rate,
+    const BATCH =
+      500;
 
-      stopped
 
-    });
+    /* =========================
+       バッチ
+    ========================== */
 
+    function runBatch(){
+
+      if(stopped){
+
+        finish(true);
+
+        return;
+      }
+
+
+      const end =
+        Math.min(
+          index + BATCH,
+          limit
+        );
+
+
+      while(
+        index < end &&
+        !stopped
+      ){
+
+        const key =
+          keyFromIndex(
+            index,
+            tripLen
+          );
+
+
+        let trip;
+
+        try{
+
+          trip =
+            makeTrip(key);
+
+        }catch(error){
+
+          postMessage({
+
+            type:"error",
+
+            message:
+              error.message ||
+              String(error)
+
+          });
+
+          return;
+        }
+
+
+        attempts++;
+
+
+        if(
+          matches(
+            trip,
+            needles
+          )
+        ){
+
+          found++;
+
+
+          postMessage({
+
+            type:"hit",
+
+            item:{
+              key,
+              trip
+            }
+
+          });
+        }
+
+
+        index++;
+      }
+
+
+      const seconds =
+        (
+          performance.now() -
+          started
+        ) / 1000;
+
+
+      const rate =
+        Math.round(
+          attempts /
+          Math.max(
+            seconds,
+            0.001
+          )
+        );
+
+
+      postMessage({
+
+        type:"progress",
+
+        attempts,
+
+        rate,
+
+        found,
+
+        total
+
+      });
+
+
+      /*
+       * 次のバッチ
+       */
+
+      if(
+        !stopped &&
+        index < limit
+      ){
+
+        setTimeout(
+          runBatch,
+          0
+        );
+
+      }else{
+
+        finish(
+          stopped
+        );
+      }
+    }
+
+
+    /* =========================
+       完了
+    ========================== */
+
+    function finish(
+      wasStopped
+    ){
+
+      const seconds =
+        (
+          performance.now() -
+          started
+        ) / 1000;
+
+
+      const rate =
+        Math.round(
+          attempts /
+          Math.max(
+            seconds,
+            0.001
+          )
+        );
+
+
+      postMessage({
+
+        type:"done",
+
+        attempts,
+
+        rate,
+
+        found,
+
+        stopped:
+          wasStopped
+
+      });
+    }
+
+
+    runBatch();
   };
