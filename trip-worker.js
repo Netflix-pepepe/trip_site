@@ -1,37 +1,35 @@
 "use strict";
 
-/*
- * trip-worker.js
- *
- * ・Worker内でunix-crypt-tdを読み込む
- * ・ランダムな10/12文字キーを生成
- * ・同じキーを生成しない
- * ・Workerごとの重複を防ぐ
- */
-
 let crypt = null;
 
 self.onmessage = function (e) {
 
     const data = e.data || {};
 
-    /* =========================================
-       初期化
-    ========================================= */
-
     if (data.type === "init") {
 
         try {
 
+            // ライブラリ読み込み
             importScripts("./unix-crypt-td.min.js");
 
+            /*
+             * unix-crypt-td.min.js は Worker では
+             * window.unixCryptTD を作らない。
+             *
+             * 貼ってくれたライブラリでは
+             * 内部の関数が var z として存在するので、
+             * Workerでは self.z を取得する。
+             */
             if (typeof self.unixCryptTD === "function") {
                 crypt = self.unixCryptTD;
             }
-
-            if (typeof crypt !== "function") {
+            else if (typeof self.z === "function") {
+                crypt = self.z;
+            }
+            else {
                 throw new Error(
-                    "unixCryptTD unavailable"
+                    "unixCryptTD / z が見つかりません"
                 );
             }
 
@@ -43,109 +41,134 @@ self.onmessage = function (e) {
 
             self.postMessage({
                 type: "error",
-                message: err.message || String(err)
+                message: String(
+                    err && err.message
+                        ? err.message
+                        : err
+                )
             });
         }
 
         return;
     }
-
-
-    /* =========================================
-       検索
-    ========================================= */
-
-    if (data.type === "search") {
-
-        if (typeof crypt !== "function") {
-
-            self.postMessage({
-                type: "error",
-                message: "unixCryptTD unavailable"
-            });
-
-            return;
-        }
-
-        search(data);
-
-        return;
-    }
-
-
-    /* =========================================
-       単発生成
-    ========================================= */
 
     if (data.type === "generate") {
 
         try {
 
-            const key = String(data.key || "");
+            if (typeof crypt !== "function") {
+                throw new Error(
+                    "crypt is not a function"
+                );
+            }
 
-            const trip = makeTrip(key);
+            const key =
+                String(data.key || "");
+
+            const salt =
+                key.slice(0, 2);
+
+            const result =
+                crypt(key, salt);
+
+            if (
+                typeof result !== "string"
+            ) {
+                throw new Error(
+                    "Trip生成結果が文字列ではありません"
+                );
+            }
 
             self.postMessage({
                 type: "generated",
                 key: key,
-                trip: trip
+                trip: result.slice(2)
             });
 
         } catch (err) {
 
             self.postMessage({
                 type: "error",
-                message: err.message || String(err)
+                message: String(
+                    err && err.message
+                        ? err.message
+                        : err
+                )
             });
         }
+
+        return;
+    }
+
+    if (data.type === "search") {
+
+        try {
+
+            if (typeof crypt !== "function") {
+                throw new Error(
+                    "crypt is not a function"
+                );
+            }
+
+            search(data);
+
+        } catch (err) {
+
+            self.postMessage({
+                type: "error",
+                message: String(
+                    err && err.message
+                        ? err.message
+                        : err
+                )
+            });
+        }
+
+        return;
     }
 };
 
 
-/* =========================================
+/* ================================
    Trip生成
-========================================= */
+================================ */
 
 function makeTrip(key) {
 
-    if (!key) {
-        throw new Error("キーが空です");
+    if (typeof crypt !== "function") {
+        throw new Error(
+            "crypt is not a function"
+        );
     }
 
-    /*
-     * Unix cryptのsalt
-     *
-     * 2文字を使用
-     */
-    const salt = key.slice(0, 2);
+    const salt =
+        key.slice(0, 2);
 
-    const result = crypt(key, salt);
+    const result =
+        crypt(key, salt);
 
-    if (typeof result !== "string") {
-        throw new Error("Trip生成失敗");
+    if (
+        typeof result !== "string"
+    ) {
+        throw new Error(
+            "Trip生成失敗"
+        );
     }
 
-    /*
-     * 通常のTrip部分だけ返す
-     *
-     * crypt結果:
-     * xxXXXXXXXXXXX
-     *
-     * 先頭2文字はsalt
-     */
     return result.slice(2);
 }
 
 
-/* =========================================
-   ランダムキー検索
-========================================= */
+/* ================================
+   検索
+================================ */
 
 function search(data) {
 
-    const length = Number(data.length) === 12
-        ? 12
-        : 10;
+    const length =
+        Number(data.length) === 12
+            ? 12
+            : 10;
 
     const charset =
         data.charset ||
@@ -159,23 +182,18 @@ function search(data) {
     const special =
         data.special || "none";
 
-
     let count = 0;
 
-    /*
-     * 同じWorker内で同じキーを出さない
-     */
-    const usedKeys = new Set();
+    const usedKeys =
+        new Set();
 
-    /*
-     * 乱数で永遠に検索
-     */
     while (true) {
 
-        const key = randomKey(
-            charset,
-            length
-        );
+        const key =
+            randomKey(
+                charset,
+                length
+            );
 
         if (usedKeys.has(key)) {
             continue;
@@ -183,13 +201,11 @@ function search(data) {
 
         usedKeys.add(key);
 
-        const trip = makeTrip(key);
+        const trip =
+            makeTrip(key);
 
         count++;
 
-        /*
-         * 条件チェック
-         */
         if (
             matchesConditions(
                 trip,
@@ -208,11 +224,9 @@ function search(data) {
             });
         }
 
-
-        /*
-         * まとめて進捗送信
-         */
-        if ((count & 1023) === 0) {
+        if (
+            (count & 1023) === 0
+        ) {
 
             self.postMessage({
                 type: "progress",
@@ -223,33 +237,36 @@ function search(data) {
 }
 
 
-/* =========================================
-   暗号学的乱数
-========================================= */
+/* ================================
+   ランダムキー
+================================ */
 
-function randomKey(charset, length) {
+function randomKey(
+    charset,
+    length
+) {
 
     const result = [];
 
-    /*
-     * rejection sampling
-     *
-     * 文字コード範囲の偏りを避ける
-     */
-    const max = 256 -
+    const max =
+        256 -
         (256 % charset.length);
 
-    while (result.length < length) {
+    while (
+        result.length < length
+    ) {
 
         const buf =
             new Uint8Array(32);
 
         crypto.getRandomValues(buf);
 
-        for (let i = 0;
-             i < buf.length &&
-             result.length < length;
-             i++) {
+        for (
+            let i = 0;
+            i < buf.length &&
+            result.length < length;
+            i++
+        ) {
 
             const n = buf[i];
 
@@ -258,7 +275,9 @@ function randomKey(charset, length) {
             }
 
             result.push(
-                charset[n % charset.length]
+                charset[
+                    n % charset.length
+                ]
             );
         }
     }
@@ -267,9 +286,9 @@ function randomKey(charset, length) {
 }
 
 
-/* =========================================
+/* ================================
    通常条件
-========================================= */
+================================ */
 
 function matchesConditions(
     trip,
@@ -285,9 +304,6 @@ function matchesConditions(
             continue;
         }
 
-        /*
-         * 正規表現
-         */
         if (c.regex) {
 
             try {
@@ -307,34 +323,35 @@ function matchesConditions(
             continue;
         }
 
-
         const mode =
             c.mode || "contains";
 
+        if (
+            mode === "starts" &&
+            !trip.startsWith(text)
+        ) {
+            return false;
+        }
 
-        if (mode === "starts") {
+        if (
+            mode === "ends" &&
+            !trip.endsWith(text)
+        ) {
+            return false;
+        }
 
-            if (!trip.startsWith(text)) {
-                return false;
-            }
+        if (
+            mode === "exact" &&
+            trip !== text
+        ) {
+            return false;
+        }
 
-        } else if (mode === "ends") {
-
-            if (!trip.endsWith(text)) {
-                return false;
-            }
-
-        } else if (mode === "exact") {
-
-            if (trip !== text) {
-                return false;
-            }
-
-        } else {
-
-            if (!trip.includes(text)) {
-                return false;
-            }
+        if (
+            mode === "contains" &&
+            !trip.includes(text)
+        ) {
+            return false;
         }
     }
 
@@ -342,9 +359,9 @@ function matchesConditions(
 }
 
 
-/* =========================================
+/* ================================
    特殊Trip
-========================================= */
+================================ */
 
 function matchesSpecial(
     s,
@@ -358,23 +375,13 @@ function matchesSpecial(
             return true;
 
         case "pure":
-            return hasRun(
-                s,
-                8,
-                false
-            );
+            return hasRun(s, 8, false);
 
         case "quasi":
-            return hasRun(
-                s,
-                9,
-                true
-            );
+            return hasRun(s, 9, true);
 
         case "two":
-            return new Set(
-                s.split("")
-            ).size <= 2;
+            return new Set(s).size <= 2;
 
         case "longest":
             return /^[MmW]+$/.test(s);
@@ -411,10 +418,6 @@ function matchesSpecial(
     }
 }
 
-
-/* =========================================
-   純連 / 準連
-========================================= */
 
 function hasRun(
     s,
@@ -463,10 +466,6 @@ function hasRun(
 }
 
 
-/* =========================================
-   八雲
-========================================= */
-
 function yakumo(s) {
 
     const groups =
@@ -494,18 +493,12 @@ function yakumo(s) {
 }
 
 
-/* =========================================
-   鏡
-========================================= */
-
 function mirror(s) {
 
     const pair = {
-
         ".": ".",
         "0": "0",
         "8": "8",
-
         "A": "A",
         "H": "H",
         "I": "I",
@@ -517,17 +510,13 @@ function mirror(s) {
         "W": "W",
         "X": "X",
         "Y": "Y",
-
         "b": "d",
         "d": "b",
-
         "i": "i",
         "l": "l",
         "o": "o",
-
         "p": "q",
         "q": "p",
-
         "v": "v",
         "w": "w"
     };
@@ -550,10 +539,6 @@ function mirror(s) {
 }
 
 
-/* =========================================
-   回文
-========================================= */
-
 function palindrome(s) {
 
     for (
@@ -574,10 +559,6 @@ function palindrome(s) {
 }
 
 
-/* =========================================
-   山彦
-========================================= */
-
 function echo(s) {
 
     if (s.length % 2 !== 0) {
@@ -594,10 +575,6 @@ function echo(s) {
 }
 
 
-/* =========================================
-   双連
-========================================= */
-
 function doublePair(s) {
 
     if (s.length % 2 !== 0) {
@@ -611,8 +588,7 @@ function doublePair(s) {
     ) {
 
         if (
-            s[i] !==
-            s[i + 1]
+            s[i] !== s[i + 1]
         ) {
             return false;
         }
@@ -621,10 +597,6 @@ function doublePair(s) {
     return true;
 }
 
-
-/* =========================================
-   飛石
-========================================= */
 
 function tobiishi(s) {
 
@@ -646,17 +618,14 @@ function tobiishi(s) {
 }
 
 
-/* =========================================
-   拡飛
-========================================= */
-
 function kakutobi(s) {
 
     if (s.length < 2) {
         return false;
     }
 
-    const separator = s[1];
+    const separator =
+        s[1];
 
     for (
         let i = 1;
