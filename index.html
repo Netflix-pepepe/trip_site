@@ -1,186 +1,235 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover"
->
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover">
 
 <title>🐺 人狼オンライン トリップ検索機</title>
 
 <style>
-
-* {
-    box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    background: #0d1117;
-    color: #e6edf3;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+body{
+  margin:0;
+  padding:16px;
+  background:#111827;
+  color:#f3f4f6;
+  font-family:-apple-system,BlinkMacSystemFont,
+    "Segoe UI","Hiragino Kaku Gothic ProN",
+    "Yu Gothic",sans-serif;
 }
 
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
+.container{
+  max-width:1100px;
+  margin:auto;
 }
 
-h1 {
-    font-size: 28px;
-    margin-bottom: 8px;
+h1{
+  margin-top:0;
+  font-size:28px;
 }
 
-h2 {
-    margin-top: 0;
+h2{
+  margin-top:26px;
 }
 
-.card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 14px;
-    padding: 18px;
-    margin: 16px 0;
+h3{
+  margin-bottom:8px;
 }
 
-label {
-    display: block;
-    margin-bottom: 7px;
-    font-weight: bold;
+.card{
+  background:#1f2937;
+  border:1px solid #374151;
+  border-radius:12px;
+  padding:16px;
+  margin:14px 0;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
 }
 
 input,
 select,
-button {
-    font: inherit;
+button{
+  font-size:16px;
+  border-radius:8px;
+  border:1px solid #4b5563;
+  padding:10px 12px;
 }
 
 input,
-select {
-    width: 100%;
-    padding: 11px;
-    border-radius: 8px;
-    border: 1px solid #30363d;
-    background: #0d1117;
-    color: white;
+select{
+  background:#111827;
+  color:#fff;
 }
 
-button {
-    padding: 10px 15px;
-    border: 0;
-    border-radius: 8px;
-    cursor: pointer;
-    margin: 4px;
+button{
+  background:#2563eb;
+  color:#fff;
+  cursor:pointer;
+  border:none;
+  font-weight:bold;
 }
 
-.primary {
-    background: #238636;
-    color: white;
+button:hover{
+  background:#1d4ed8;
 }
 
-.danger {
-    background: #da3633;
-    color: white;
+button.stop{
+  background:#dc2626;
 }
 
-.secondary {
-    background: #30363d;
-    color: white;
+button.stop:hover{
+  background:#b91c1c;
 }
 
-.result {
-    font-size: 26px;
-    font-weight: bold;
-    color: #58a6ff;
-    word-break: break-all;
+button.gray{
+  background:#4b5563;
 }
 
-.status {
-    padding: 10px;
-    border-radius: 8px;
-    background: #0d1117;
-    margin-top: 10px;
+button.gray:hover{
+  background:#374151;
 }
 
-.ok {
-    color: #3fb950;
+.status{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:10px;
 }
 
-.error {
-    color: #f85149;
+.statusBox{
+  background:#111827;
+  border-radius:8px;
+  padding:12px;
 }
 
-.hit {
-    padding: 12px;
-    margin: 8px 0;
-    background: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 8px;
+.ok{
+  color:#4ade80;
 }
 
-.hit-trip {
-    color: #58a6ff;
-    font-size: 22px;
-    font-weight: bold;
+.warn{
+  color:#facc15;
 }
 
-.hit-key {
-    color: #8b949e;
-    word-break: break-all;
+.error{
+  color:#f87171;
 }
 
-.condition {
-    display: grid;
-    grid-template-columns: 1fr 150px auto;
-    gap: 8px;
-    margin-bottom: 8px;
+.trip{
+  font-size:28px;
+  font-weight:bold;
+  color:#fbbf24;
+  word-break:break-all;
+  margin:12px 0;
 }
 
-@media(max-width:700px) {
-
-    .condition {
-        grid-template-columns: 1fr;
-    }
-
-    button {
-        width: 100%;
-        margin: 4px 0;
-    }
-
+.condition{
+  background:#111827;
+  border:1px solid #374151;
+  border-radius:10px;
+  padding:12px;
+  margin:10px 0;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+.conditionGrid{
+  display:grid;
+  grid-template-columns:1fr 180px auto;
+  gap:10px;
+  align-items:center;
 }
 
-td,
-th {
-    padding: 9px;
-    border-bottom: 1px solid #30363d;
-    text-align: left;
+@media(max-width:700px){
+  .conditionGrid{
+    grid-template-columns:1fr;
+  }
 }
 
-.small {
-    color: #8b949e;
-    font-size: 13px;
+.results{
+  max-height:500px;
+  overflow:auto;
 }
 
-.big {
-    font-size: 20px;
+.result{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  padding:10px;
+  border-bottom:1px solid #374151;
 }
 
+.resultTrip{
+  color:#fbbf24;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.resultKey{
+  color:#93c5fd;
+}
+
+.specialList{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.specialList th,
+.specialList td{
+  padding:8px;
+  border-bottom:1px solid #374151;
+  text-align:left;
+}
+
+.progress{
+  height:10px;
+  background:#111827;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.progressBar{
+  height:100%;
+  background:#22c55e;
+  width:0%;
+  transition:width .2s;
+}
+
+.small{
+  color:#9ca3af;
+  font-size:13px;
+}
+
+.stat{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.hidden{
+  display:none;
+}
+
+label{
+  font-weight:bold;
+}
+
+textarea{
+  width:100%;
+  min-height:100px;
+  background:#111827;
+  color:#fff;
+  border:1px solid #4b5563;
+  border-radius:8px;
+  padding:10px;
+}
 </style>
-
 </head>
 
 <body>
@@ -189,199 +238,203 @@ th {
 
 <h1>🐺 人狼オンライン トリップ検索機</h1>
 
-<div class="small">
+<p>
 10桁・12桁キー対応 / 正規表現 / 特殊トリップ / マルチWorker
-</div>
+</p>
 
-
-<!-- ======================================
-     システム
-======================================= -->
+<!-- ========================= -->
+<!-- STATUS -->
+<!-- ========================= -->
 
 <div class="card">
 
 <h2>⚙️ システム状態</h2>
 
-<div>
-ライブラリ：
-<strong id="libraryStatus">
+<div class="status">
+
+<div class="statusBox">
+<div>ライブラリ</div>
+<strong id="libStatus" class="warn">
 確認中…
 </strong>
 </div>
 
-<div>
-Worker：
+<div class="statusBox">
+<div>Worker</div>
 <strong id="workerStatus">
 停止中
 </strong>
 </div>
 
-<div
-    id="systemMessage"
-    class="status"
->
-起動しています…
+<div class="statusBox">
+<div>CPU</div>
+<strong id="cpuStatus">
+確認中…
+</strong>
 </div>
 
 </div>
 
+</div>
 
-<!-- ======================================
-     生成
-======================================= -->
+
+<!-- ========================= -->
+<!-- GENERATOR -->
+<!-- ========================= -->
 
 <div class="card">
 
 <h2>🔑 トリップ生成</h2>
 
-<div class="small">
-トリップキーは # を入れずに入力してください。
-</div>
+<p class="small">
+トリップキーを入力してください。
+</p>
 
-<br>
+<div class="row">
 
-<label>
-トリップキー
-</label>
+<label for="generateKey">キー</label>
 
 <input
-    id="generateKey"
-    maxlength="12"
-    placeholder="例: aaaaaaaaaa"
+  id="generateKey"
+  type="text"
+  maxlength="128"
+  placeholder="キーを入力"
+  autocomplete="off"
 >
 
-<button
-    id="generateButton"
-    class="primary"
->
+<label for="generateLength">
+トリップ長
+</label>
+
+<select id="generateLength">
+<option value="10">10桁</option>
+<option value="12">12桁</option>
+</select>
+
+<button id="generateBtn">
 ✨ トリップを生成
 </button>
 
-<div
-    id="generateResult"
-    class="result"
->
+</div>
+
+<div id="generateResult" class="trip">
 ◆—
 </div>
 
-<button
-    id="copyButton"
-    class="secondary"
->
+<button id="copyTripBtn" class="gray">
 📋 トリップをコピー
 </button>
 
 </div>
 
 
-<!-- ======================================
-     自動検証
-======================================= -->
+<!-- ========================= -->
+<!-- VERIFY -->
+<!-- ========================= -->
 
 <div class="card">
 
 <h2>🧪 自動検証</h2>
 
-<div class="small">
-既知の結果と比較してライブラリが正常か確認します。
-</div>
+<p>
+既知の計算をWorkerで実行して、
+ライブラリが正常に動作しているか確認します。
+</p>
 
-<div
-    id="verifyResult"
-    class="status"
->
+<div id="verifyResult">
 未実行
 </div>
 
-<button
-    id="verifyButton"
-    class="secondary"
->
+<button id="verifyBtn">
 🧪 4件を検証
 </button>
 
 </div>
 
 
-<!-- ======================================
-     検索
-======================================= -->
+<!-- ========================= -->
+<!-- SEARCH -->
+<!-- ========================= -->
 
 <div class="card">
 
 <h2>🔎 トリップ検索</h2>
 
-<div class="small">
-複数条件を追加した場合、すべての条件に一致するものを検索します。
-</div>
+<p>
+複数条件を追加した場合、
+<strong>すべての条件</strong>に一致するものを検索します。
+</p>
 
 <p>
 <strong>最大試行回数はありません。</strong>
+停止ボタンを押すまで検索を続けます。
 </p>
 
-<p class="small">
-⏹ 検索停止を押すまで検索を続けます。
-</p>
 
+<h3>探索するキーの長さ</h3>
+
+<div class="row">
 
 <label>
-探索するキーの長さ
-</label>
-
-<select id="keyLength">
-
-<option value="10">
+<input
+  type="radio"
+  name="searchLength"
+  value="10"
+  checked
+>
 10文字
-</option>
-
-<option value="12">
-12文字
-</option>
-
-</select>
-
-
-<br><br>
-
-
-<label>
-一致方式
 </label>
 
-<select id="matchType">
+<label>
+<input
+  type="radio"
+  name="searchLength"
+  value="12"
+>
+12文字
+</label>
 
-<option value="normal">
+</div>
+
+
+<h3>一致方式</h3>
+
+<div class="row">
+
+<label>
+<input
+  type="radio"
+  name="matchMode"
+  value="normal"
+  checked
+>
 通常検索
-</option>
+</label>
 
-<option value="regex">
+<label>
+<input
+  type="radio"
+  name="matchMode"
+  value="regex"
+>
 🔥 正規表現
-</option>
+</label>
 
-</select>
-
-
-<br><br>
+</div>
 
 
 <h3>一致条件</h3>
 
 <div id="conditions"></div>
 
-<button
-    id="addCondition"
-    class="secondary"
->
+<button id="addConditionBtn" class="gray">
 ＋ 条件を追加
 </button>
 
 
-<br><br>
-
-
 <h3>⭐ 特殊トリップ</h3>
 
-<select id="special">
+<select id="specialType">
 
 <option value="none">
 指定なし
@@ -391,7 +444,7 @@ Worker：
 純n連（純8連以上）
 </option>
 
-<option value="quasi">
+<option value="semi">
 準n連（準9連以上）
 </option>
 
@@ -399,11 +452,11 @@ Worker：
 二構
 </option>
 
-<option value="longest">
+<option value="long">
 最長
 </option>
 
-<option value="shortest">
+<option value="short">
 最短
 </option>
 
@@ -427,25 +480,27 @@ Worker：
 双連
 </option>
 
-<option value="numbers">
+<option value="number">
 全数
 </option>
 
-<option value="tobiishi">
+<option value="skip">
 飛石
 </option>
 
-<option value="kakutobi">
+<option value="wideSkip">
 拡飛
 </option>
 
 </select>
 
+<p class="small">
+特殊トリップを選ぶと、その分類条件に一致する
+トリップだけを表示します。
+</p>
 
-<br><br>
 
-
-<h3>⚡ Worker数</h3>
+<h3>高速化 Worker数</h3>
 
 <select id="workerCount">
 
@@ -453,93 +508,102 @@ Worker：
 自動（CPUコア数に合わせる）
 </option>
 
-<option value="1">
-1 Worker
-</option>
-
-<option value="2">
-2 Workers
-</option>
-
-<option value="4">
-4 Workers
-</option>
-
-<option value="6">
-6 Workers
-</option>
-
-<option value="8">
-8 Workers
-</option>
+<option value="1">1 Worker</option>
+<option value="2">2 Workers</option>
+<option value="4">4 Workers</option>
+<option value="6">6 Workers</option>
+<option value="8">8 Workers</option>
 
 </select>
 
 
-<br><br>
+<div class="row" style="margin-top:20px">
 
-
-<button
-    id="startButton"
-    class="primary"
->
+<button id="startBtn">
 🔍 検索開始
 </button>
 
-<button
-    id="stopButton"
-    class="danger"
-    disabled
->
+<button id="stopBtn" class="stop">
 ⏹ 検索停止
 </button>
 
+</div>
 
-<div
-    id="searchStatus"
-    class="status"
->
+
+<div class="card">
+
+<div id="searchStatus">
 待機中
 </div>
 
-<div
-    id="searchSpace"
-    class="small"
->
+<div class="row">
+
+<div>
+<div class="small">試行キー</div>
+<div id="keyCount" class="stat">0</div>
+</div>
+
+<div>
+<div class="small">ヒット</div>
+<div id="hitCount" class="stat">0</div>
+</div>
+
+<div>
+<div class="small">速度</div>
+<div id="speed" class="stat">0 / 秒</div>
+</div>
+
+</div>
+
+<div class="progress">
+<div id="progressBar" class="progressBar"></div>
+</div>
+
+<p>
+探索空間：
+<strong id="space">
+-
+</strong>
+通り
+</p>
+
 </div>
 
 </div>
 
 
-<!-- ======================================
-     結果
-======================================= -->
+<!-- ========================= -->
+<!-- RESULTS -->
+<!-- ========================= -->
 
 <div class="card">
 
 <h2>🎯 検索結果</h2>
 
-<div id="results">
-まだ結果はありません。
+<div id="results" class="results">
 </div>
 
 </div>
 
 
-<!-- ======================================
-     特殊一覧
-======================================= -->
+<!-- ========================= -->
+<!-- SPECIAL INFO -->
+<!-- ========================= -->
 
 <div class="card">
 
 <h2>📖 特殊トリップ一覧</h2>
 
-<table>
+<table class="specialList">
 
+<thead>
 <tr>
-<th>分類</th>
+<th>分類条件</th>
 <th>意味</th>
 </tr>
+</thead>
+
+<tbody>
 
 <tr>
 <td>純n連</td>
@@ -606,6 +670,7 @@ Worker：
 <td>同じ区切り文字が1文字おき</td>
 </tr>
 
+</tbody>
 </table>
 
 </div>
@@ -613,863 +678,2673 @@ Worker：
 </div>
 
 
-<!--
-=========================================
-ライブラリ
-=========================================
--->
+<!-- ===================================================== -->
+<!-- UNIX CRYPT -->
+<!-- ===================================================== -->
 
 <script src="./unix-crypt-td.min.js"></script>
 
 
 <script>
-
 "use strict";
 
+/* =========================================================
+   基本設定
+========================================================= */
 
-/* =========================================
-   DOM
-========================================= */
+const CHARSET =
+  "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-const $ = id =>
-    document.getElementById(id);
-
-
-/* =========================================
-   ライブラリ確認
-========================================= */
-
-function checkLibrary() {
-
-    if (
-        typeof window.unixCryptTD ===
-        "function"
-    ) {
-
-        $("libraryStatus").innerHTML =
-            '<span class="ok">正常</span>';
-
-        $("systemMessage").textContent =
-            "ライブラリを読み込みました。";
-
-        return true;
-    }
-
-    $("libraryStatus").innerHTML =
-        '<span class="error">エラー</span>';
-
-    $("systemMessage").innerHTML =
-        '<span class="error">' +
-        'unixCryptTD が読み込めません。' +
-        '</span>';
-
-    return false;
-}
-
-
-/* =========================================
-   Worker管理
-========================================= */
+const RESULT_LIMIT = 10000;
 
 let workers = [];
-let workerReady = 0;
-let workerRunning = false;
+let running = false;
 
-let totalCount = 0;
-let hitCount = 0;
+let totalKeys = 0;
+let totalHits = 0;
+
+let uniqueTrips = new Set();
+
+let startTime = 0;
+let lastStatTime = 0;
+let lastStatKeys = 0;
+
+let currentTrip = "◆—";
+
+let workerBlobURL = null;
+
+let conditionCounter = 0;
 
 
-/* =========================================
-   Worker作成
-========================================= */
+/* =========================================================
+   DOM
+========================================================= */
 
-function createWorker() {
+const $ = id => document.getElementById(id);
 
-    const worker =
-        new Worker(
-            "./trip-worker.js"
-        );
+const libStatus = $("libStatus");
+const workerStatus = $("workerStatus");
+const cpuStatus = $("cpuStatus");
 
-    worker.onmessage =
-        handleWorkerMessage;
+const generateKey = $("generateKey");
+const generateLength = $("generateLength");
+const generateBtn = $("generateBtn");
+const generateResult = $("generateResult");
+const copyTripBtn = $("copyTripBtn");
 
-    worker.onerror =
-        function (e) {
+const verifyBtn = $("verifyBtn");
+const verifyResult = $("verifyResult");
 
-            console.error(
-                "Worker error:",
-                e
-            );
+const conditions = $("conditions");
+const addConditionBtn = $("addConditionBtn");
 
-            $("systemMessage").innerHTML =
-                '<span class="error">' +
-                "Workerエラー: " +
-                (e.message || "不明なエラー") +
-                "</span>";
+const specialType = $("specialType");
+const workerCount = $("workerCount");
 
-            $("workerStatus").innerHTML =
-                '<span class="error">エラー</span>';
-        };
+const startBtn = $("startBtn");
+const stopBtn = $("stopBtn");
 
-    return worker;
+const searchStatus = $("searchStatus");
+const keyCount = $("keyCount");
+const hitCount = $("hitCount");
+const speed = $("speed");
+const progressBar = $("progressBar");
+const space = $("space");
+
+const results = $("results");
+
+
+/* =========================================================
+   初期化
+========================================================= */
+
+cpuStatus.textContent =
+  (navigator.hardwareConcurrency || 1) + " cores";
+
+
+/*
+ * unix-crypt-td.min.js は正常にロードされると
+ * window.unixCryptTD を作る。
+ */
+if(typeof window.unixCryptTD === "function"){
+  libStatus.textContent = "正常";
+  libStatus.className = "ok";
+}else{
+  libStatus.textContent = "読み込み失敗";
+  libStatus.className = "error";
 }
 
 
-/* =========================================
-   Workerメッセージ
-========================================= */
+/* =========================================================
+   条件追加
+========================================================= */
 
-function handleWorkerMessage(e) {
+function addCondition(value = "", method = "contains"){
 
-    const data = e.data || {};
+  conditionCounter++;
 
-    if (data.type === "ready") {
+  const box = document.createElement("div");
+  box.className = "condition";
 
-        workerReady++;
+  box.dataset.id = conditionCounter;
 
-        $("workerStatus").innerHTML =
-            '<span class="ok">' +
-            workerReady +
-            " Worker 起動中" +
-            "</span>";
+  box.innerHTML = `
+    <div class="conditionGrid">
 
-        return;
-    }
+      <input
+        class="conditionValue"
+        type="text"
+        placeholder="例：abc / ^abc / abc$"
+        value="${escapeHTML(value)}"
+      >
 
+      <select class="conditionMethod">
 
-    if (data.type === "test-ok") {
+        <option value="contains"
+          ${method==="contains" ? "selected" : ""}>
+          部分一致
+        </option>
 
-        return;
-    }
+        <option value="starts"
+          ${method==="starts" ? "selected" : ""}>
+          前方一致
+        </option>
 
+        <option value="ends"
+          ${method==="ends" ? "selected" : ""}>
+          後方一致
+        </option>
 
-    if (data.type === "progress") {
+        <option value="exact"
+          ${method==="exact" ? "selected" : ""}>
+          完全一致
+        </option>
 
-        totalCount +=
-            Number(data.count || 0);
+      </select>
 
-        updateSearchStatus();
+      <button
+        type="button"
+        class="gray removeCondition">
+        🗑️ この条件を削除
+      </button>
 
-        return;
-    }
+    </div>
+  `;
 
+  box.querySelector(".removeCondition")
+    .addEventListener("click", () => {
 
-    if (data.type === "hit") {
+      box.remove();
 
-        hitCount++;
+      if(!conditions.children.length){
+        addCondition();
+      }
 
-        addResult(
-            data.trip,
-            data.key
-        );
+    });
 
-        updateSearchStatus();
-
-        return;
-    }
-
-
-    if (data.type === "stopped") {
-
-        return;
-    }
-
-
-    if (data.type === "error") {
-
-        console.error(
-            data.message
-        );
-
-        $("systemMessage").innerHTML =
-            '<span class="error">' +
-            "❌ " +
-            escapeHtml(
-                data.message
-            ) +
-            "</span>";
-
-        return;
-    }
+  conditions.appendChild(box);
 }
 
 
-/* =========================================
-   Worker起動
-========================================= */
-
-function startWorkers() {
-
-    stopWorkers();
-
-    workerReady = 0;
-
-    const select =
-        $("workerCount").value;
-
-    let count;
-
-    if (select === "auto") {
-
-        count =
-            Math.max(
-                1,
-                Math.min(
-                    8,
-                    navigator.hardwareConcurrency ||
-                    4
-                )
-            );
-
-    } else {
-
-        count =
-            Number(select);
-    }
-
-    for (
-        let i = 0;
-        i < count;
-        i++
-    ) {
-
-        try {
-
-            workers.push(
-                createWorker()
-            );
-
-        } catch (e) {
-
-            console.error(e);
-        }
-    }
-}
-
-
-/* =========================================
-   Worker停止
-========================================= */
-
-function stopWorkers() {
-
-    for (const worker of workers) {
-
-        try {
-
-            worker.postMessage({
-                type: "stop"
-            });
-
-        } catch (e) {}
-
-        try {
-
-            worker.terminate();
-
-        } catch (e) {}
-    }
-
-    workers = [];
-
-    workerReady = 0;
-
-    $("workerStatus").textContent =
-        "停止中";
-}
-
-
-/* =========================================
-   条件
-========================================= */
-
-function addCondition() {
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
-        "condition";
-
-    wrapper.innerHTML = `
-
-        <input
-            class="condition-text"
-            placeholder="検索文字列 / 正規表現"
-        >
-
-        <select class="condition-mode">
-
-            <option value="contains">
-                部分一致
-            </option>
-
-            <option value="starts">
-                前方一致
-            </option>
-
-            <option value="ends">
-                後方一致
-            </option>
-
-            <option value="exact">
-                完全一致
-            </option>
-
-        </select>
-
-        <button
-            class="secondary remove-condition"
-        >
-            🗑️ 削除
-        </button>
-
-    `;
-
-    wrapper
-        .querySelector(
-            ".remove-condition"
-        )
-        .onclick =
-        () => wrapper.remove();
-
-    $("conditions")
-        .appendChild(wrapper);
-}
-
-
+/* 最初の条件 */
 addCondition();
 
 
-/* =========================================
-   条件取得
-========================================= */
+addConditionBtn.addEventListener(
+  "click",
+  () => addCondition()
+);
 
-function getConditions() {
 
-    const regex =
-        $("matchType").value ===
-        "regex";
+/* =========================================================
+   HTML escape
+========================================================= */
 
-    const elements =
-        document.querySelectorAll(
-            ".condition"
-        );
+function escapeHTML(value){
 
-    const result = [];
-
-    for (const element of elements) {
-
-        const text =
-            element
-                .querySelector(
-                    ".condition-text"
-                )
-                .value;
-
-        const mode =
-            element
-                .querySelector(
-                    ".condition-mode"
-                )
-                .value;
-
-        if (!text) {
-            continue;
-        }
-
-        result.push({
-            text,
-            mode,
-            regex
-        });
-    }
-
-    return result;
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 
-/* =========================================
-   検索開始
-========================================= */
+/* =========================================================
+   10桁トリップ
+========================================================= */
 
-function startSearch() {
+/*
+ * 2ch系10桁トリップのsalt生成。
+ */
+function makeSalt(key){
 
-    if (!checkLibrary()) {
-        return;
+  let k = key;
+
+  if(k.length < 2){
+    k += "H";
+  }
+
+  let salt =
+    k.substring(1,3);
+
+  salt = salt.replace(
+    /[^.-z]/g,
+    "."
+  );
+
+  const map = {
+    ":":"A",
+    ";":"B",
+    "<":"C",
+    "=":"D",
+    ">":"E",
+    "?":"F",
+    "@":"G",
+    "[":"a",
+    "\\":"b",
+    "]":"c",
+    "^":"d",
+    "_":"e",
+    "`":"f"
+  };
+
+  return salt.replace(
+    /[:;<=>?@\[\\\]\^_`]/g,
+    c => map[c] || c
+  );
+}
+
+
+/*
+ * 10桁生成
+ */
+function generate10(key){
+
+  if(typeof window.unixCryptTD !== "function"){
+    throw new Error(
+      "unixCryptTD unavailable"
+    );
+  }
+
+  const salt = makeSalt(key);
+
+  const crypted =
+    window.unixCryptTD(
+      key,
+      salt
+    );
+
+  if(typeof crypted !== "string"){
+    throw new Error(
+      "unixCryptTD returned invalid value"
+    );
+  }
+
+  return crypted.slice(-10);
+}
+
+
+/* =========================================================
+   SHA-1
+========================================================= */
+
+function rotr(x,n){
+
+  return (
+    (x >>> n) |
+    (x << (32-n))
+  ) >>> 0;
+}
+
+
+function sha1Bytes(message){
+
+  let ml = message.length;
+
+  const words = [];
+
+  for(let i=0;i<ml;i++){
+
+    words[i>>2] =
+      (words[i>>2] || 0) |
+      (message[i] << (24-(i%4)*8));
+
+  }
+
+  words[ml>>2] =
+    (words[ml>>2] || 0) |
+    (0x80 << (24-(ml%4)*8));
+
+
+  const totalWords =
+    (((ml + 8) >> 6) + 1) * 16;
+
+  while(words.length < totalWords){
+    words.push(0);
+  }
+
+  words[totalWords-1] =
+    ml * 8;
+
+
+  let h0 = 0x67452301;
+  let h1 = 0xEFCDAB89;
+  let h2 = 0x98BADCFE;
+  let h3 = 0x10325476;
+  let h4 = 0xC3D2E1F0;
+
+
+  const w = new Uint32Array(80);
+
+  for(
+    let block=0;
+    block<totalWords;
+    block+=16
+  ){
+
+    for(let i=0;i<16;i++){
+      w[i] =
+        words[block+i] >>> 0;
     }
 
-    stopWorkers();
+    for(let i=16;i<80;i++){
 
-    totalCount = 0;
-    hitCount = 0;
+      w[i] =
+        rotr(
+          w[i-3]^
+          w[i-8]^
+          w[i-14]^
+          w[i-16],
+          31
+        );
+    }
 
-    $("results").innerHTML =
-        "";
+    let a=h0;
+    let b=h1;
+    let c=h2;
+    let d=h3;
+    let e=h4;
 
-    const length =
+    for(let i=0;i<80;i++){
+
+      let f;
+      let k;
+
+      if(i<20){
+
+        f =
+          (b & c) |
+          ((~b) & d);
+
+        k=0x5A827999;
+
+      }else if(i<40){
+
+        f =
+          b ^ c ^ d;
+
+        k=0x6ED9EBA1;
+
+      }else if(i<60){
+
+        f =
+          (b & c) |
+          (b & d) |
+          (c & d);
+
+        k=0x8F1BBCDC;
+
+      }else{
+
+        f =
+          b ^ c ^ d;
+
+        k=0xCA62C1D6;
+      }
+
+      const temp =
+        (
+          rotr(a,27) +
+          f +
+          e +
+          k +
+          w[i]
+        ) >>> 0;
+
+      e=d;
+      d=c;
+      c=rotr(b,2);
+      b=a;
+      a=temp;
+    }
+
+    h0=(h0+a)>>>0;
+    h1=(h1+b)>>>0;
+    h2=(h2+c)>>>0;
+    h3=(h3+d)>>>0;
+    h4=(h4+e)>>>0;
+  }
+
+  const out = new Uint8Array(20);
+
+  const hs=[
+    h0,h1,h2,h3,h4
+  ];
+
+  for(let i=0;i<5;i++){
+
+    out[i*4] =
+      hs[i] >>> 24;
+
+    out[i*4+1] =
+      hs[i] >>> 16;
+
+    out[i*4+2] =
+      hs[i] >>> 8;
+
+    out[i*4+3] =
+      hs[i];
+  }
+
+  return out;
+}
+
+
+/* =========================================================
+   Base64
+========================================================= */
+
+function base64Bytes(bytes){
+
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "abcdefghijklmnopqrstuvwxyz" +
+    "0123456789+/";
+
+  let out="";
+
+  for(
+    let i=0;
+    i<bytes.length;
+    i+=3
+  ){
+
+    const a=bytes[i];
+
+    const b=
+      i+1<bytes.length
+        ? bytes[i+1]
+        : 0;
+
+    const c=
+      i+2<bytes.length
+        ? bytes[i+2]
+        : 0;
+
+    out += chars[a>>2];
+
+    out += chars[
+      ((a&3)<<4) |
+      (b>>4)
+    ];
+
+    out +=
+      i+1<bytes.length
+      ? chars[
+          ((b&15)<<2) |
+          (c>>6)
+        ]
+      : "=";
+
+    out +=
+      i+2<bytes.length
+      ? chars[c&63]
+      : "=";
+  }
+
+  return out;
+}
+
+
+/* =========================================================
+   12桁
+========================================================= */
+
+function generate12(key){
+
+  /*
+   * ASCII検索を高速化するためTextEncoderを使用。
+   * 通常の検索対象である ./0-9A-Za-z はUTF-8=ASCII。
+   */
+  const enc =
+    new TextEncoder();
+
+  const bytes =
+    enc.encode(key);
+
+  const hash =
+    sha1Bytes(bytes);
+
+  /*
+   * 2ch系12桁方式
+   * Base64の+を.へ変更。
+   */
+  return base64Bytes(hash)
+    .slice(0,12)
+    .replaceAll("+",".");
+}
+
+
+/* =========================================================
+   統一生成
+========================================================= */
+
+function makeTrip(key,length){
+
+  if(length === 10){
+    return generate10(key);
+  }
+
+  return generate12(key);
+}
+
+
+/* =========================================================
+   生成ボタン
+========================================================= */
+
+generateBtn.addEventListener(
+  "click",
+  () => {
+
+    try{
+
+      const key =
+        generateKey.value;
+
+      if(!key){
+        alert("キーを入力してください。");
+        return;
+      }
+
+      const length =
         Number(
-            $("keyLength").value
+          generateLength.value
         );
 
-    const special =
-        $("special").value;
-
-    const conditions =
-        getConditions();
-
-    startWorkers();
-
-    workerRunning = true;
-
-    $("startButton").disabled =
-        true;
-
-    $("stopButton").disabled =
-        false;
-
-    $("searchStatus").textContent =
-        "🔎 検索中… 0 keys / ヒット 0";
-
-
-    /*
-     * 文字種類64
-     */
-    const charset =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-        "abcdefghijklmnopqrstuvwxyz" +
-        "0123456789./";
-
-
-    /*
-     * 探索空間表示
-     */
-    const space =
-        Math.pow(
-            charset.length,
-            length
+      const trip =
+        makeTrip(
+          key,
+          length
         );
 
-    $("searchSpace").textContent =
-        "探索空間：" +
-        formatNumber(space) +
-        " 通り";
+      currentTrip =
+        "◆" + trip;
+
+      generateResult.textContent =
+        currentTrip;
+
+    }catch(err){
+
+      console.error(err);
+
+      generateResult.textContent =
+        "❌ " + err.message;
+    }
+  }
+);
 
 
-    for (const worker of workers) {
+/* =========================================================
+   コピー
+========================================================= */
+
+copyTripBtn.addEventListener(
+  "click",
+  async () => {
+
+    if(currentTrip === "◆—"){
+      return;
+    }
+
+    try{
+
+      await navigator.clipboard.writeText(
+        currentTrip
+      );
+
+      copyTripBtn.textContent =
+        "✅ コピーしました";
+
+      setTimeout(
+        () => {
+          copyTripBtn.textContent =
+            "📋 トリップをコピー";
+        },
+        1200
+      );
+
+    }catch(e){
+
+      alert(currentTrip);
+    }
+  }
+);
+
+
+/* =========================================================
+   検索条件取得
+========================================================= */
+
+function getConditions(){
+
+  return [
+    ...document.querySelectorAll(
+      ".condition"
+    )
+  ]
+  .map(box => {
+
+    return {
+      value:
+        box.querySelector(
+          ".conditionValue"
+        ).value,
+
+      method:
+        box.querySelector(
+          ".conditionMethod"
+        ).value
+    };
+
+  })
+  .filter(x => x.value !== "");
+}
+
+
+/* =========================================================
+   検索設定
+========================================================= */
+
+function getSearchConfig(){
+
+  const length =
+    Number(
+      document.querySelector(
+        'input[name="searchLength"]:checked'
+      ).value
+    );
+
+  const mode =
+    document.querySelector(
+      'input[name="matchMode"]:checked'
+    ).value;
+
+  return {
+
+    length,
+
+    mode,
+
+    conditions:
+      getConditions(),
+
+    special:
+      specialType.value
+  };
+}
+
+
+/* =========================================================
+   特殊トリップ判定
+========================================================= */
+
+function checkSpecial(trip,type){
+
+  if(type === "none"){
+    return true;
+  }
+
+
+  /* 純n連 */
+  if(type === "pure"){
+
+    return /(.)\1{7,}/.test(
+      trip
+    );
+  }
+
+
+  /* 準n連 */
+  if(type === "semi"){
+
+    return /(.)\1{8,}/i.test(
+      trip
+    );
+  }
+
+
+  /* 二構 */
+  if(type === "two"){
+
+    return new Set(trip.split(""))
+      .size === 2;
+  }
+
+
+  /* 最長 */
+  if(type === "long"){
+
+    return /^[MmW]+$/.test(
+      trip
+    );
+  }
+
+
+  /* 最短 */
+  if(type === "short"){
+
+    return /^[li.]+$/.test(
+      trip
+    );
+  }
+
+
+  /* 八雲 */
+  if(type === "yakumo"){
+
+    /*
+     * 10桁:
+     * aaa bbb ccc + 1文字
+     *
+     * 12桁:
+     * aaa bbb ccc ddd
+     */
+    for(
+      let i=0;
+      i+2<trip.length;
+      i+=3
+    ){
+
+      if(
+        trip[i] !== trip[i+1] ||
+        trip[i] !== trip[i+2]
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  /* 鏡 */
+  if(type === "mirror"){
+
+    const mirrorPairs = {
+
+      ".":".",
+      "0":"0",
+      "8":"8",
+      "A":"A",
+      "H":"H",
+      "I":"I",
+      "M":"M",
+      "O":"O",
+      "T":"T",
+      "U":"U",
+      "V":"V",
+      "W":"W",
+      "X":"X",
+      "Y":"Y",
+
+      "b":"d",
+      "d":"b",
+      "i":"i",
+      "l":"l",
+      "o":"o",
+      "p":"q",
+      "q":"p",
+      "v":"v",
+      "w":"w",
+      "x":"x"
+    };
+
+    for(
+      let i=0;
+      i<trip.length;
+      i++
+    ){
+
+      const a=trip[i];
+      const b=
+        trip[
+          trip.length-1-i
+        ];
+
+      if(
+        mirrorPairs[a] !== b
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  /* 回文 */
+  if(type === "palindrome"){
+
+    for(
+      let i=0;
+      i<trip.length/2;
+      i++
+    ){
+
+      if(
+        trip[i] !==
+        trip[trip.length-1-i]
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  /* 山彦 */
+  if(type === "echo"){
+
+    if(
+      trip.length % 2 !== 0
+    ){
+      return false;
+    }
+
+    const half =
+      trip.length / 2;
+
+    return (
+      trip.slice(0,half) ===
+      trip.slice(half)
+    );
+  }
+
+
+  /* 双連 */
+  if(type === "double"){
+
+    for(
+      let i=0;
+      i<trip.length;
+      i+=2
+    ){
+
+      if(
+        trip[i] !==
+        trip[i+1]
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  /* 全数 */
+  if(type === "number"){
+
+    return /^[0-9]+$/.test(
+      trip
+    );
+  }
+
+
+  /* 飛石 */
+  if(type === "skip"){
+
+    for(
+      let i=1;
+      i<trip.length;
+      i+=2
+    ){
+
+      if(
+        trip[i] !== "." &&
+        trip[i] !== "/"
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  /* 拡飛 */
+  if(type === "wideSkip"){
+
+    if(trip.length < 2){
+      return false;
+    }
+
+    const separator =
+      trip[1];
+
+    if(
+      separator === "." ||
+      separator === "/"
+    ){
+      for(
+        let i=1;
+        i<trip.length;
+        i+=2
+      ){
+
+        if(
+          trip[i] !== separator
+        ){
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
+
+  return false;
+}
+
+
+/* =========================================================
+   条件判定
+========================================================= */
+
+function checkConditions(
+  trip,
+  config
+){
+
+  for(
+    const condition of
+    config.conditions
+  ){
+
+    const value =
+      condition.value;
+
+
+    if(config.mode === "regex"){
+
+      let re;
+
+      try{
+        re = new RegExp(value);
+      }catch(e){
+        return false;
+      }
+
+      if(!re.test(trip)){
+        return false;
+      }
+
+      continue;
+    }
+
+
+    if(
+      condition.method ===
+      "contains"
+    ){
+
+      if(!trip.includes(value)){
+        return false;
+      }
+
+    }else if(
+      condition.method ===
+      "starts"
+    ){
+
+      if(!trip.startsWith(value)){
+        return false;
+      }
+
+    }else if(
+      condition.method ===
+      "ends"
+    ){
+
+      if(!trip.endsWith(value)){
+        return false;
+      }
+
+    }else if(
+      condition.method ===
+      "exact"
+    ){
+
+      if(trip !== value){
+        return false;
+      }
+    }
+  }
+
+
+  return checkSpecial(
+    trip,
+    config.special
+  );
+}
+
+
+/* =========================================================
+   64進数変換
+========================================================= */
+
+function indexToKey(
+  index,
+  length
+){
+
+  let result =
+    "";
+
+  for(
+    let i=0;
+    i<length;
+    i++
+  ){
+
+    result =
+      CHARSET[
+        Number(
+          index % 64n
+        )
+      ] +
+      result;
+
+    index =
+      index / 64n;
+  }
+
+  return result;
+}
+
+
+/* =========================================================
+   探索空間
+========================================================= */
+
+function getSpace(length){
+
+  return 64n ** BigInt(length);
+}
+
+
+/* =========================================================
+   数値表示
+========================================================= */
+
+function formatBigInt(n){
+
+  return n.toLocaleString(
+    "en-US"
+  );
+}
+
+
+/* =========================================================
+   Workerコード生成
+========================================================= */
+
+async function createWorkerURL(){
+
+  /*
+   * ファイルをテキストとして取得。
+   *
+   * これが重要。
+   *
+   * unix-crypt-td.min.js は
+   *
+   * window.unixCryptTD=z
+   *
+   * となっているため、
+   * Workerでは
+   * windowが存在せず
+   * unixCryptTD unavailable
+   *
+   * になっていた。
+   *
+   * そこでWorker側で
+   *
+   * var window=self;
+   *
+   * を先に定義する。
+   */
+
+  const response =
+    await fetch(
+      "./unix-crypt-td.min.js",
+      {
+        cache:"no-store"
+      }
+    );
+
+  if(!response.ok){
+
+    throw new Error(
+      "unix-crypt-td.min.js を読み込めません。"
+    );
+  }
+
+  const cryptSource =
+    await response.text();
+
+
+  const workerCode = `
+
+"use strict";
+
+var window = self;
+
+/* unixCryptTDをWorkerへロード */
+${cryptSource}
+
+/* 念のため */
+var crypt =
+  self.unixCryptTD ||
+  self.window.unixCryptTD;
+
+if(typeof crypt !== "function"){
+
+  throw new Error(
+    "unixCryptTD unavailable"
+  );
+}
+
+
+/* =========================
+   設定
+========================= */
+
+const CHARSET =
+"./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+
+/* =========================
+   salt
+========================= */
+
+function makeSalt(key){
+
+  let k=key;
+
+  if(k.length<2){
+    k+="H";
+  }
+
+  let salt=k.substring(1,3);
+
+  salt=salt.replace(
+    /[^.-z]/g,
+    "."
+  );
+
+  const map={
+    ":":"A",
+    ";":"B",
+    "<":"C",
+    "=":"D",
+    ">":"E",
+    "?":"F",
+    "@":"G",
+    "[":"a",
+    "\\\\\\\\":"b",
+    "]":"c",
+    "^":"d",
+    "_":"e",
+    "\`":"f"
+  };
+
+  return salt.replace(
+    /[:;<=>?@\\\\[\\\\]\\\\^_\`]/g,
+    c=>map[c]||c
+  );
+}
+
+
+/* =========================
+   10桁
+========================= */
+
+function generate10(key){
+
+  const salt=
+    makeSalt(key);
+
+  const result=
+    crypt(key,salt);
+
+  if(
+    typeof result !== "string"
+  ){
+    throw new Error(
+      "crypt is not a function"
+    );
+  }
+
+  return result.slice(-10);
+}
+
+
+/* =========================
+   SHA1
+========================= */
+
+function rotr(x,n){
+
+  return (
+    (x>>>n) |
+    (x<<(32-n))
+  )>>>0;
+}
+
+
+function sha1Bytes(message){
+
+  const ml=message.length;
+
+  const words=[];
+
+  for(
+    let i=0;
+    i<ml;
+    i++
+  ){
+
+    words[i>>2]=
+      (words[i>>2]||0) |
+      (
+        message[i] <<
+        (24-(i%4)*8)
+      );
+  }
+
+  words[ml>>2]=
+    (words[ml>>2]||0) |
+    (
+      0x80 <<
+      (24-(ml%4)*8)
+    );
+
+  const totalWords=
+    (((ml+8)>>6)+1)*16;
+
+  while(
+    words.length<totalWords
+  ){
+    words.push(0);
+  }
+
+  words[totalWords-1]=
+    ml*8;
+
+
+  let h0=0x67452301;
+  let h1=0xEFCDAB89;
+  let h2=0x98BADCFE;
+  let h3=0x10325476;
+  let h4=0xC3D2E1F0;
+
+
+  const w=
+    new Uint32Array(80);
+
+
+  for(
+    let block=0;
+    block<totalWords;
+    block+=16
+  ){
+
+    for(let i=0;i<16;i++){
+
+      w[i]=
+        words[block+i]>>>0;
+    }
+
+    for(let i=16;i<80;i++){
+
+      w[i]=
+        rotr(
+          w[i-3]^
+          w[i-8]^
+          w[i-14]^
+          w[i-16],
+          31
+        );
+    }
+
+    let a=h0;
+    let b=h1;
+    let c=h2;
+    let d=h3;
+    let e=h4;
+
+    for(let i=0;i<80;i++){
+
+      let f,k;
+
+      if(i<20){
+
+        f=
+          (b&c) |
+          ((~b)&d);
+
+        k=0x5A827999;
+
+      }else if(i<40){
+
+        f=b^c^d;
+
+        k=0x6ED9EBA1;
+
+      }else if(i<60){
+
+        f=
+          (b&c) |
+          (b&d) |
+          (c&d);
+
+        k=0x8F1BBCDC;
+
+      }else{
+
+        f=b^c^d;
+
+        k=0xCA62C1D6;
+      }
+
+      const temp=
+        (
+          rotr(a,27)+
+          f+
+          e+
+          k+
+          w[i]
+        )>>>0;
+
+      e=d;
+      d=c;
+      c=rotr(b,2);
+      b=a;
+      a=temp;
+    }
+
+    h0=(h0+a)>>>0;
+    h1=(h1+b)>>>0;
+    h2=(h2+c)>>>0;
+    h3=(h3+d)>>>0;
+    h4=(h4+e)>>>0;
+  }
+
+
+  const out=
+    new Uint8Array(20);
+
+  const hs=[
+    h0,h1,h2,h3,h4
+  ];
+
+  for(let i=0;i<5;i++){
+
+    out[i*4]=
+      hs[i]>>>24;
+
+    out[i*4+1]=
+      hs[i]>>>16;
+
+    out[i*4+2]=
+      hs[i]>>>8;
+
+    out[i*4+3]=
+      hs[i];
+  }
+
+  return out;
+}
+
+
+/* =========================
+   Base64
+========================= */
+
+function base64Bytes(bytes){
+
+  const chars=
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"+
+    "abcdefghijklmnopqrstuvwxyz"+
+    "0123456789+/";
+
+  let out="";
+
+  for(
+    let i=0;
+    i<bytes.length;
+    i+=3
+  ){
+
+    const a=bytes[i];
+
+    const b=
+      i+1<bytes.length
+      ? bytes[i+1]
+      : 0;
+
+    const c=
+      i+2<bytes.length
+      ? bytes[i+2]
+      : 0;
+
+    out+=chars[a>>2];
+
+    out+=chars[
+      ((a&3)<<4) |
+      (b>>4)
+    ];
+
+    out+=
+      i+1<bytes.length
+      ? chars[
+          ((b&15)<<2) |
+          (c>>6)
+        ]
+      : "=";
+
+    out+=
+      i+2<bytes.length
+      ? chars[c&63]
+      : "=";
+  }
+
+  return out;
+}
+
+
+/* =========================
+   12桁
+========================= */
+
+function generate12(key){
+
+  /*
+   * 検索文字はASCIIなので、
+   * UTF-8 = そのまま1byte。
+   */
+
+  const bytes=
+    new Uint8Array(
+      key.length
+    );
+
+  for(
+    let i=0;
+    i<key.length;
+    i++
+  ){
+    bytes[i]=
+      key.charCodeAt(i)&255;
+  }
+
+  return base64Bytes(
+    sha1Bytes(bytes)
+  )
+  .slice(0,12)
+  .replace(/\\\\+/g,".");
+}
+
+
+/* =========================
+   trip
+========================= */
+
+function makeTrip(key,length){
+
+  return length===10
+    ? generate10(key)
+    : generate12(key);
+}
+
+
+/* =========================
+   key
+========================= */
+
+function indexToKey(
+  index,
+  length
+){
+
+  let result="";
+
+  for(
+    let i=0;
+    i<length;
+    i++
+  ){
+
+    result=
+      CHARSET[
+        Number(index%64n)
+      ]+
+      result;
+
+    index=
+      index/64n;
+  }
+
+  return result;
+}
+
+
+/* =========================
+   条件
+========================= */
+
+function checkSpecial(
+  trip,
+  type
+){
+
+  if(type==="none")
+    return true;
+
+
+  if(type==="pure")
+    return /(.)\\\\1{7,}/.test(trip);
+
+
+  if(type==="semi")
+    return /(.)\\\\1{8,}/i.test(trip);
+
+
+  if(type==="two")
+    return new Set(trip).size===2;
+
+
+  if(type==="long")
+    return /^[MmW]+$/.test(trip);
+
+
+  if(type==="short")
+    return /^[li.]+$/.test(trip);
+
+
+  if(type==="yakumo"){
+
+    for(
+      let i=0;
+      i+2<trip.length;
+      i+=3
+    ){
+
+      if(
+        trip[i]!==trip[i+1] ||
+        trip[i]!==trip[i+2]
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  if(type==="mirror"){
+
+    const mp={
+      ".":".",
+      "0":"0",
+      "8":"8",
+      "A":"A",
+      "H":"H",
+      "I":"I",
+      "M":"M",
+      "O":"O",
+      "T":"T",
+      "U":"U",
+      "V":"V",
+      "W":"W",
+      "X":"X",
+      "Y":"Y",
+      "b":"d",
+      "d":"b",
+      "i":"i",
+      "l":"l",
+      "o":"o",
+      "p":"q",
+      "q":"p",
+      "v":"v",
+      "w":"w",
+      "x":"x"
+    };
+
+    for(
+      let i=0;
+      i<trip.length;
+      i++
+    ){
+
+      if(
+        mp[trip[i]] !==
+        trip[
+          trip.length-1-i
+        ]
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  if(type==="palindrome"){
+
+    for(
+      let i=0;
+      i<trip.length/2;
+      i++
+    ){
+
+      if(
+        trip[i] !==
+        trip[
+          trip.length-1-i
+        ]
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  if(type==="echo"){
+
+    if(trip.length%2)
+      return false;
+
+    const half=
+      trip.length/2;
+
+    return (
+      trip.slice(0,half)===
+      trip.slice(half)
+    );
+  }
+
+
+  if(type==="double"){
+
+    for(
+      let i=0;
+      i<trip.length;
+      i+=2
+    ){
+
+      if(
+        trip[i]!==trip[i+1]
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  if(type==="number")
+    return /^[0-9]+$/.test(trip);
+
+
+  if(type==="skip"){
+
+    for(
+      let i=1;
+      i<trip.length;
+      i+=2
+    ){
+
+      if(
+        trip[i]!=="." &&
+        trip[i]!=="/"
+      ){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  if(type==="wideSkip"){
+
+    if(trip.length<2)
+      return false;
+
+    const sep=trip[1];
+
+    if(
+      sep!=="." &&
+      sep!=="/"
+    ){
+      return false;
+    }
+
+    for(
+      let i=1;
+      i<trip.length;
+      i+=2
+    ){
+
+      if(trip[i]!==sep)
+        return false;
+    }
+
+    return true;
+  }
+
+
+  return false;
+}
+
+
+function checkConditions(
+  trip,
+  config
+){
+
+  for(
+    const condition of
+    config.conditions
+  ){
+
+    if(!condition.value)
+      continue;
+
+
+    if(config.mode==="regex"){
+
+      let re;
+
+      try{
+        re=
+          new RegExp(
+            condition.value
+          );
+      }catch(e){
+        return false;
+      }
+
+      if(!re.test(trip))
+        return false;
+
+      continue;
+    }
+
+
+    const v=
+      condition.value;
+
+
+    if(
+      condition.method==="contains"
+    ){
+
+      if(!trip.includes(v))
+        return false;
+
+    }else if(
+      condition.method==="starts"
+    ){
+
+      if(!trip.startsWith(v))
+        return false;
+
+    }else if(
+      condition.method==="ends"
+    ){
+
+      if(!trip.endsWith(v))
+        return false;
+
+    }else if(
+      condition.method==="exact"
+    ){
+
+      if(trip!==v)
+        return false;
+    }
+  }
+
+
+  return checkSpecial(
+    trip,
+    config.special
+  );
+}
+
+
+/* =========================
+   Worker
+========================= */
+
+let workerStart=0;
+let localCount=0;
+
+self.onmessage=function(event){
+
+  const data=
+    event.data;
+
+
+  if(data.type==="search"){
+
+    localCount=0;
+
+    const start=
+      BigInt(data.start);
+
+    const end=
+      BigInt(data.end);
+
+    const length=
+      data.length;
+
+    const config=
+      data.config;
+
+
+    for(
+      let i=start;
+      i<end;
+      i++
+    ){
+
+      const key=
+        indexToKey(
+          i,
+          length
+        );
+
+      const trip=
+        makeTrip(
+          key,
+          length
+        );
+
+      localCount++;
+
+
+      if(
+        checkConditions(
+          trip,
+          config
+        )
+      ){
+
+        self.postMessage({
+          type:"hit",
+          key:key,
+          trip:trip
+        });
+      }
+
+
+      /*
+       * 定期的に進捗を返す。
+       * UIを固めないため重要。
+       */
+      if(
+        (localCount & 4095) === 0
+      ){
+
+        self.postMessage({
+          type:"progress",
+          count:localCount
+        });
+
+        localCount=0;
+      }
+    }
+
+
+    if(localCount>0){
+
+      self.postMessage({
+        type:"progress",
+        count:localCount
+      });
+    }
+
+
+    self.postMessage({
+      type:"done"
+    });
+  }
+
+
+  if(data.type==="verify"){
+
+    try{
+
+      const tests=[
+        {
+          key:"foob",
+          salt:"ar",
+          expected:"arlEKn0OzVJn."
+        },
+
+        {
+          key:"Jim",
+          salt:"Ji"
+        },
+
+        {
+          key:"aaaaaaaaaa",
+          salt:"aa"
+        },
+
+        {
+          key:"test",
+          salt:"te"
+        }
+      ];
+
+
+      const output=
+        tests.map(
+          test => {
+
+            const r=
+              crypt(
+                test.key,
+                test.salt
+              );
+
+            return {
+              key:test.key,
+              result:r,
+              expected:
+                test.expected||null
+            };
+          }
+        );
+
+
+      self.postMessage({
+        type:"verifyResult",
+        result:output
+      });
+
+    }catch(error){
+
+      self.postMessage({
+        type:"verifyError",
+        error:String(error)
+      });
+    }
+  }
+};
+
+`;
+
+
+  const blob =
+    new Blob(
+      [workerCode],
+      {
+        type:
+          "application/javascript"
+      }
+    );
+
+  return URL.createObjectURL(
+    blob
+  );
+}
+
+
+/* =========================================================
+   Worker停止
+========================================================= */
+
+function terminateWorkers(){
+
+  for(
+    const worker of workers
+  ){
+
+    try{
+      worker.terminate();
+    }catch(e){}
+  }
+
+  workers=[];
+
+  $("workerStatus").textContent =
+    "停止中";
+
+  running=false;
+}
+
+
+/* =========================================================
+   検索開始
+========================================================= */
+
+startBtn.addEventListener(
+  "click",
+  async () => {
+
+    if(running){
+      return;
+    }
+
+
+    try{
+
+      const config =
+        getSearchConfig();
+
+
+      /*
+       * 正規表現を事前検査
+       */
+      if(config.mode==="regex"){
+
+        for(
+          const c of
+          config.conditions
+        ){
+
+          if(c.value){
+
+            try{
+              new RegExp(c.value);
+            }catch(e){
+
+              alert(
+                "正規表現が不正です：\n"+
+                c.value
+              );
+
+              return;
+            }
+          }
+        }
+      }
+
+
+      const length=
+        config.length;
+
+
+      const totalSpace=
+        getSpace(length);
+
+
+      space.textContent=
+        formatBigInt(
+          totalSpace
+        );
+
+
+      terminateWorkers();
+
+      uniqueTrips.clear();
+
+      results.innerHTML="";
+
+      totalKeys=0;
+      totalHits=0;
+
+      keyCount.textContent="0";
+      hitCount.textContent="0";
+      speed.textContent="0 / 秒";
+
+      progressBar.style.width="0%";
+
+
+      const url=
+        await createWorkerURL();
+
+      workerBlobURL=url;
+
+
+      let count;
+
+      if(
+        workerCount.value==="auto"
+      ){
+
+        const cores=
+          navigator.hardwareConcurrency ||
+          4;
+
+        count=
+          Math.min(
+            Math.max(1,cores),
+            8
+          );
+
+      }else{
+
+        count=
+          Number(
+            workerCount.value
+          );
+      }
+
+
+      /*
+       * iPad等でWorkerを増やしすぎると
+       * 逆に遅くなるため最大8。
+       */
+      count=
+        Math.min(
+          Math.max(1,count),
+          8
+        );
+
+
+      running=true;
+
+      searchStatus.textContent =
+        "🔎 検索中…";
+
+
+      $("workerStatus").textContent =
+        count +
+        " Worker 起動中";
+
+
+      startTime=
+        performance.now();
+
+      lastStatTime=
+        startTime;
+
+      lastStatKeys=0;
+
+
+      const range=
+        totalSpace /
+        BigInt(count);
+
+
+      for(
+        let n=0;
+        n<count;
+        n++
+      ){
+
+        const worker=
+          new Worker(url);
+
+
+        workers.push(worker);
+
+
+        const start=
+          range *
+          BigInt(n);
+
+        const end=
+          n===count-1
+          ? totalSpace
+          : range *
+            BigInt(n+1);
+
+
+        worker.onmessage =
+          event => {
+
+            handleWorkerMessage(
+              event,
+              worker
+            );
+          };
+
+
+        worker.onerror =
+          error => {
+
+            console.error(
+              "Worker error:",
+              error
+            );
+
+            searchStatus.textContent =
+              "❌ Workerエラー：" +
+              (
+                error.message ||
+                "Worker error"
+              );
+          };
+
 
         worker.postMessage({
 
-            type: "search",
+          type:"search",
 
-            length,
+          start:
+            start.toString(),
 
-            conditions,
+          end:
+            end.toString(),
 
-            special,
+          length,
 
-            charset
-
+          config
         });
-    }
-}
+      }
 
 
-/* =========================================
-   検索停止
-========================================= */
+    }catch(error){
 
-function stopSearch() {
+      console.error(error);
 
-    workerRunning = false;
+      running=false;
 
-    for (const worker of workers) {
-
-        try {
-
-            worker.postMessage({
-                type: "stop"
-            });
-
-        } catch (e) {}
+      searchStatus.textContent =
+        "❌ " +
+        error.message;
     }
 
-    for (const worker of workers) {
+  }
+);
 
-        try {
-            worker.terminate();
-        } catch (e) {}
+
+/* =========================================================
+   Worker message
+========================================================= */
+
+function handleWorkerMessage(
+  event,
+  worker
+){
+
+  const data=
+    event.data;
+
+
+  if(data.type==="progress"){
+
+    totalKeys +=
+      data.count;
+
+
+    updateStats();
+
+    return;
+  }
+
+
+  if(data.type==="hit"){
+
+    totalHits++;
+
+    /*
+     * ここが「トリップかぶり」対策。
+     *
+     * 同じtripを複数のキーが生成しても
+     * 1回しか表示しない。
+     */
+    if(
+      !uniqueTrips.has(
+        data.trip
+      )
+    ){
+
+      uniqueTrips.add(
+        data.trip
+      );
+
+
+      if(
+        uniqueTrips.size <=
+        RESULT_LIMIT
+      ){
+
+        const row=
+          document.createElement(
+            "div"
+          );
+
+        row.className=
+          "result";
+
+
+        row.innerHTML=`
+          <span class="resultTrip">
+            ◆${escapeHTML(data.trip)}
+          </span>
+
+          <span>キー：</span>
+
+          <span class="resultKey">
+            ${escapeHTML(data.key)}
+          </span>
+        `;
+
+
+        results.prepend(row);
+      }
     }
 
-    workers = [];
 
-    $("workerStatus").textContent =
+    hitCount.textContent =
+      uniqueTrips.size;
+
+    return;
+  }
+
+
+  if(data.type==="done"){
+
+    /*
+     * Worker単位の終了。
+     *
+     * 全Workerが終了したら停止。
+     */
+    worker.__done=true;
+
+    if(
+      workers.length &&
+      workers.every(
+        w => w.__done
+      )
+    ){
+
+      running=false;
+
+      searchStatus.textContent =
+        "✅ 探索完了";
+
+      $("workerStatus").textContent =
         "停止中";
 
-    $("startButton").disabled =
-        false;
+      updateStats();
+    }
 
-    $("stopButton").disabled =
-        true;
+    return;
+  }
 
-    $("searchStatus").textContent =
-        "⏹ 停止しました。" +
-        " " +
-        formatNumber(totalCount) +
-        " keys / ヒット " +
-        hitCount;
+
+  if(data.type==="verifyResult"){
+
+    const output=
+      data.result;
+
+    let ok=true;
+
+    for(
+      const item of output
+    ){
+
+      if(
+        item.expected &&
+        item.result !==
+        item.expected
+      ){
+        ok=false;
+      }
+    }
+
+
+    verifyResult.innerHTML =
+      ok
+      ? `<span class="ok">
+           ✅ 検証成功
+         </span>`
+      : `<span class="error">
+           ❌ 検証失敗
+         </span>`;
+
+    console.log(
+      "verification:",
+      output
+    );
+
+    return;
+  }
+
+
+  if(data.type==="verifyError"){
+
+    verifyResult.innerHTML =
+      `<span class="error">
+        ❌ ${escapeHTML(data.error)}
+       </span>`;
+
+    return;
+  }
 }
 
 
-/* =========================================
-   進捗
-========================================= */
+/* =========================================================
+   統計
+========================================================= */
 
-function updateSearchStatus() {
+function updateStats(){
 
-    $("searchStatus").textContent =
-        "🔎 検索中… " +
-        formatNumber(totalCount) +
-        " keys / ヒット " +
-        hitCount;
+  keyCount.textContent =
+    totalKeys.toLocaleString();
+
+
+  hitCount.textContent =
+    uniqueTrips.size.toLocaleString();
+
+
+  const now=
+    performance.now();
+
+  const elapsed=
+    (now-startTime)/1000;
+
+
+  if(elapsed>0){
+
+    const currentSpeed=
+      totalKeys /
+      elapsed;
+
+    speed.textContent =
+      Math.floor(
+        currentSpeed
+      ).toLocaleString() +
+      " / 秒";
+  }
+
+
+  /*
+   * BigIntなので安全。
+   */
+  const config=
+    getSearchConfig();
+
+  const total=
+    getSpace(
+      config.length
+    );
+
+
+  if(total>0){
+
+    const ratio=
+      Number(
+        (
+          BigInt(totalKeys) *
+          10000n
+        ) /
+        total
+      ) / 100;
+
+
+    progressBar.style.width =
+      Math.min(
+        100,
+        ratio
+      ) + "%";
+  }
 }
 
 
-/* =========================================
-   結果
-========================================= */
+/* =========================================================
+   停止
+========================================================= */
 
-function addResult(
-    trip,
-    key
-) {
+stopBtn.addEventListener(
+  "click",
+  () => {
 
-    const div =
-        document.createElement(
-            "div"
-        );
+    if(!running){
+      return;
+    }
 
-    div.className =
-        "hit";
+    terminateWorkers();
 
-    div.innerHTML = `
+    searchStatus.textContent =
+      "⏹ 停止しました";
 
-        <div class="hit-trip">
-            ◆${escapeHtml(trip)}
-        </div>
-
-        <div class="hit-key">
-            キー：${escapeHtml(key)}
-        </div>
-
-    `;
-
-    $("results")
-        .prepend(div);
-}
+    updateStats();
+  }
+);
 
 
-/* =========================================
-   Trip生成
-========================================= */
+/* =========================================================
+   自動検証
+========================================================= */
 
-$("generateButton")
-    .onclick =
-    function () {
+verifyBtn.addEventListener(
+  "click",
+  async () => {
 
-        const key =
-            $("generateKey")
-                .value
-                .trim();
+    verifyResult.textContent =
+      "検証中…";
 
-        if (!key) {
 
-            $("generateResult")
-                .textContent =
-                "❌ キーを入力してください";
+    try{
 
-            return;
-        }
+      const url=
+        await createWorkerURL();
 
-        if (key.includes("#")) {
+      const worker=
+        new Worker(url);
 
-            $("generateResult")
-                .textContent =
-                "❌ # は入れないでください";
 
-            return;
-        }
+      worker.onmessage =
+        event => {
 
-        if (
-            key.length > 12
-        ) {
+          const data=
+            event.data;
 
-            $("generateResult")
-                .textContent =
-                "❌ 12文字以内にしてください";
+          if(
+            data.type===
+            "verifyResult"
+          ){
 
-            return;
-        }
+            let html="";
 
-        if (
-            typeof window.unixCryptTD !==
-            "function"
-        ) {
+            for(
+              const item of
+              data.result
+            ){
 
-            $("generateResult")
-                .textContent =
-                "❌ unixCryptTD unavailable";
+              const passed=
+                !item.expected ||
+                item.result===
+                item.expected;
 
-            return;
-        }
+              html += `
+                <div>
+                  ${
+                    passed
+                    ? "✅"
+                    : "❌"
+                  }
 
-        try {
+                  ${escapeHTML(
+                    item.key
+                  )}
 
-            const salt =
-                key.substring(0, 2);
+                  →
 
-            const result =
-                window.unixCryptTD(
-                    key,
-                    salt
-                );
-
-            if (
-                typeof result !==
-                "string"
-            ) {
-                throw new Error(
-                    "Trip生成結果が不正です"
-                );
+                  ${escapeHTML(
+                    item.result
+                  )}
+                </div>
+              `;
             }
 
-            const trip =
-                result.substring(
-                    2,
-                    12
-                );
+            verifyResult.innerHTML=
+              html;
 
-            $("generateResult")
-                .textContent =
-                "◆" + trip;
+            worker.terminate();
 
-        } catch (e) {
-
-            console.error(e);
-
-            $("generateResult")
-                .textContent =
-                "❌ " +
-                e.message;
-        }
-    };
-
-
-/* =========================================
-   コピー
-========================================= */
-
-$("copyButton")
-    .onclick =
-    async function () {
-
-        const text =
-            $("generateResult")
-                .textContent
-                .replace(/^◆/, "");
-
-        if (!text) {
-            return;
-        }
-
-        try {
-
-            await navigator.clipboard
-                .writeText(text);
-
-            $("copyButton")
-                .textContent =
-                "✅ コピーしました";
-
-            setTimeout(
-                () => {
-
-                    $("copyButton")
-                        .textContent =
-                        "📋 トリップをコピー";
-
-                },
-                1500
+            URL.revokeObjectURL(
+              url
             );
+          }
 
-        } catch (e) {
 
-            alert(
-                "コピーできませんでした"
+          if(
+            data.type===
+            "verifyError"
+          ){
+
+            verifyResult.innerHTML=
+              `<span class="error">
+                ❌ ${escapeHTML(
+                  data.error
+                )}
+               </span>`;
+
+            worker.terminate();
+
+            URL.revokeObjectURL(
+              url
             );
-        }
-    };
+          }
+        };
 
 
-/* =========================================
-   検証
-========================================= */
+      worker.onerror =
+        error => {
 
-$("verifyButton")
-    .onclick =
-    function () {
+          verifyResult.innerHTML=
+            `<span class="error">
+              ❌ Workerエラー：
+              ${escapeHTML(
+                error.message ||
+                "unknown"
+              )}
+             </span>`;
 
-        const result =
-            $("verifyResult");
+          worker.terminate();
 
-        result.textContent =
-            "検証中…";
-
-        if (
-            typeof window.unixCryptTD !==
-            "function"
-        ) {
-
-            result.innerHTML =
-                '<span class="error">' +
-                "ライブラリがありません" +
-                "</span>";
-
-            return;
-        }
-
-        try {
-
-            const keys = [
-                "aaaaaaaaaa",
-                "aaaaaaaaab",
-                "aaaaaaaaac",
-                "aaaaaaaaad"
-            ];
-
-            const outputs = [];
-
-            for (const key of keys) {
-
-                const salt =
-                    key.substring(0, 2);
-
-                const value =
-                    window.unixCryptTD(
-                        key,
-                        salt
-                    );
-
-                const trip =
-                    value.substring(
-                        2,
-                        12
-                    );
-
-                outputs.push(
-                    key +
-                    " → ◆" +
-                    trip
-                );
-            }
-
-            result.innerHTML =
-                '<span class="ok">' +
-                "✅ 4件正常に生成できました" +
-                "</span>" +
-                "<br><br>" +
-                outputs.join(
-                    "<br>"
-                );
-
-        } catch (e) {
-
-            result.innerHTML =
-                '<span class="error">' +
-                "❌ " +
-                escapeHtml(
-                    e.message
-                ) +
-                "</span>";
-        }
-    };
+          URL.revokeObjectURL(
+            url
+          );
+        };
 
 
-/* =========================================
-   ボタン
-========================================= */
+      worker.postMessage({
+        type:"verify"
+      });
 
-$("addCondition")
-    .onclick =
-    addCondition;
+    }catch(error){
 
-$("startButton")
-    .onclick =
-    startSearch;
-
-$("stopButton")
-    .onclick =
-    stopSearch;
-
-
-/* =========================================
-   数値
-========================================= */
-
-function formatNumber(n) {
-
-    return Number(n)
-        .toLocaleString(
-            "ja-JP"
-        );
-}
+      verifyResult.innerHTML=
+        `<span class="error">
+          ❌ ${escapeHTML(
+            error.message
+          )}
+         </span>`;
+    }
+  }
+);
 
 
-/* =========================================
-   HTML escape
-========================================= */
-
-function escapeHtml(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-/* =========================================
-   起動
-========================================= */
+/* =========================================================
+   ページ終了時
+========================================================= */
 
 window.addEventListener(
-    "load",
-    function () {
+  "beforeunload",
+  () => {
 
-        checkLibrary();
+    terminateWorkers();
 
-        startWorkers();
+    if(workerBlobURL){
 
+      URL.revokeObjectURL(
+        workerBlobURL
+      );
     }
+  }
 );
 
 </script>
