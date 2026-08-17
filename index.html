@@ -1,462 +1,368 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
 
 <title>🐺 人狼オンライン トリップ検索機</title>
 
 <style>
-:root{
-  --bg:#f7f4fb;
-  --card:#fff;
-  --text:#252536;
-  --muted:#77748a;
-  --line:#e8e1f0;
-  --pink:#f6c9dc;
-  --lav:#d9cef3;
-  --blue:#cfe8f7;
-  --mint:#d9f0e7;
-  --danger:#f8d5dc;
-  --shadow:0 8px 24px rgba(94,72,116,.10);
+
+* {
+    box-sizing: border-box;
 }
 
-*{
-  box-sizing:border-box;
+body {
+    margin: 0;
+    background:
+        linear-gradient(
+            135deg,
+            #111827,
+            #020617
+        );
+    color: #e5e7eb;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
-body{
-  margin:0;
-  padding:16px 12px 40px;
-  background:linear-gradient(
-    180deg,
-    #fbf8fd 0%,
-    var(--bg) 100%
-  );
-  color:var(--text);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Hiragino Sans",
-    "Yu Gothic",
-    sans-serif;
+main {
+    width: min(1000px, 94%);
+    margin: 20px auto 60px;
 }
 
-.wrap{
-  max-width:850px;
-  margin:auto;
+h1 {
+    font-size: 28px;
 }
 
-.hero{
-  background:
-    linear-gradient(
-      135deg,
-      #fff,
-      #f7effa 55%,
-      #edf6fb
-    );
-  border:1px solid #eee3f2;
-  border-radius:24px;
-  padding:24px 20px;
-  box-shadow:var(--shadow);
-  margin-bottom:16px;
+h2 {
+    margin-top: 0;
 }
 
-.badge{
-  display:inline-block;
-  background:var(--pink);
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:800;
+.card {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 16px 0;
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.25);
 }
 
-h1{
-  font-size:28px;
-  margin:10px 0 4px;
-}
-
-h2{
-  font-size:19px;
-  margin:0 0 8px;
-}
-
-.subtitle{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.7;
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:18px;
-  margin:14px 0;
-  box-shadow:var(--shadow);
-}
-
-.note{
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.7;
-}
-
-label{
-  display:block;
-  font-weight:800;
-  margin:14px 0 6px;
-  font-size:14px;
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: 700;
 }
 
 input,
 select,
-button{
-  font:inherit;
+button {
+    font: inherit;
 }
 
 input,
-select{
-  width:100%;
-  padding:13px 14px;
-  border:1px solid #ddd6e6;
-  border-radius:13px;
-  background:#fff;
-  color:var(--text);
-  outline:none;
+select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #4b5563;
+    background: #030712;
+    color: white;
 }
 
-input:focus,
-select:focus{
-  border-color:#c7b4df;
-  box-shadow:0 0 0 3px #efe7f8;
+button {
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    font-weight: 700;
+    margin: 4px;
 }
 
-button{
-  border:0;
-  border-radius:13px;
-  padding:13px 16px;
-  margin-top:12px;
-  font-weight:800;
-  cursor:pointer;
+button:hover {
+    filter: brightness(1.1);
 }
 
-button:active{
-  transform:scale(.98);
+button.stop {
+    background: #dc2626;
 }
 
-.primary{
-  background:linear-gradient(
-    135deg,
-    #e9b8d1,
-    #d6c4ec
-  );
-  color:#30283a;
+button.secondary {
+    background: #374151;
 }
 
-.secondary{
-  background:#eef7fb;
-  color:#33404a;
+button.green {
+    background: #059669;
 }
 
-.danger{
-  background:var(--danger);
-  color:#63343e;
+.row {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 10px;
 }
 
-.row{
-  display:flex;
-  gap:9px;
+@media(max-width:650px) {
+
+    .row {
+        grid-template-columns: 1fr;
+    }
+
 }
 
-.row>*{
-  flex:1;
+.status {
+    padding: 12px;
+    border-radius: 10px;
+    background: #030712;
+    margin-top: 10px;
 }
 
-.trip{
-  font-size:25px;
-  font-weight:900;
-  word-break:break-all;
-  margin:13px 0;
-  background:#faf6fc;
-  border:1px dashed #d9c9e5;
-  border-radius:14px;
-  padding:13px;
-  min-height:58px;
+.ok {
+    color: #34d399;
 }
 
-.ok{
-  color:#27825c;
+.error {
+    color: #f87171;
 }
 
-.bad{
-  color:#b23c50;
+.trip {
+    font-size: 32px;
+    font-weight: 900;
+    color: #facc15;
+    word-break: break-all;
+    margin: 12px 0;
 }
 
-.status{
-  margin-top:12px;
-  color:#6f687c;
-  font-variant-numeric:tabular-nums;
-  line-height:1.6;
+.result {
+    padding: 10px;
+    border-bottom: 1px solid #374151;
 }
 
-.cond{
-  border:1px solid #e8deee;
-  border-radius:15px;
-  padding:11px;
-  margin:9px 0;
-  background:#fdfaff;
+.result b {
+    color: #facc15;
 }
 
-.result{
-  padding:12px;
-  margin-top:9px;
-  border:1px solid #e7dfef;
-  border-radius:14px;
-  background:linear-gradient(
-    90deg,
-    #fff,
-    #fbf7fd
-  );
+.conditions {
+    display: grid;
+    gap: 10px;
 }
 
-.mono{
-  font-family:
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
+.condition {
+    background: #030712;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 12px;
 }
 
-.help{
-  background:
-    linear-gradient(
-      135deg,
-      #eef8fc,
-      #f7f1fb
-    );
-  border-radius:14px;
-  padding:11px 13px;
-  font-size:13px;
-  color:#625c70;
-  line-height:1.7;
+.hit {
+    color: #86efac;
 }
 
-.panel{
-  background:#faf7fc;
-  border:1px solid #eee5f2;
-  border-radius:14px;
-  padding:12px;
-  margin-top:12px;
+.small {
+    font-size: 13px;
+    color: #9ca3af;
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-th,
-td{
-  padding:9px 7px;
-  border-bottom:1px solid #eee8f2;
-  text-align:left;
+td,
+th {
+    border: 1px solid #374151;
+    padding: 9px;
+    text-align: left;
 }
 
-.worker-good{
-  color:#27825c;
-  font-weight:800;
+.progress {
+    height: 12px;
+    background: #1f2937;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 10px;
 }
 
-.worker-bad{
-  color:#b23c50;
-  font-weight:800;
+.progress div {
+    height: 100%;
+    width: 0%;
+    background: #22c55e;
 }
 
-.small{
-  font-size:12px;
-  color:var(--muted);
-}
-
-@media(max-width:600px){
-  body{
-    padding:10px 8px 28px;
-  }
-
-  .hero{
-    padding:20px 16px;
-  }
-
-  h1{
-    font-size:25px;
-  }
-
-  .row{
-    flex-direction:column;
-    gap:0;
-  }
-
-  button{
-    min-height:46px;
-  }
-}
 </style>
+
 </head>
 
 <body>
 
-<div class="wrap">
+<main>
 
-<section class="hero">
+<h1>🐺 人狼オンライン トリップ検索機</h1>
 
-  <span class="badge">
-    🐺 CPU版・iPad対応
-  </span>
+<div class="small">
+10桁・12桁キー対応 / 正規表現 / 特殊トリップ / マルチWorker
+</div>
 
-  <h1>
-    🐺 人狼オンライン<br>
-    トリップ検索機
-  </h1>
 
-  <div class="subtitle">
-    10桁・12桁キー対応 /
-    正規表現 /
-    特殊トリップ /
-    マルチWorker高速検索
-  </div>
+<!-- =====================================================
+     STATUS
+===================================================== -->
+
+<section class="card">
+
+<h2>⚙️ システム状態</h2>
+
+<div id="libraryStatus">
+ライブラリ：確認中…
+</div>
+
+<div id="workerStatus">
+Worker：停止中
+</div>
 
 </section>
 
 
-<!-- =========================
-     SYSTEM
-========================= -->
+<!-- =====================================================
+     GENERATE
+===================================================== -->
 
-<div class="card">
-
-<h2>⚙️ システム状態</h2>
-
-<div class="panel">
-
-<div>
-ライブラリ：
-<strong id="libStatus">
-確認中…
-</strong>
-</div>
-
-<div>
-Worker：
-<strong id="workerStatus">
-停止中
-</strong>
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =========================
-     GENERATOR
-========================= -->
-
-<div class="card">
+<section class="card">
 
 <h2>🔑 トリップ生成</h2>
 
-<p class="note">
-トリップキーは
-<b>#を入れずに10文字以内</b>
-入力してください。
+<p>
+トリップキーを入力してください。
 </p>
 
+<div class="row">
+
+<div>
+
 <label>
-トリップキー
+キー
 </label>
 
 <input
-  id="key"
-  maxlength="10"
-  value="passwordaa"
-  autocomplete="off"
+    id="generateKey"
+    maxlength="12"
+    placeholder="aaaaaaaaaa"
 >
 
+</div>
+
+<div>
+
+<label>
+トリップ長
+</label>
+
+<select id="generateLength">
+
+<option value="10">
+10桁
+</option>
+
+<option value="12">
+12桁
+</option>
+
+</select>
+
+</div>
+
+</div>
+
 <button
-  class="primary"
-  id="make"
+    id="generateButton"
+    class="green"
 >
 ✨ トリップを生成
 </button>
 
 <div
-  class="trip"
-  id="trip"
+    id="generateResult"
+    class="trip"
 >
 ◆—
 </div>
 
 <button
-  class="secondary"
-  id="copy"
+    id="copyButton"
+    class="secondary"
 >
 📋 トリップをコピー
 </button>
 
-</div>
+</section>
 
 
-<!-- =========================
+<!-- =====================================================
      TEST
-========================= -->
+===================================================== -->
 
-<div class="card">
+<section class="card">
 
 <h2>🧪 自動検証</h2>
 
-<p class="note">
-既知の結果と比較して
-ライブラリが正常か確認します。
+<p>
+既知の計算をWorkerで実行して、
+ライブラリが正常に動作しているか確認します。
 </p>
 
-<div id="tests">
+<div id="testResult">
 未実行
 </div>
 
 <button
-  class="primary"
-  id="runTests"
+    id="testButton"
 >
 🧪 4件を検証
 </button>
 
-</div>
+</section>
 
 
-<!-- =========================
+<!-- =====================================================
      SEARCH
-========================= -->
+===================================================== -->
 
-<div class="card">
+<section class="card">
 
 <h2>🔎 トリップ検索</h2>
 
-<div class="help">
+<p>
 複数条件を追加した場合、
-<b>すべての条件</b>
-に一致するトリップを検索します。<br>
-最大試行回数はありません。
-<br>
-⏹ 停止ボタンを押すまで検索を続けます。
-</div>
+<strong>すべての条件</strong>に一致するものを検索します。
+</p>
 
+<p class="small">
+最大試行回数はありません。
+停止ボタンを押すまで検索を続けます。
+</p>
+
+
+<div class="row">
+
+<div>
 
 <label>
 探索するキーの長さ
 </label>
 
-<select id="tripLen">
+<select id="keyLength">
 
 <option value="10">
 10文字
@@ -468,12 +374,15 @@ Worker：
 
 </select>
 
+</div>
+
+<div>
 
 <label>
 一致方式
 </label>
 
-<select id="matchMode">
+<select id="regexMode">
 
 <option value="normal">
 通常検索
@@ -485,53 +394,28 @@ Worker：
 
 </select>
 
-
-<div class="help" style="margin-top:10px">
-
-正規表現では、例えば
-
-<code>.</code>
-任意の1文字、
-
-<code>[A-Z]</code>
-英大文字、
-
-<code>[0-9]</code>
-数字、
-
-<code>+</code>、
-<code>*</code>、
-<code>?</code>、
-<code>{3}</code>、
-<code>{2,4}</code>、
-<code>(ABC|DEF)</code>
-
-などを使用できます。
+</div>
 
 </div>
 
 
-<label>
-一致条件
-</label>
+<h3>一致条件</h3>
 
-<div id="conditions"></div>
+<div
+    id="conditions"
+    class="conditions"
+>
+</div>
 
 <button
-  class="secondary"
-  id="add"
+    id="addCondition"
+    class="secondary"
 >
 ＋ 条件を追加
 </button>
 
 
-<!-- =========================
-     SPECIAL
-========================= -->
-
-<label>
-⭐ 特殊トリップ
-</label>
+<h3>⭐ 特殊トリップ</h3>
 
 <select id="special">
 
@@ -583,32 +467,23 @@ Worker：
 全数
 </option>
 
-<option value="ish">
+<option value="stepping">
 飛石
 </option>
 
-<option value="wide">
+<option value="expanded">
 拡飛
 </option>
 
 </select>
 
-<div class="help" style="margin-top:10px">
-
-特殊トリップを選ぶと、
-その分類条件に一致する
+<p class="small">
+特殊トリップを選ぶと、その分類条件に一致する
 トリップだけを表示します。
+</p>
 
-</div>
 
-
-<!-- =========================
-     WORKERS
-========================= -->
-
-<label>
-高速化 Worker数
-</label>
+<h3>高速化 Worker数</h3>
 
 <select id="workerCount">
 
@@ -624,7 +499,7 @@ Worker：
 2 Workers
 </option>
 
-<option value="4" selected>
+<option value="4">
 4 Workers
 </option>
 
@@ -639,18 +514,17 @@ Worker：
 </select>
 
 
-<div class="row">
+<div style="margin-top:15px">
 
 <button
-  class="primary"
-  id="start"
+    id="startButton"
 >
 🔍 検索開始
 </button>
 
 <button
-  class="danger"
-  id="stop"
+    id="stopButton"
+    class="stop"
 >
 ⏹ 検索停止
 </button>
@@ -659,43 +533,58 @@ Worker：
 
 
 <div
-  class="status"
-  id="status"
+    id="searchStatus"
+    class="status"
 >
 待機中
 </div>
 
 <div
-  class="status"
-  id="space"
+    class="progress"
 >
-探索空間：—
+<div id="progressBar"></div>
 </div>
 
 
-<div
-  id="results"
->
+<div id="space">
+探索空間：-
 </div>
 
+</section>
+
+
+<!-- =====================================================
+     RESULTS
+===================================================== -->
+
+<section class="card">
+
+<h2>🎯 検索結果</h2>
+
+<div id="results">
+まだ結果はありません。
 </div>
 
+</section>
 
-<!-- =========================
+
+<!-- =====================================================
      SPECIAL LIST
-========================= -->
+===================================================== -->
 
-<div class="card">
+<section class="card">
 
 <h2>📖 特殊トリップ一覧</h2>
 
 <table>
 
 <thead>
+
 <tr>
 <th>分類</th>
-<th>意味</th>
+<th>条件</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -766,970 +655,658 @@ Worker：
 </tr>
 
 </tbody>
+
 </table>
 
-</div>
+</section>
 
-</div>
+</main>
 
 
 <script>
 
 /* =========================================================
-   基本設定
+   メイン
 ========================================================= */
+
+const workers = [];
+
+let running = false;
+
+let totalCount = 0;
+
+let hitCount = 0;
+
+let lastTrip = "";
 
 const CHARS =
-  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
-
-let workers = [];
-let searchRunning = false;
-
-let totalAttempts = 0;
-let totalHits = 0;
-let finishedWorkers = 0;
+    "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 
-/* =========================================================
-   HTMLエスケープ
-========================================================= */
+/* ---------------------------------------------------------
+   要素
+--------------------------------------------------------- */
 
-function escapeHTML(value){
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
+const $ = id =>
+    document.getElementById(id);
 
 
-/* =========================================================
-   unixCryptTD
-========================================================= */
-
-function getCrypt(){
-
-  if(
-    typeof window.unixCryptTD ===
-    "function"
-  ){
-
-    return window.unixCryptTD;
-
-  }
-
-  throw new Error(
-    "unixCryptTD unavailable"
-  );
-
-}
-
-
-function saltForTrip(key){
-
-  let s =
-    (key + "H.")
-    .slice(1,3);
-
-  s =
-    s.replace(
-      /[^\\.-z]/g,
-      "."
-    );
-
-  s =
-    s.replace(
-      /[\\:;<=>?@[\\\]^_`]/g,
-      c => {
-
-        const table = {
-
-          ":":"A",
-          ";":"B",
-          "<":"C",
-          "=":"D",
-          ">":"E",
-          "?":"F",
-          "@":"G",
-
-          "[":"a",
-          "\\":"b",
-          "]":"c",
-          "^":"d",
-          "_":"e",
-          "`":"f"
-
-        };
-
-        return table[c] || c;
-
-      }
-    );
-
-  return s;
-}
-
-
-function makeTrip(key){
-
-  if(
-    typeof key !== "string"
-  ){
-    key = String(key);
-  }
-
-  if(
-    key.length < 1 ||
-    key.length > 10
-  ){
-    throw new Error(
-      "キーは1～10文字で入力してください"
-    );
-  }
-
-  const crypt = getCrypt();
-
-  return "◆" +
-    crypt(
-      key,
-      saltForTrip(key)
-    ).slice(-10);
-
-}
-
-
-/* =========================================================
+/* ---------------------------------------------------------
    ライブラリ確認
-========================================================= */
+--------------------------------------------------------- */
 
-function checkLibrary(){
+function checkLibrary() {
 
-  try{
+    /*
+     * index.html側でも確認する。
+     *
+     * unix-crypt-td.min.js は
+     * window.unixCryptTD=z
+     * を持っているので普通に読み込める。
+     */
 
-    const crypt = getCrypt();
+    const script =
+        document.createElement("script");
 
-    if(
-      typeof crypt === "function"
-    ){
+    script.src =
+        "./unix-crypt-td.min.js";
 
-      document.getElementById(
-        "libStatus"
-      ).textContent =
-        "正常";
+    script.onload = () => {
 
-      document.getElementById(
-        "libStatus"
-      ).className =
-        "worker-good";
+        if (
+            typeof window.unixCryptTD ===
+            "function"
+        ) {
 
-      return true;
-    }
+            $("libraryStatus").innerHTML =
+                'ライブラリ：<span class="ok">正常</span>';
 
-  }catch(e){}
+        } else {
 
-  document.getElementById(
-    "libStatus"
-  ).textContent =
-    "エラー";
+            $("libraryStatus").innerHTML =
+                '<span class="error">' +
+                "❌ unixCryptTD が見つかりません" +
+                "</span>";
+        }
+    };
 
-  document.getElementById(
-    "libStatus"
-  ).className =
-    "worker-bad";
+    script.onerror = () => {
 
-  return false;
+        $("libraryStatus").innerHTML =
+            '<span class="error">' +
+            "❌ unix-crypt-td.min.js を読み込めません" +
+            "</span>";
+    };
+
+    document.head.appendChild(script);
+}
+
+checkLibrary();
+
+
+/* ---------------------------------------------------------
+   条件追加
+--------------------------------------------------------- */
+
+let conditionId = 0;
+
+function addCondition(
+    value = "",
+    mode = "contains"
+) {
+
+    const id =
+        conditionId++;
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "condition";
+
+    div.dataset.id =
+        id;
+
+    div.innerHTML = `
+
+        <div class="row">
+
+            <div>
+
+                <label>
+                    条件
+                </label>
+
+                <input
+                    class="conditionValue"
+                    value="${escapeHtml(value)}"
+                    placeholder="例：abc"
+                >
+
+            </div>
+
+            <div>
+
+                <label>
+                    一致方法
+                </label>
+
+                <select class="conditionMode">
+
+                    <option value="contains">
+                        部分一致
+                    </option>
+
+                    <option value="starts">
+                        前方一致
+                    </option>
+
+                    <option value="ends">
+                        後方一致
+                    </option>
+
+                    <option value="exact">
+                        完全一致
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <button
+            class="removeCondition secondary"
+        >
+            🗑️ この条件を削除
+        </button>
+    `;
+
+    $("conditions").appendChild(div);
+
+    div.querySelector(".conditionMode")
+        .value = mode;
+
+    div.querySelector(
+        ".removeCondition"
+    ).onclick = () => {
+
+        div.remove();
+    };
 }
 
 
-/* =========================================================
-   初期生成
-========================================================= */
-
-document.getElementById(
-  "make"
-).onclick = () => {
-
-  try{
-
-    const key =
-      document.getElementById(
-        "key"
-      ).value;
-
-    document.getElementById(
-      "trip"
-    ).textContent =
-      makeTrip(key);
-
-  }catch(e){
-
-    document.getElementById(
-      "trip"
-    ).textContent =
-      "❌ " + e.message;
-
-  }
-
-};
-
-
-/* =========================================================
-   コピー
-========================================================= */
-
-document.getElementById(
-  "copy"
-).onclick = async () => {
-
-  const text =
-    document.getElementById(
-      "trip"
-    ).textContent;
-
-  if(
-    !text ||
-    text.startsWith("❌") ||
-    text === "◆—"
-  ){
-    return;
-  }
-
-  try{
-
-    await navigator.clipboard.writeText(text);
-
-  }catch{
-
-    alert(
-      "コピーできませんでした"
-    );
-
-  }
-
-};
-
-
-/* =========================================================
-   自動検証
-========================================================= */
-
-const expected = [
-
-  [
-    "test123456",
-    "◆o9CDijBNYE"
-  ],
-
-  [
-    "hello12345",
-    "◆FQWl9PgQwg"
-  ],
-
-  [
-    "abcdef1234",
-    "◆E4hSdx1q4w"
-  ],
-
-  [
-    "passwordaa",
-    "◆ozOtJW9BFA"
-  ]
-
-];
-
-
-document.getElementById(
-  "runTests"
-).onclick = () => {
-
-  const box =
-    document.getElementById(
-      "tests"
-    );
-
-  box.innerHTML =
-    "検証中…";
-
-  setTimeout(() => {
-
-    box.innerHTML = "";
-
-    let ok = 0;
-
-    for(
-      const [key,want]
-      of expected
-    ){
-
-      let got;
-
-      try{
-
-        got =
-          makeTrip(key);
-
-      }catch(e){
-
-        got =
-          e.message;
-
-      }
-
-      const good =
-        got === want;
-
-      if(good)
-        ok++;
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-      div.className =
-        good ? "ok" : "bad";
-
-      div.innerHTML =
-        `${good ? "✅" : "❌"} `
-        + `<b>${escapeHTML(key)}</b>`
-        + ` → ${escapeHTML(got)}`
-        + ` / 正解 ${escapeHTML(want)}`;
-
-      box.appendChild(div);
-
-    }
-
-    const hr =
-      document.createElement(
-        "hr"
-      );
-
-    box.appendChild(hr);
-
-    const result =
-      document.createElement(
-        "div"
-      );
-
-    result.innerHTML =
-      `<b>${ok}/4 一致</b>`;
-
-    box.appendChild(result);
-
-  },50);
-
-};
-
-
-/* =========================================================
-   条件
-========================================================= */
-
-const conditions =
-  document.getElementById(
-    "conditions"
-  );
-
-
-function addCondition(){
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-  div.className =
-    "cond";
-
-  div.innerHTML = `
-
-    <div class="row">
-
-      <input
-        class="needle"
-        placeholder="例：ABC / ^ABC / A.{3}"
-        autocomplete="off"
-      >
-
-      <select class="mode">
-
-        <option value="contains">
-          部分一致
-        </option>
-
-        <option value="prefix">
-          前方一致
-        </option>
-
-        <option value="suffix">
-          後方一致
-        </option>
-
-        <option value="exact">
-          完全一致
-        </option>
-
-      </select>
-
-    </div>
-
-    <button
-      type="button"
-      class="danger deleteCondition"
-    >
-      🗑️ この条件を削除
-    </button>
-
-  `;
-
-  div.querySelector(
-    ".deleteCondition"
-  ).onclick = () => {
-
-    div.remove();
-
-  };
-
-  conditions.appendChild(
-    div
-  );
-
+function escapeHtml(s) {
+
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
-document.getElementById(
-  "add"
-).onclick =
-  addCondition;
-
+/* 最初の条件 */
 
 addCondition();
 
 
-/* =========================================================
-   探索空間
-========================================================= */
+$("addCondition").onclick =
+    () => addCondition();
 
-function updateSpace(){
 
-  const len =
-    Number(
-      document.getElementById(
-        "tripLen"
-      ).value
-    );
+/* ---------------------------------------------------------
+   Worker生成
+--------------------------------------------------------- */
 
-  const total =
-    Math.pow(
-      CHARS.length,
-      len
-    );
+function createWorker() {
 
-  document.getElementById(
-    "space"
-  ).textContent =
-    "探索空間：" +
-    total.toLocaleString() +
-    " 通り";
-
-}
-
-
-document.getElementById(
-  "tripLen"
-).onchange =
-  updateSpace;
-
-updateSpace();
-
-
-/* =========================================================
-   Worker停止
-========================================================= */
-
-function stopWorkers(){
-
-  for(
-    const worker
-    of workers
-  ){
-
-    try{
-
-      worker.postMessage({
-        cmd:"stop"
-      });
-
-    }catch{}
-
-    try{
-
-      worker.terminate();
-
-    }catch{}
-
-  }
-
-  workers = [];
-
-  searchRunning =
-    false;
-
-  finishedWorkers =
-    0;
-
-  document.getElementById(
-    "workerStatus"
-  ).textContent =
-    "停止中";
-
-}
-
-
-/* =========================================================
-   STOP
-========================================================= */
-
-document.getElementById(
-  "stop"
-).onclick = () => {
-
-  if(!searchRunning)
-    return;
-
-  stopWorkers();
-
-  document.getElementById(
-    "status"
-  ).textContent =
-    "⏹ 検索を停止しました";
-
-};
-
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-document.getElementById(
-  "start"
-).onclick = () => {
-
-  stopWorkers();
-
-  const len =
-    Number(
-      document.getElementById(
-        "tripLen"
-      ).value
-    );
-
-  const mode =
-    document.getElementById(
-      "matchMode"
-    ).value;
-
-  const special =
-    document.getElementById(
-      "special"
-    ).value;
-
-  const conditions =
-    [
-      ...document.querySelectorAll(
-        ".cond"
-      )
-    ]
-    .map(c => ({
-      text:
-        c.querySelector(
-          ".needle"
-        ).value.trim(),
-
-      mode:
-        c.querySelector(
-          ".mode"
-        ).value
-    }))
-    .filter(
-      x => x.text.length > 0
-    );
-
-
-  if(
-    conditions.length === 0 &&
-    !special
-  ){
-
-    alert(
-      "検索条件または特殊トリップを選んでください"
-    );
-
-    return;
-
-  }
-
-
-  /* 正規表現チェック */
-
-  if(
-    mode === "regex"
-  ){
-
-    for(
-      const c
-      of conditions
-    ){
-
-      try{
-
-        new RegExp(
-          c.text
-        );
-
-      }catch(e){
-
-        alert(
-          "正規表現が正しくありません：\n"
-          + c.text
-        );
-
-        return;
-
-      }
-
-    }
-
-  }
-
-
-  let workerCount =
-    document.getElementById(
-      "workerCount"
-    ).value;
-
-  if(
-    workerCount === "auto"
-  ){
-
-    workerCount =
-      navigator.hardwareConcurrency ||
-      4;
-
-    workerCount =
-      Math.max(
-        1,
-        Math.min(
-          8,
-          workerCount
-        )
-      );
-
-  }else{
-
-    workerCount =
-      Number(workerCount);
-
-  }
-
-
-  totalAttempts = 0;
-  totalHits = 0;
-  finishedWorkers = 0;
-
-  document.getElementById(
-    "results"
-  ).innerHTML = "";
-
-  document.getElementById(
-    "status"
-  ).textContent =
-    "🔎 検索開始…";
-
-  document.getElementById(
-    "workerStatus"
-  ).textContent =
-    workerCount +
-    " Worker 起動中";
-
-  searchRunning =
-    true;
-
-
-  /*
-   * Workerを起動
-   */
-
-  for(
-    let workerId = 0;
-    workerId < workerCount;
-    workerId++
-  ){
-
-    let worker;
-
-    try{
-
-      worker =
+    const worker =
         new Worker(
-          "./trip-worker.js"
+            "./trip-worker.js"
         );
-
-    }catch(e){
-
-      document.getElementById(
-        "status"
-      ).textContent =
-        "❌ Workerの起動に失敗しました";
-
-      stopWorkers();
-
-      return;
-
-    }
-
-
-    worker._done =
-      false;
-
-    workers.push(
-      worker
-    );
-
-
-    worker.onmessage =
-      event => {
-
-        const d =
-          event.data;
-
-
-        /* READY */
-
-        if(
-          d.type === "ready"
-        ){
-
-          worker.postMessage({
-
-            cmd:"start",
-
-            workerId,
-
-            workerCount,
-
-            chars:CHARS,
-
-            length:len,
-
-            conditions,
-
-            regexMode:
-              mode === "regex",
-
-            special
-
-          });
-
-          return;
-        }
-
-
-        /* PROGRESS */
-
-        if(
-          d.type === "progress"
-        ){
-
-          totalAttempts +=
-            d.attempts || 0;
-
-          document.getElementById(
-            "status"
-          ).textContent =
-            "🔎 検索中… "
-            + totalAttempts.toLocaleString()
-            + " keys / ヒット "
-            + totalHits.toLocaleString();
-
-          return;
-        }
-
-
-        /* HIT */
-
-        if(
-          d.type === "hit"
-        ){
-
-          totalHits++;
-
-          const item =
-            d.item;
-
-          const result =
-            document.createElement(
-              "div"
-            );
-
-          result.className =
-            "result";
-
-          result.innerHTML = `
-
-            <div class="mono">
-              ${escapeHTML(
-                item.trip
-              )}
-            </div>
-
-            <div>
-              キー：
-              <span class="mono">
-                ${escapeHTML(
-                  item.key
-                )}
-              </span>
-            </div>
-
-          `;
-
-          document.getElementById(
-            "results"
-          ).appendChild(
-            result
-          );
-
-          return;
-        }
-
-
-        /* DONE */
-
-        if(
-          d.type === "done"
-        ){
-
-          worker._done =
-            true;
-
-          finishedWorkers++;
-
-          totalAttempts +=
-            d.attempts || 0;
-
-          if(
-            finishedWorkers >=
-            workers.length
-          ){
-
-            searchRunning =
-              false;
-
-            document.getElementById(
-              "workerStatus"
-            ).textContent =
-              "停止中";
-
-            document.getElementById(
-              "status"
-            ).textContent =
-              "✅ 検索完了："
-              + totalAttempts.toLocaleString()
-              + " keys / ヒット "
-              + totalHits.toLocaleString();
-
-          }
-
-          return;
-        }
-
-
-        /* ERROR */
-
-        if(
-          d.type === "error"
-        ){
-
-          console.error(
-            "Worker error:",
-            d.error
-          );
-
-          document.getElementById(
-            "status"
-          ).textContent =
-            "❌ Workerエラー："
-            + d.error;
-
-          return;
-        }
-
-      };
-
 
     worker.onerror =
-      event => {
+        function(event) {
 
-        console.error(
-          "Worker error:",
-          event
-        );
+            console.error(
+                "Worker error:",
+                event
+            );
 
-        document.getElementById(
-          "status"
-        ).textContent =
-          "❌ Workerエラー："
-          +
-          (
-            event.message ||
-            "Workerの起動に失敗しました"
-          );
+            $("searchStatus").innerHTML =
+                '<span class="error">' +
+                "❌ Workerエラー：" +
+                escapeHtml(
+                    event.message ||
+                    "Workerの起動に失敗しました"
+                ) +
+                "</span>";
+        };
 
-      };
+    worker.onmessage =
+        handleWorkerMessage;
 
-  }
+    return worker;
+}
 
-};
 
+/* ---------------------------------------------------------
+   Worker message
+--------------------------------------------------------- */
 
-/* =========================================================
-   初期化
-========================================================= */
+function handleWorkerMessage(event) {
 
-window.addEventListener(
-  "load",
-  () => {
+    const data =
+        event.data || {};
 
-    checkLibrary();
+    if (data.type === "progress") {
 
-    try{
+        totalCount +=
+            Number(data.count || 0);
 
-      document.getElementById(
-        "trip"
-      ).textContent =
-        makeTrip(
-          document.getElementById(
-            "key"
-          ).value
-        );
-
-    }catch(e){
-
-      document.getElementById(
-        "trip"
-      ).textContent =
-        "❌ " + e.message;
-
+        $("searchStatus").textContent =
+            "🔎 検索中… " +
+            totalCount.toLocaleString() +
+            " keys / ヒット " +
+            hitCount;
     }
 
-  }
-);
+
+    if (data.type === "hit") {
+
+        hitCount++;
+
+        lastTrip =
+            "◆" + data.trip;
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "result hit";
+
+        div.innerHTML =
+            "◆<b>" +
+            escapeHtml(data.trip) +
+            "</b>" +
+            "<br>" +
+            "キー：" +
+            escapeHtml(data.key);
+
+        $("results")
+            .prepend(div);
+
+        $("searchStatus").textContent =
+            "🔎 検索中… " +
+            totalCount.toLocaleString() +
+            " keys / ヒット " +
+            hitCount;
+    }
+
+
+    if (data.type === "error") {
+
+        console.error(
+            data.message
+        );
+
+        $("searchStatus").innerHTML =
+            '<span class="error">' +
+            "❌ Workerエラー：" +
+            escapeHtml(
+                data.message
+            ) +
+            "</span>";
+    }
+
+
+    if (data.type === "stopped") {
+
+        $("workerStatus").textContent =
+            "Worker：停止";
+    }
+
+
+    if (data.type === "generateResult") {
+
+        lastTrip =
+            "◆" + data.trip;
+
+        $("generateResult").textContent =
+            lastTrip;
+    }
+
+
+    if (data.type === "testResult") {
+
+        $("testResult").innerHTML =
+            data.result
+                .map(
+                    x =>
+                        escapeHtml(x.key) +
+                        " → ◆" +
+                        escapeHtml(x.trip)
+                )
+                .join("<br>");
+    }
+}
+
+
+/* ---------------------------------------------------------
+   生成
+--------------------------------------------------------- */
+
+$("generateButton").onclick =
+    function() {
+
+        const key =
+            $("generateKey")
+                .value;
+
+        const length =
+            Number(
+                $("generateLength")
+                    .value
+            );
+
+        if (!key) {
+
+            $("generateResult")
+                .textContent =
+                "❌ キーを入力してください";
+
+            return;
+        }
+
+        const worker =
+            createWorker();
+
+        worker.postMessage({
+            type: "generate",
+            key,
+            keyLength: length
+        });
+
+        setTimeout(
+            () => worker.terminate(),
+            1000
+        );
+    };
+
+
+/* ---------------------------------------------------------
+   コピー
+--------------------------------------------------------- */
+
+$("copyButton").onclick =
+    async function() {
+
+        if (!lastTrip) {
+            return;
+        }
+
+        try {
+
+            await navigator.clipboard
+                .writeText(lastTrip);
+
+        } catch {
+
+            const ta =
+                document.createElement("textarea");
+
+            ta.value =
+                lastTrip;
+
+            document.body.appendChild(ta);
+
+            ta.select();
+
+            document.execCommand("copy");
+
+            ta.remove();
+        }
+    };
+
+
+/* ---------------------------------------------------------
+   検証
+--------------------------------------------------------- */
+
+$("testButton").onclick =
+    function() {
+
+        $("testResult").textContent =
+            "検証中…";
+
+        const worker =
+            createWorker();
+
+        worker.postMessage({
+            type: "test"
+        });
+
+        setTimeout(
+            () => worker.terminate(),
+            3000
+        );
+    };
+
+
+/* ---------------------------------------------------------
+   条件取得
+--------------------------------------------------------- */
+
+function getConditions() {
+
+    const regex =
+        $("regexMode").value ===
+        "regex";
+
+    const elements =
+        document.querySelectorAll(
+            ".condition"
+        );
+
+    const result = [];
+
+    for (const el of elements) {
+
+        const value =
+            el.querySelector(
+                ".conditionValue"
+            ).value;
+
+        if (!value) {
+            continue;
+        }
+
+        const mode =
+            el.querySelector(
+                ".conditionMode"
+            ).value;
+
+        result.push({
+            value,
+            mode,
+            regex
+        });
+    }
+
+    return result;
+}
+
+
+/* ---------------------------------------------------------
+   検索開始
+--------------------------------------------------------- */
+
+$("startButton").onclick =
+    function() {
+
+        if (running) {
+            return;
+        }
+
+        running = true;
+
+        totalCount = 0;
+
+        hitCount = 0;
+
+        $("results").innerHTML =
+            "";
+
+        const keyLength =
+            Number(
+                $("keyLength").value
+            );
+
+        let count =
+            $("workerCount").value;
+
+        if (count === "auto") {
+
+            count =
+                navigator.hardwareConcurrency ||
+                4;
+
+            /*
+             * iPad等で増やしすぎない
+             */
+
+            count =
+                Math.min(
+                    Math.max(1, count),
+                    8
+                );
+
+        } else {
+
+            count =
+                Number(count);
+        }
+
+
+        /*
+         * 10^? ではなく
+         *
+         * 64^10
+         * 64^12
+         *
+         */
+
+        const space =
+            64n ** BigInt(keyLength);
+
+        $("space").textContent =
+            "探索空間：" +
+            space.toLocaleString() +
+            " 通り";
+
+
+        /*
+         * 古いWorkerを全部停止
+         */
+
+        stopWorkers();
+
+
+        /*
+         * Workerを起動
+         */
+
+        for (
+            let i = 0;
+            i < count;
+            i++
+        ) {
+
+            const worker =
+                createWorker();
+
+            workers.push(worker);
+
+            worker.postMessage({
+                type: "start",
+                workerId: i,
+                workerCount: count,
+                keyLength,
+                conditions:
+                    getConditions(),
+                special:
+                    $("special").value
+            });
+        }
+
+
+        $("workerStatus").textContent =
+            "Worker：" +
+            count +
+            " Worker 起動中";
+
+        $("searchStatus").textContent =
+            "🔎 検索開始…";
+
+        $("progressBar")
+            .style.width = "100%";
+    };
+
+
+/* ---------------------------------------------------------
+   停止
+--------------------------------------------------------- */
+
+$("stopButton").onclick =
+    function() {
+
+        stopWorkers();
+
+        running = false;
+
+        $("workerStatus").textContent =
+            "Worker：停止";
+
+        $("searchStatus").textContent =
+            "⏹ 停止しました。" +
+            " " +
+            totalCount.toLocaleString() +
+            " keys / ヒット " +
+            hitCount;
+    };
+
+
+function stopWorkers() {
+
+    for (
+        const worker of workers
+    ) {
+
+        try {
+
+            worker.postMessage({
+                type: "stop"
+            });
+
+        } catch {}
+
+        setTimeout(
+            () => {
+                try {
+                    worker.terminate();
+                } catch {}
+            },
+            50
+        );
+    }
+
+    workers.length = 0;
+}
 
 </script>
 
 </body>
+
 </html>
