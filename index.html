@@ -257,60 +257,96 @@ td {
 <h2>🔑 トリップ生成</h2>
 
 <p class="muted">
-10桁はキーの先頭8文字を使用します。
-10桁の表示キーには <b>#</b> と <b>..</b> を付けます。
-12桁は12文字キー全体を使用し、
-表示キーには <b>#</b> のみ付けます。
+    <b>10桁</b>：キーの先頭8文字を使用します。
+    表示するキーには <b>#</b> を先頭に付け、
+    末尾に <b>..</b> を付けます。<br>
+
+    <b>12桁</b>：キーの12文字すべてを使用します。
+    表示するキーには <b>#</b> のみを先頭に付けます。
 </p>
 
 <div class="grid">
 
-<div>
+    <div>
 
-<label>トリップ長</label>
+        <label for="generateLength">
+            トリップ長
+        </label>
 
-<select id="generateLength">
+        <select id="generateLength">
 
-<option value="10">
-10桁
-</option>
+            <option value="10">
+                10桁
+            </option>
 
-<option value="12">
-12桁
-</option>
+            <option value="12">
+                12桁
+            </option>
 
-</select>
+        </select>
+
+    </div>
+
+    <div>
+
+        <label for="generateKey">
+            キー
+        </label>
+
+        <input
+            id="generateKey"
+            type="text"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="トリップキーを入力"
+        >
+
+    </div>
 
 </div>
 
-<div>
+<div style="margin-top:10px;">
 
-<label>キー</label>
+    <button
+        id="generateButton"
+        class="primary"
+        type="button"
+    >
+        ✨ トリップを生成
+    </button>
 
-<input
-    id="generateKey"
-    autocomplete="off"
-    spellcheck="false"
->
+    <button
+        id="copyButton"
+        type="button"
+    >
+        📋 トリップをコピー
+    </button>
 
 </div>
-
-</div>
-
-<button
-    id="generateButton"
-    class="primary"
->
-✨ トリップを生成
-</button>
-
-<button
-    id="copyButton"
->
-📋 トリップをコピー
-</button>
 
 <div id="generateResult"></div>
+
+</section>
+
+
+<section>
+
+<h2>🧪 自動検証</h2>
+
+<p class="muted">
+    既知の計算を実行して、
+    ライブラリとトリップ抽出処理を確認します。
+</p>
+
+<button
+    id="testButton"
+    type="button"
+>
+    🧪 検証する
+</button>
+
+<div id="testResult"></div>
 
 </section>
 
