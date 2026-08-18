@@ -7,10 +7,12 @@
 
 <meta
     name="viewport"
-    content="width=device-width,initial-scale=1"
+    content="width=device-width, initial-scale=1.0"
 >
 
-<title>🐺 人狼オンライン トリップ検索機</title>
+<title>
+人狼オンライン トリップ検索機
+</title>
 
 <style>
 
@@ -19,10 +21,17 @@
 }
 
 body {
+
     margin: 0;
+
     padding: 20px;
-    background: #111827;
-    color: #e5e7eb;
+
+    background:
+        #111827;
+
+    color:
+        #f3f4f6;
+
     font-family:
         system-ui,
         -apple-system,
@@ -32,370 +41,562 @@ body {
 }
 
 .container {
+
     max-width: 1100px;
-    margin: auto;
+
+    margin:
+        0 auto;
 }
 
 h1 {
-    margin-top: 0;
-    color: #fff;
+
+    font-size: 28px;
+
+    margin-bottom:
+        25px;
 }
 
-.card {
-    background: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 18px;
+section {
+
+    background:
+        #1f2937;
+
+    border:
+        1px solid #374151;
+
+    border-radius:
+        12px;
+
+    padding:
+        20px;
+
+    margin-bottom:
+        20px;
 }
 
 h2 {
+
     margin-top: 0;
+
+    font-size: 20px;
+}
+
+h3 {
+
+    font-size: 16px;
+
+    margin-top: 20px;
 }
 
 label {
+
     display: block;
-    margin-top: 10px;
-    margin-bottom: 5px;
+
+    margin:
+        8px 0;
 }
 
 input,
 select,
 button {
-    font: inherit;
+
+    font:
+        inherit;
 }
 
-input,
+input[type="text"],
 select {
+
     width: 100%;
+
     padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #4b5563;
-    background: #111827;
-    color: #fff;
+
+    margin-top: 5px;
+
+    color:
+        #fff;
+
+    background:
+        #111827;
+
+    border:
+        1px solid #4b5563;
+
+    border-radius:
+        7px;
 }
 
 button {
-    padding: 10px 15px;
+
     border: 0;
-    border-radius: 8px;
-    cursor: pointer;
-    background: #2563eb;
-    color: white;
-    margin-top: 10px;
+
+    border-radius:
+        7px;
+
+    padding:
+        10px 15px;
+
+    margin:
+        5px;
+
+    cursor:
+        pointer;
+
+    background:
+        #2563eb;
+
+    color:
+        white;
 }
 
 button:hover {
-    background: #1d4ed8;
+
+    background:
+        #1d4ed8;
 }
 
 button.stop {
-    background: #dc2626;
+
+    background:
+        #dc2626;
+}
+
+button.stop:hover {
+
+    background:
+        #b91c1c;
 }
 
 button.secondary {
-    background: #4b5563;
-}
 
-button:disabled {
-    opacity: .5;
-    cursor: not-allowed;
+    background:
+        #4b5563;
 }
 
 .status {
-    display: grid;
+
+    display:
+        grid;
+
     grid-template-columns:
-        repeat(auto-fit,minmax(180px,1fr));
-    gap: 10px;
+        repeat(3, 1fr);
+
+    gap:
+        10px;
 }
 
 .status-box {
-    padding: 12px;
-    background: #111827;
-    border-radius: 8px;
-}
 
-.status-value {
-    font-weight: bold;
-    font-size: 18px;
-    margin-top: 4px;
-}
+    background:
+        #111827;
 
-.trip-result {
-    margin-top: 15px;
-    padding: 15px;
-    background: #111827;
-    border-radius: 8px;
-    font-size: 20px;
-}
+    border-radius:
+        8px;
 
-.trip-key {
-    font-size: 14px;
-    color: #9ca3af;
-    margin-top: 5px;
-    word-break: break-all;
+    padding:
+        15px;
 }
 
 .result {
-    padding: 10px 12px;
-    margin: 6px 0;
-    background: #111827;
-    border-radius: 8px;
+
+    background:
+        #111827;
+
+    border:
+        1px solid #374151;
+
+    border-radius:
+        8px;
+
+    padding:
+        12px;
+
+    margin:
+        8px 0;
+
+    word-break:
+        break-all;
 }
 
-.result-trip {
-    color: #fbbf24;
-    font-weight: bold;
+.trip {
+
+    color:
+        #fbbf24;
+
+    font-size:
+        18px;
+
+    font-weight:
+        bold;
 }
 
-.result-key {
-    color: #9ca3af;
-    font-size: 14px;
-    word-break: break-all;
+.key {
+
+    color:
+        #93c5fd;
+
+    margin-top:
+        5px;
+}
+
+.grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap:
+        15px;
 }
 
 .condition {
-    display: grid;
+
+    display:
+        grid;
+
     grid-template-columns:
         1fr 150px auto;
-    gap: 8px;
-    align-items: end;
-    margin-bottom: 8px;
+
+    gap:
+        8px;
+
+    align-items:
+        end;
+
+    margin:
+        10px 0;
 }
 
-.condition button {
+.condition input {
+
     margin: 0;
 }
 
-.stats {
-    display: grid;
-    grid-template-columns:
-        repeat(auto-fit,minmax(150px,1fr));
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.stat {
-    background: #111827;
-    padding: 12px;
-    border-radius: 8px;
-}
-
-.stat-value {
-    font-size: 20px;
-    font-weight: bold;
-}
-
 .log {
-    max-height: 250px;
-    overflow: auto;
-    background: #030712;
-    padding: 10px;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 12px;
-    white-space: pre-wrap;
+
+    background:
+        #030712;
+
+    border-radius:
+        8px;
+
+    padding:
+        12px;
+
+    max-height:
+        250px;
+
+    overflow-y:
+        auto;
+
+    white-space:
+        pre-wrap;
+
+    font-size:
+        12px;
+
+    color:
+        #9ca3af;
 }
 
 table {
+
     width: 100%;
-    border-collapse: collapse;
+
+    border-collapse:
+        collapse;
 }
 
 th,
 td {
-    border: 1px solid #374151;
-    padding: 8px;
-    text-align: left;
+
+    border:
+        1px solid #374151;
+
+    padding:
+        8px;
+
+    text-align:
+        left;
 }
 
 @media (max-width: 700px) {
 
-    .condition {
-        grid-template-columns: 1fr;
+    .status,
+    .grid {
+
+        grid-template-columns:
+            1fr;
     }
 
+    .condition {
+
+        grid-template-columns:
+            1fr;
+    }
 }
 
 </style>
 
 </head>
 
-
 <body>
 
 <div class="container">
 
-<h1>🐺 人狼オンライン トリップ検索機</h1>
+<h1>
+🐺 人狼オンライン トリップ検索機
+</h1>
 
 
-<!-- =========================================
-     SYSTEM
-========================================= -->
+<!-- =====================================
+     システム状態
+====================================== -->
 
-<div class="card">
+<section>
 
-<h2>⚙️ システム状態</h2>
+<h2>
+⚙️ システム状態
+</h2>
 
 <div class="status">
 
 <div class="status-box">
-<div>ライブラリ</div>
-<div
-    id="libraryStatus"
-    class="status-value"
->
+
+<div>
+ライブラリ
+</div>
+
+<strong id="libraryStatus">
 確認中...
+</strong>
+
 </div>
-</div>
+
 
 <div class="status-box">
-<div>Worker</div>
-<div
-    id="workerStatus"
-    class="status-value"
->
-0 Worker
+
+<div>
+Worker
 </div>
+
+<strong id="workerStatus">
+起動中...
+</strong>
+
 </div>
+
 
 <div class="status-box">
-<div>CPU</div>
-<div
-    id="cpuStatus"
-    class="status-value"
->
--
-</div>
+
+<div>
+CPU
 </div>
 
-</div>
+<strong id="cpuStatus">
+確認中...
+</strong>
 
 </div>
 
+</div>
 
-<!-- =========================================
-     GENERATE
-========================================= -->
+</section>
 
-<div class="card">
 
-<h2>🔑 トリップ生成</h2>
+<!-- =====================================
+     トリップ生成
+====================================== -->
+
+<section>
+
+<h2>
+🔑 トリップ生成
+</h2>
 
 <p>
 10桁はキーの先頭8文字のみ使用します。
+10桁の表示キーには <code>#</code> と <code>..</code> を付けます。
 12桁は12文字キー全体を使用します。
 </p>
 
-<label>トリップ長</label>
 
-<select id="generateLength">
-<option value="10">10桁</option>
-<option value="12">12桁</option>
+<label>
+トリップ長
+
+<select id="tripLength">
+
+<option value="10">
+10桁
+</option>
+
+<option value="12">
+12桁
+</option>
+
 </select>
 
+</label>
 
-<label>キー</label>
+
+<label>
+
+キー
 
 <input
-    id="generateKey"
+    id="tripKey"
     type="text"
     autocomplete="off"
     spellcheck="false"
-    value="aaaaaaaaaa"
+    placeholder="トリップキーを入力"
 >
 
+</label>
 
-<button id="generateButton">
+
+<button
+    id="generateButton"
+>
 ✨ トリップを生成
 </button>
+
 
 <button
     id="copyButton"
     class="secondary"
-    disabled
+    type="button"
 >
 📋 トリップをコピー
 </button>
 
 
 <div
-    id="generateResult"
-    class="trip-result"
-    style="display:none"
+    id="generatedResult"
+    class="result"
+    style="display:none;"
+>
+
+<div
+    id="generatedTrip"
+    class="trip"
+></div>
+
+<div
+    id="generatedKey"
+    class="key"
 ></div>
 
 </div>
 
+</section>
 
-<!-- =========================================
-     TEST
-========================================= -->
 
-<div class="card">
+<!-- =====================================
+     自動検証
+====================================== -->
 
-<h2>🧪 自動検証</h2>
+<section>
+
+<h2>
+🧪 自動検証
+</h2>
 
 <p>
 既知の計算を実行して、ライブラリと
 トリップ抽出処理を確認します。
 </p>
 
-<button id="testButton">
+
+<button
+    id="testButton"
+>
 🧪 検証する
 </button>
 
-<div id="testResult">
+
+<div id="testStatus">
 </div>
 
-</div>
+
+<div
+    id="testResults"
+    class="result"
+    style="display:none;"
+></div>
+
+</section>
 
 
-<!-- =========================================
-     SEARCH
-========================================= -->
+<!-- =====================================
+     検索
+====================================== -->
 
-<div class="card">
+<section>
 
-<h2>🔎 トリップ検索</h2>
+<h2>
+🔎 トリップ検索
+</h2>
 
 <p>
-複数条件を追加した場合、すべての条件に一致するものを検索します。
+複数条件を追加した場合、
+すべての条件に一致するものを検索します。
 停止ボタンを押すまで検索を続けます。
 </p>
 
 
-<label>探索するトリップ長</label>
+<h3>
+探索するトリップ長
+</h3>
 
-<select id="searchLength">
-
-<option value="10">
+<label>
+<input
+    type="radio"
+    name="searchLength"
+    value="10"
+    checked
+>
 10文字
-</option>
+</label>
 
-<option value="12">
+<label>
+<input
+    type="radio"
+    name="searchLength"
+    value="12"
+>
 12文字
-</option>
-
-</select>
+</label>
 
 
-<label>一致方式</label>
+<h3>
+一致方式
+</h3>
 
-<select id="matchMode">
-
-<option value="normal">
+<label>
+<input
+    type="radio"
+    name="searchMode"
+    value="normal"
+    checked
+>
 通常検索
-</option>
+</label>
 
-<option value="regex">
+<label>
+<input
+    type="radio"
+    name="searchMode"
+    value="regex"
+>
 🔥 正規表現
-</option>
-
-</select>
+</label>
 
 
-<label>Worker数</label>
+<h3>
+Worker数
+</h3>
 
 <select id="workerCount">
 
@@ -403,16 +604,32 @@ td {
 自動
 </option>
 
-<option value="1">1 Worker</option>
-<option value="2">2 Workers</option>
-<option value="4">4 Workers</option>
-<option value="6">6 Workers</option>
-<option value="8">8 Workers</option>
+<option value="1">
+1 Worker
+</option>
+
+<option value="2">
+2 Workers
+</option>
+
+<option value="4">
+4 Workers
+</option>
+
+<option value="6">
+6 Workers
+</option>
+
+<option value="8">
+8 Workers
+</option>
 
 </select>
 
 
-<h3>一致条件</h3>
+<h3>
+一致条件
+</h3>
 
 <div id="conditions"></div>
 
@@ -425,7 +642,9 @@ td {
 </button>
 
 
-<h3>⭐ 特殊トリップ</h3>
+<h3>
+⭐ 特殊トリップ
+</h3>
 
 <select id="special">
 
@@ -488,16 +707,17 @@ td {
 </select>
 
 
-<div>
+<div style="margin-top:15px;">
 
-<button id="startButton">
+<button
+    id="startSearch"
+>
 🔍 検索開始
 </button>
 
 <button
-    id="stopButton"
+    id="stopSearch"
     class="stop"
-    disabled
 >
 ⏹ 検索停止
 </button>
@@ -505,83 +725,82 @@ td {
 </div>
 
 
-<div class="stats">
+<div class="result">
 
-<div class="stat">
-<div>状態</div>
-<div
-    id="searchState"
-    class="stat-value"
->
-待機中
-</div>
+<div>
+試行キー
 </div>
 
-<div class="stat">
-<div>試行キー</div>
-<div
-    id="attemptCount"
-    class="stat-value"
->
+<strong id="attemptCount">
 0
-</div>
+</strong>
+
+<br><br>
+
+<div>
+ヒット
 </div>
 
-<div class="stat">
-<div>ヒット</div>
-<div
-    id="hitCount"
-    class="stat-value"
->
+<strong id="hitCount">
 0
-</div>
+</strong>
+
+<br><br>
+
+<div>
+速度
 </div>
 
-<div class="stat">
-<div>速度</div>
-<div
-    id="speed"
-    class="stat-value"
->
+<strong id="speed">
 0 / 秒
-</div>
-</div>
+</strong>
 
 </div>
 
-</div>
+</section>
 
 
-<!-- =========================================
-     RESULTS
-========================================= -->
+<!-- =====================================
+     検索結果
+====================================== -->
 
-<div class="card">
+<section>
 
-<h2>🎯 検索結果</h2>
+<h2>
+🎯 検索結果
+</h2>
 
 <div id="results">
-検索を開始してください。
+検索を開始しました。
 </div>
 
-</div>
+</section>
 
 
-<!-- =========================================
-     SPECIAL
-========================================= -->
+<!-- =====================================
+     特殊トリップ
+====================================== -->
 
-<div class="card">
+<section>
 
-<h2>📖 特殊トリップ一覧</h2>
+<h2>
+📖 特殊トリップ一覧
+</h2>
 
 <table>
 
 <thead>
 
 <tr>
-<th>分類</th>
-<th>条件</th>
+
+<th>
+分類
+</th>
+
+<th>
+条件
+</th>
+
 </tr>
 
 </thead>
@@ -657,69 +876,32 @@ td {
 
 </table>
 
-</div>
+</section>
 
 
-<!-- =========================================
-     LOG
-========================================= -->
+<!-- =====================================
+     ログ
+====================================== -->
 
-<div class="card">
+<section>
 
-<h2>📋 デバッグログ</h2>
+<h2>
+📋 デバッグログ
+</h2>
 
 <div
     id="log"
     class="log"
 ></div>
 
-</div>
-
+</section>
 
 </div>
 
 
 <script>
 
-/* =========================================
-   設定
-========================================= */
-
-const WORKER_PATH =
-    "./worker.js";
-
-
-/*
- * 検索用文字セット。
- *
- * 隣接同一文字はworker側で除外する。
- */
-const SEARCH_CHARSET =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-    "abcdefghijklmnopqrstuvwxyz" +
-    "0123456789./" +
-    "!@#$%^&*()_+-=[]{}<>?";
-
-
-/* =========================================
-   状態
-========================================= */
-
-let workers = [];
-
-let searching = false;
-
-let attempts = 0;
-
-let hits = 0;
-
-let startTime = 0;
-
-let lastSpeedTime = 0;
-
-let lastSpeedCount = 0;
-
-let lastGeneratedTrip = "";
+"use strict";
 
 
 /* =========================================
@@ -741,20 +923,129 @@ const cpuStatus =
         "cpuStatus"
     );
 
-const conditionsBox =
+const tripLength =
+    document.getElementById(
+        "tripLength"
+    );
+
+const tripKey =
+    document.getElementById(
+        "tripKey"
+    );
+
+const generateButton =
+    document.getElementById(
+        "generateButton"
+    );
+
+const copyButton =
+    document.getElementById(
+        "copyButton"
+    );
+
+const generatedResult =
+    document.getElementById(
+        "generatedResult"
+    );
+
+const generatedTrip =
+    document.getElementById(
+        "generatedTrip"
+    );
+
+const generatedKey =
+    document.getElementById(
+        "generatedKey"
+    );
+
+const testButton =
+    document.getElementById(
+        "testButton"
+    );
+
+const testStatus =
+    document.getElementById(
+        "testStatus"
+    );
+
+const testResults =
+    document.getElementById(
+        "testResults"
+    );
+
+const conditions =
     document.getElementById(
         "conditions"
     );
 
-const resultsBox =
+const addCondition =
+    document.getElementById(
+        "addCondition"
+    );
+
+const special =
+    document.getElementById(
+        "special"
+    );
+
+const workerCount =
+    document.getElementById(
+        "workerCount"
+    );
+
+const startSearch =
+    document.getElementById(
+        "startSearch"
+    );
+
+const stopSearch =
+    document.getElementById(
+        "stopSearch"
+    );
+
+const attemptCount =
+    document.getElementById(
+        "attemptCount"
+    );
+
+const hitCount =
+    document.getElementById(
+        "hitCount"
+    );
+
+const speed =
+    document.getElementById(
+        "speed"
+    );
+
+const results =
     document.getElementById(
         "results"
     );
 
-const logBox =
+const logElement =
     document.getElementById(
         "log"
     );
+
+
+/* =========================================
+   状態
+========================================= */
+
+let workers = [];
+
+let searching = false;
+
+let totalAttempts = 0;
+
+let totalHits = 0;
+
+let startTime = 0;
+
+let progressTimer = null;
+
+let currentSearchId = 0;
 
 
 /* =========================================
@@ -762,14 +1053,15 @@ const logBox =
 ========================================= */
 
 const cpuCount =
-    navigator.hardwareConcurrency || 4;
+    navigator.hardwareConcurrency ||
+    4;
 
 cpuStatus.textContent =
     cpuCount + " cores";
 
 
 /* =========================================
-   Log
+   ログ
 ========================================= */
 
 function log(message) {
@@ -785,62 +1077,30 @@ function log(message) {
             }
         );
 
-    logBox.textContent +=
+    logElement.textContent +=
         "[" +
         time +
         "] " +
         message +
         "\n";
 
-    logBox.scrollTop =
-        logBox.scrollHeight;
+    logElement.scrollTop =
+        logElement.scrollHeight;
 }
 
 
 /* =========================================
-   Worker数
-========================================= */
-
-function getWorkerCount() {
-
-    const value =
-        document.getElementById(
-            "workerCount"
-        ).value;
-
-
-    if (value === "auto") {
-
-        return Math.max(
-            1,
-            Math.min(cpuCount, 8)
-        );
-    }
-
-
-    return Number(value);
-}
-
-
-/* =========================================
-   Worker生成
+   Worker作成
 ========================================= */
 
 function createWorker() {
 
     const worker =
         new Worker(
-            WORKER_PATH
+            "./worker.js"
         );
 
-    worker.addEventListener(
-        "message",
-        handleWorkerMessage
-    );
-
-
-    worker.addEventListener(
-        "error",
+    worker.onerror =
         function (event) {
 
             log(
@@ -850,236 +1110,20 @@ function createWorker() {
                     "unknown"
                 )
             );
-        }
-    );
-
+        };
 
     return worker;
 }
 
 
 /* =========================================
-   Worker初期化
+   生成用Worker
 ========================================= */
 
-function initializeWorkers() {
-
-    /*
-     * 既存Workerを完全終了。
-     */
-    terminateWorkers();
-
-
-    const count =
-        getWorkerCount();
-
-
-    for (
-        let i = 0;
-        i < count;
-        i++
-    ) {
-
-        const worker =
-            createWorker();
-
-        worker._workerIndex =
-            i + 1;
-
-        workers.push(
-            worker
-        );
-    }
-
-
-    workerStatus.textContent =
-        workers.length +
-        " Worker 起動中";
-
-
-    log(
-        "Worker: " +
-        WORKER_PATH +
-        " × " +
-        workers.length
-    );
-}
-
-
-/* =========================================
-   Worker完全停止
-========================================= */
-
-function terminateWorkers() {
-
-    for (
-        const worker of workers
-    ) {
-
-        try {
-
-            worker.terminate();
-
-        } catch (e) {
-            /* ignore */
-        }
-    }
-
-
-    workers = [];
-
-
-    workerStatus.textContent =
-        "0 Worker";
-}
-
-
-/* =========================================
-   Worker message
-========================================= */
-
-function handleWorkerMessage(event) {
-
-    const data =
-        event.data || {};
+function createGeneratorWorker() {
 
     const worker =
-        event.currentTarget;
-
-
-    switch (data.type) {
-
-
-        /* -----------------------------
-           ready
-        ----------------------------- */
-
-        case "ready":
-
-            libraryStatus.textContent =
-                "正常";
-
-            log(
-                "Worker #" +
-                worker._workerIndex +
-                ": ready"
-            );
-
-            break;
-
-
-        /* -----------------------------
-           error
-        ----------------------------- */
-
-        case "error":
-
-            log(
-                "Worker #" +
-                worker._workerIndex +
-                " error: " +
-                (
-                    data.message ||
-                    "unknown error"
-                )
-            );
-
-            break;
-
-
-        /* -----------------------------
-           progress
-        ----------------------------- */
-
-        case "progress":
-
-            attempts +=
-                Number(
-                    data.count || 0
-                );
-
-            updateStats();
-
-            break;
-
-
-        /* -----------------------------
-           hit
-        ----------------------------- */
-
-        case "hit":
-
-            hits++;
-
-            addResult(
-                data.trip,
-                data.key
-            );
-
-            updateStats();
-
-            break;
-
-
-        /* -----------------------------
-           test
-        ----------------------------- */
-
-        case "test-results":
-
-            renderTestResults(
-                data.results || []
-            );
-
-            break;
-
-
-        default:
-
-            /*
-             * stopping / stopped等は
-             * 使わない。
-             */
-
-            log(
-                "Unknown Worker message: " +
-                String(data.type)
-            );
-
-            break;
-    }
-}
-
-
-/* =========================================
-   Test
-========================================= */
-
-function runTest() {
-
-    const testButton =
-        document.getElementById(
-            "testButton"
-        );
-
-    testButton.disabled =
-        true;
-
-
-    document.getElementById(
-        "testResult"
-    ).textContent =
-        "検証中...";
-
-
-    /*
-     * テスト用Workerを1つ作る。
-     */
-    const worker =
-        new Worker(
-            WORKER_PATH
-        );
-
+        createWorker();
 
     worker.onmessage =
         function (event) {
@@ -1089,135 +1133,185 @@ function runTest() {
 
 
             if (
-                data.type ===
-                "test-results"
+                data.type === "ready"
             ) {
 
-                renderTestResults(
-                    data.results
-                );
+                libraryStatus.textContent =
+                    "正常";
 
-                worker.terminate();
-
-                testButton.disabled =
-                    false;
+                return;
             }
 
 
-            else if (
+            if (
+                data.type ===
+                "generate-result"
+            ) {
+
+                generatedTrip.textContent =
+                    "◆" +
+                    data.trip;
+
+                generatedKey.textContent =
+                    "キー：" +
+                    data.key;
+
+                generatedResult.style.display =
+                    "block";
+
+                log(
+                    "トリップ生成: " +
+                    data.key +
+                    " → " +
+                    data.trip
+                );
+
+                return;
+            }
+
+
+            if (
                 data.type ===
                 "error"
             ) {
 
-                document.getElementById(
-                    "testResult"
-                ).textContent =
-                    "❌ " +
+                generatedTrip.textContent =
+                    "エラー";
+
+                generatedKey.textContent =
                     data.message;
 
-                worker.terminate();
+                generatedResult.style.display =
+                    "block";
 
-                testButton.disabled =
-                    false;
+                log(
+                    "Worker error: " +
+                    data.message
+                );
+
+                return;
             }
         };
 
-
-    worker.onerror =
-        function (event) {
-
-            document.getElementById(
-                "testResult"
-            ).textContent =
-                "❌ Worker error: " +
-                (
-                    event.message ||
-                    "unknown"
-                );
-
-            worker.terminate();
-
-            testButton.disabled =
-                false;
-        };
-
-
-    /*
-     * ready後にtestを送る。
-     */
-    worker.addEventListener(
-        "message",
-        function readyHandler(event) {
-
-            if (
-                event.data &&
-                event.data.type === "ready"
-            ) {
-
-                worker.postMessage({
-                    type: "test"
-                });
-
-                worker.removeEventListener(
-                    "message",
-                    readyHandler
-                );
-            }
-        }
-    );
+    return worker;
 }
 
 
 /* =========================================
-   Test表示
+   トリップ生成
 ========================================= */
 
-function renderTestResults(results) {
+generateButton.onclick =
+    function () {
 
-    const box =
-        document.getElementById(
-            "testResult"
-        );
+        const length =
+            Number(
+                tripLength.value
+            ) === 12
+                ? 12
+                : 10;
+
+        const input =
+            tripKey.value;
 
 
-    box.innerHTML = "";
+        if (!input) {
 
-
-    for (
-        const item of results
-    ) {
-
-        const row =
-            document.createElement(
-                "div"
+            alert(
+                "トリップキーを入力してください"
             );
 
-
-        row.textContent =
-            item.key +
-            " : " +
-            item.trip;
+            return;
+        }
 
 
-        box.appendChild(
-            row
+        /*
+         * ここではWorkerに元キーを渡す。
+         *
+         * 実際の8文字/12文字への
+         * 切り詰めはworker.js側で行う。
+         */
+
+        const worker =
+            createGeneratorWorker();
+
+
+        worker.postMessage({
+
+            type:
+                "generate",
+
+            key:
+                input,
+
+            length:
+                length
+        });
+
+
+        setTimeout(
+            function () {
+
+                worker.terminate();
+
+            },
+            5000
         );
-    }
+    };
 
 
-    log(
-        "自動検証完了"
-    );
-}
+/* =========================================
+   コピー
+========================================= */
+
+copyButton.onclick =
+    async function () {
+
+        const text =
+            generatedTrip.textContent
+                .replace(/^◆/, "");
+
+
+        if (!text) {
+
+            return;
+        }
+
+
+        try {
+
+            await navigator.clipboard.writeText(
+                text
+            );
+
+            copyButton.textContent =
+                "✅ コピーしました";
+
+            setTimeout(
+                function () {
+
+                    copyButton.textContent =
+                        "📋 トリップをコピー";
+
+                },
+                1500
+            );
+
+        } catch (e) {
+
+            log(
+                "コピー失敗"
+            );
+        }
+    };
 
 
 /* =========================================
    条件追加
 ========================================= */
 
-function addCondition(
-    text = "",
-    mode = "contains"
+function addConditionRow(
+    initialText = ""
 ) {
 
     const row =
@@ -1237,14 +1331,11 @@ function addCondition(
     input.type =
         "text";
 
-    input.className =
-        "condition-text";
-
     input.placeholder =
         "一致する文字列";
 
     input.value =
-        text;
+        initialText;
 
 
     const select =
@@ -1252,11 +1343,9 @@ function addCondition(
             "select"
         );
 
-    select.className =
-        "condition-mode";
-
 
     select.innerHTML = `
+
         <option value="contains">
             部分一致
         </option>
@@ -1272,43 +1361,58 @@ function addCondition(
         <option value="exact">
             完全一致
         </option>
+
     `;
 
 
-    select.value =
-        mode;
-
-
-    const remove =
+    const button =
         document.createElement(
             "button"
         );
 
-    remove.textContent =
+    button.textContent =
         "🗑️ この条件を削除";
 
-    remove.className =
+    button.className =
         "secondary";
 
 
-    remove.onclick =
+    button.onclick =
         function () {
 
             row.remove();
+
         };
 
 
-    row.appendChild(input);
+    row.appendChild(
+        input
+    );
 
-    row.appendChild(select);
+    row.appendChild(
+        select
+    );
 
-    row.appendChild(remove);
+    row.appendChild(
+        button
+    );
 
 
-    conditionsBox.appendChild(
+    conditions.appendChild(
         row
     );
 }
+
+
+addCondition.onclick =
+    function () {
+
+        addConditionRow();
+
+    };
+
+
+addConditionRow();
 
 
 /* =========================================
@@ -1318,54 +1422,121 @@ function addCondition(
 function getConditions() {
 
     const rows =
-        conditionsBox.querySelectorAll(
+        conditions.querySelectorAll(
             ".condition"
         );
 
 
     const regex =
-        document.getElementById(
-            "matchMode"
+        document.querySelector(
+            'input[name="searchMode"]:checked'
         ).value === "regex";
 
 
-    const conditions = [];
+    const list = [];
 
 
-    for (
-        const row of rows
+    rows.forEach(
+        function (row) {
+
+            const input =
+                row.querySelector(
+                    "input"
+                );
+
+            const select =
+                row.querySelector(
+                    "select"
+                );
+
+
+            const text =
+                input.value.trim();
+
+
+            if (!text) {
+
+                return;
+            }
+
+
+            list.push({
+
+                text:
+                    text,
+
+                mode:
+                    select.value,
+
+                regex:
+                    regex
+            });
+
+        }
+    );
+
+
+    return list;
+}
+
+
+/* =========================================
+   Worker数
+========================================= */
+
+function getWorkerNumber() {
+
+    if (
+        workerCount.value ===
+        "auto"
     ) {
 
-        const text =
-            row.querySelector(
-                ".condition-text"
-            ).value;
-
-
-        if (!text) {
-            continue;
-        }
-
-
-        const mode =
-            row.querySelector(
-                ".condition-mode"
-            ).value;
-
-
-        conditions.push({
-
-            text: text,
-
-            mode: mode,
-
-            regex: regex
-
-        });
+        return Math.max(
+            1,
+            Math.min(
+                cpuCount,
+                8
+            )
+        );
     }
 
 
-    return conditions;
+    return Number(
+        workerCount.value
+    ) || 1;
+}
+
+
+/* =========================================
+   Worker停止
+========================================= */
+
+function terminateWorkers() {
+
+    workers.forEach(
+        function (worker) {
+
+            try {
+
+                worker.postMessage({
+                    type: "stop"
+                });
+
+            } catch (e) {
+            }
+
+            try {
+
+                worker.terminate();
+
+            } catch (e) {
+            }
+
+        }
+    );
+
+
+    workers = [];
 }
 
 
@@ -1373,397 +1544,94 @@ function getConditions() {
    検索開始
 ========================================= */
 
-function startSearch() {
+startSearch.onclick =
+    function () {
 
-    if (searching) {
-        return;
-    }
+        if (searching) {
 
-
-    searching = true;
-
-    attempts = 0;
-
-    hits = 0;
-
-    startTime =
-        performance.now();
-
-    lastSpeedTime =
-        startTime;
-
-    lastSpeedCount =
-        0;
+            return;
+        }
 
 
-    resultsBox.innerHTML =
-        "";
+        terminateWorkers();
 
 
-    document.getElementById(
-        "searchState"
-    ).textContent =
-        "検索中...";
+        searching = true;
+
+        currentSearchId++;
 
 
-    document.getElementById(
-        "startButton"
-    ).disabled =
-        true;
+        totalAttempts =
+            0;
 
+        totalHits =
+            0;
 
-    document.getElementById(
-        "stopButton"
-    ).disabled =
-        false;
+        attemptCount.textContent =
+            "0";
 
+        hitCount.textContent =
+            "0";
 
-    initializeWorkers();
-
-
-    const length =
-        Number(
-            document.getElementById(
-                "searchLength"
-            ).value
-        );
-
-
-    const conditions =
-        getConditions();
-
-
-    const special =
-        document.getElementById(
-            "special"
-        ).value;
-
-
-    log(
-        "検索開始: " +
-        length +
-        "文字 / " +
-        workers.length +
-        " Worker"
-    );
-
-
-    /*
-     * 全Workerへ検索開始。
-     */
-    for (
-        const worker of workers
-    ) {
-
-        worker.postMessage({
-
-            type: "search",
-
-            length: length,
-
-            conditions:
-                conditions,
-
-            special:
-                special,
-
-            charset:
-                SEARCH_CHARSET
-        });
-    }
-
-
-    updateStats();
-}
-
-
-/* =========================================
-   検索停止
-========================================= */
-
-function stopSearch() {
-
-    if (!searching) {
-        return;
-    }
-
-
-    searching = false;
-
-
-    /*
-     * まずWorkerを完全terminate。
-     *
-     * これで無限while中でも
-     * 確実に停止する。
-     */
-    terminateWorkers();
-
-
-    document.getElementById(
-        "searchState"
-    ).textContent =
-        "停止";
-
-
-    document.getElementById(
-        "startButton"
-    ).disabled =
-        false;
-
-
-    document.getElementById(
-        "stopButton"
-    ).disabled =
-        true;
-
-
-    updateStats();
-
-
-    log(
-        "検索停止"
-    );
-}
-
-
-/* =========================================
-   統計
-========================================= */
-
-function updateStats() {
-
-    document.getElementById(
-        "attemptCount"
-    ).textContent =
-        attempts.toLocaleString();
-
-
-    document.getElementById(
-        "hitCount"
-    ).textContent =
-        hits.toLocaleString();
-
-
-    if (!searching) {
-
-        document.getElementById(
-            "speed"
-        ).textContent =
+        speed.textContent =
             "0 / 秒";
 
-        return;
-    }
+
+        results.innerHTML =
+            "";
 
 
-    const now =
-        performance.now();
+        const length =
+            Number(
+                document.querySelector(
+                    'input[name="searchLength"]:checked'
+                ).value
+            ) === 12
+                ? 12
+                : 10;
 
 
-    const elapsed =
-        (
-            now -
-            startTime
-        ) / 1000;
+        const number =
+            getWorkerNumber();
 
 
-    if (elapsed <= 0) {
-        return;
-    }
+        const conditionList =
+            getConditions();
 
 
-    const speed =
-        attempts /
-        elapsed;
+        const specialType =
+            special.value;
 
 
-    document.getElementById(
-        "speed"
-    ).textContent =
-        Math.floor(
-            speed
-        ).toLocaleString() +
-        " / 秒";
-}
-
-
-/* =========================================
-   結果追加
-========================================= */
-
-function addResult(
-    trip,
-    key
-) {
-
-    const row =
-        document.createElement(
-            "div"
-        );
-
-    row.className =
-        "result";
-
-
-    const tripDiv =
-        document.createElement(
-            "div"
-        );
-
-    tripDiv.className =
-        "result-trip";
-
-
-    tripDiv.textContent =
-        "◆" +
-        trip;
-
-
-    const keyDiv =
-        document.createElement(
-            "div"
-        );
-
-    keyDiv.className =
-        "result-key";
-
-
-    keyDiv.textContent =
-        "キー：" +
-        key;
-
-
-    row.appendChild(
-        tripDiv
-    );
-
-    row.appendChild(
-        keyDiv
-    );
-
-
-    /*
-     * 新しい結果を上に表示。
-     */
-    resultsBox.prepend(
-        row
-    );
-}
-
-
-/* =========================================
-   生成
-========================================= */
-
-async function generateTrip() {
-
-    const key =
-        document.getElementById(
-            "generateKey"
-        ).value;
-
-
-    const length =
-        Number(
-            document.getElementById(
-                "generateLength"
-            ).value
-        );
-
-
-    try {
-
-        const trip =
-            await calculateTrip(
-                key,
-                length
-            );
-
-
-        lastGeneratedTrip =
-            trip;
-
-
-        const box =
-            document.getElementById(
-                "generateResult"
-            );
-
-
-        box.style.display =
-            "block";
-
-
-        box.textContent =
-            "◆" +
-            trip +
-            "\nキー：" +
-            (
-                length === 10
-                    ? key.substring(0, 8)
-                    : key
-            );
-
-
-        document.getElementById(
-            "copyButton"
-        ).disabled =
-            false;
+        startTime =
+            performance.now();
 
 
         log(
-            "トリップ生成: " +
-            trip
+            "検索開始: " +
+            length +
+            "文字 / " +
+            number +
+            " Worker"
         );
 
 
-    } catch (e) {
-
-        alert(
-            e.message ||
-            String(e)
-        );
-    }
-}
-
-
-/* =========================================
-   生成計算
-========================================= */
-
-async function calculateTrip(
-    key,
-    length
-) {
-
-    /*
-     * Workerを1個だけ作って
-     * makeTripと同じ処理を実行。
-     *
-     * 生成用に一時Workerを使う。
-     */
-
-    return new Promise(
-        function(resolve, reject) {
+        for (
+            let i = 0;
+            i < number;
+            i++
+        ) {
 
             const worker =
-                new Worker(
-                    WORKER_PATH
-                );
+                createWorker();
 
 
-            let finished =
-                false;
-
-
-            function cleanup() {
-
-                worker.terminate();
-            }
+            const workerId =
+                i + 1;
 
 
             worker.onmessage =
-                async function(event) {
+                function (event) {
 
                     const data =
                         event.data || {};
@@ -1774,20 +1642,35 @@ async function calculateTrip(
                         "ready"
                     ) {
 
-                        /*
-                         * 生成用として
-                         * testではなく
-                         * 専用generateを使う。
-                         */
+                        log(
+                            "Worker #" +
+                            workerId +
+                            ": ready"
+                        );
+
 
                         worker.postMessage({
 
-                            type: "generate",
+                            type:
+                                "search",
 
-                            key: key,
+                            length:
+                                length,
 
-                            length: length
+                            conditions:
+                                conditionList,
 
+                            special:
+                                specialType,
+
+                            /*
+                             * 検索用文字セット。
+                             *
+                             * 記号・英数字を含む。
+                             */
+
+                            charset:
+                                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./!@#$%^&*()_+-=[]{}<>?"
                         });
 
                         return;
@@ -1796,25 +1679,76 @@ async function calculateTrip(
 
                     if (
                         data.type ===
-                        "generate-result"
+                        "progress"
                     ) {
 
-                        if (
-                            finished
-                        ) {
-                            return;
-                        }
+                        totalAttempts +=
+                            Number(
+                                data.count || 0
+                            );
+
+                        return;
+                    }
 
 
-                        finished =
-                            true;
+                    if (
+                        data.type ===
+                        "hit"
+                    ) {
+
+                        totalHits++;
+
+                        hitCount.textContent =
+                            String(
+                                totalHits
+                            );
 
 
-                        cleanup();
+                        const item =
+                            document.createElement(
+                                "div"
+                            );
 
-                        resolve(
-                            data.trip
+                        item.className =
+                            "result";
+
+
+                        item.innerHTML =
+
+                            '<div class="trip">' +
+
+                            "◆" +
+
+                            escapeHtml(
+                                data.trip
+                            ) +
+
+                            "</div>" +
+
+                            '<div class="key">' +
+
+                            "キー：" +
+
+                            escapeHtml(
+                                data.key
+                            ) +
+
+                            "</div>";
+
+
+                        results.prepend(
+                            item
                         );
+
+
+                        return;
+                    }
+
+
+                    if (
+                        data.type ===
+                        "stopped"
+                    ) {
 
                         return;
                     }
@@ -1825,164 +1759,410 @@ async function calculateTrip(
                         "error"
                     ) {
 
-                        if (
-                            finished
-                        ) {
-                            return;
-                        }
-
-
-                        finished =
-                            true;
-
-
-                        cleanup();
-
-                        reject(
-                            new Error(
-                                data.message
-                            )
+                        log(
+                            "Worker #" +
+                            workerId +
+                            " error: " +
+                            data.message
                         );
+
+                        return;
                     }
                 };
 
 
             worker.onerror =
-                function(event) {
+                function (event) {
 
-                    if (
-                        finished
-                    ) {
-                        return;
-                    }
-
-
-                    finished =
-                        true;
-
-
-                    cleanup();
-
-
-                    reject(
-                        new Error(
+                    log(
+                        "Worker #" +
+                        workerId +
+                        " error: " +
+                        (
                             event.message ||
-                            "Worker error"
+                            "unknown"
                         )
                     );
                 };
+
+
+            workers.push(
+                worker
+            );
         }
-    );
-}
+
+
+        workerStatus.textContent =
+            number +
+            " Worker 起動中";
+
+
+        if (progressTimer) {
+
+            clearInterval(
+                progressTimer
+            );
+        }
+
+
+        progressTimer =
+            setInterval(
+                updateProgress,
+                500
+            );
+    };
 
 
 /* =========================================
-   Copy
+   検索停止
 ========================================= */
 
-document.getElementById(
-    "copyButton"
-).onclick =
-    async function() {
+stopSearch.onclick =
+    function () {
 
-        if (!lastGeneratedTrip) {
+        if (!searching) {
+
             return;
         }
 
 
-        try {
+        searching =
+            false;
 
-            await navigator.clipboard.writeText(
-                lastGeneratedTrip
+
+        currentSearchId++;
+
+
+        terminateWorkers();
+
+
+        if (progressTimer) {
+
+            clearInterval(
+                progressTimer
             );
 
-
-            this.textContent =
-                "✅ コピーしました";
-
-
-            setTimeout(
-                () => {
-                    this.textContent =
-                        "📋 トリップをコピー";
-                },
-                1200
-            );
-
-
-        } catch (e) {
-
-            alert(
-                "コピーできませんでした"
-            );
+            progressTimer =
+                null;
         }
+
+
+        workerStatus.textContent =
+            "停止";
+
+
+        log(
+            "検索停止"
+        );
     };
 
 
 /* =========================================
-   Events
+   進捗
 ========================================= */
 
-document.getElementById(
-    "generateButton"
-).onclick =
-    generateTrip;
+function updateProgress() {
+
+    if (!searching) {
+
+        return;
+    }
 
 
-document.getElementById(
-    "testButton"
-).onclick =
-    runTest;
+    const elapsed =
+        (
+            performance.now() -
+            startTime
+        ) / 1000;
 
 
-document.getElementById(
-    "startButton"
-).onclick =
-    startSearch;
+    const currentSpeed =
+        elapsed > 0
+            ? Math.round(
+                totalAttempts /
+                elapsed
+            )
+            : 0;
 
 
-document.getElementById(
-    "stopButton"
-).onclick =
-    stopSearch;
+    attemptCount.textContent =
+        totalAttempts.toLocaleString(
+            "ja-JP"
+        );
 
 
-document.getElementById(
-    "addCondition"
-).onclick =
-    function() {
+    speed.textContent =
+        currentSpeed.toLocaleString(
+            "ja-JP"
+        ) +
+        " / 秒";
+}
 
-        addCondition();
+
+/* =========================================
+   HTMLエスケープ
+========================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* =========================================
+   自動検証
+========================================= */
+
+testButton.onclick =
+    function () {
+
+        testStatus.textContent =
+            "検証中...";
+
+
+        testResults.style.display =
+            "none";
+
+
+        const worker =
+            createWorker();
+
+
+        worker.onmessage =
+            function (event) {
+
+                const data =
+                    event.data || {};
+
+
+                if (
+                    data.type ===
+                    "ready"
+                ) {
+
+                    worker.postMessage({
+
+                        type:
+                            "test"
+
+                    });
+
+                    return;
+                }
+
+
+                if (
+                    data.type ===
+                    "test-results"
+                ) {
+
+                    testStatus.textContent =
+                        "検証完了";
+
+
+                    testResults.style.display =
+                        "block";
+
+
+                    testResults.innerHTML =
+                        "";
+
+
+                    data.results.forEach(
+                        function (item) {
+
+                            const div =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            div.innerHTML =
+
+                                "<strong>" +
+
+                                escapeHtml(
+                                    item.input
+                                ) +
+
+                                "</strong>" +
+
+                                " → " +
+
+                                escapeHtml(
+                                    item.trip
+                                ) +
+
+                                "<br>" +
+
+                                "キー：" +
+
+                                escapeHtml(
+                                    item.key
+                                );
+
+
+                            div.style.marginBottom =
+                                "10px";
+
+
+                            testResults.appendChild(
+                                div
+                            );
+                        }
+                    );
+
+
+                    worker.terminate();
+
+                    return;
+                }
+
+
+                if (
+                    data.type ===
+                    "error"
+                ) {
+
+                    testStatus.textContent =
+                        "検証エラー";
+
+                    testResults.style.display =
+                        "block";
+
+                    testResults.textContent =
+                        data.message;
+
+                    worker.terminate();
+                }
+            };
+
+
+        worker.onerror =
+            function (event) {
+
+                testStatus.textContent =
+                    "Workerエラー";
+
+                testResults.style.display =
+                    "block";
+
+                testResults.textContent =
+                    event.message ||
+                    "Worker error";
+
+                worker.terminate();
+            };
     };
 
 
 /* =========================================
-   初期条件
+   初期化
 ========================================= */
 
-addCondition();
+(function init() {
+
+    libraryStatus.textContent =
+        "確認中...";
 
 
-/* =========================================
-   初期Worker
-========================================= */
-
-initializeWorkers();
-
-log(
-    "初期化完了"
-);
+    const worker =
+        createWorker();
 
 
-/* =========================================
-   定期統計更新
-========================================= */
+    worker.onmessage =
+        function (event) {
 
-setInterval(
-    updateStats,
-    500
-);
+            const data =
+                event.data || {};
 
+
+            if (
+                data.type ===
+                "ready"
+            ) {
+
+                libraryStatus.textContent =
+                    "正常";
+
+                workerStatus.textContent =
+                    "4 Worker 起動中";
+
+                worker.terminate();
+
+                log(
+                    "初期化完了"
+                );
+
+                return;
+            }
+
+
+            if (
+                data.type ===
+                "error"
+            ) {
+
+                libraryStatus.textContent =
+                    "エラー";
+
+                log(
+                    "初期化エラー: " +
+                    data.message
+                );
+
+                worker.terminate();
+            }
+        };
+
+
+    worker.onerror =
+        function (event) {
+
+            libraryStatus.textContent =
+                "エラー";
+
+            log(
+                "初期化 Worker error: " +
+                (
+                    event.message ||
+                    "unknown"
+                )
+            );
+        };
+
+
+    log(
+        "Worker: ./worker.js"
+    );
+
+})();
+    
 </script>
 
 </body>
