@@ -49,10 +49,6 @@ h2 {
     margin-top: 0;
 }
 
-h3 {
-    margin-top: 20px;
-}
-
 label {
     display: block;
     margin: 10px 0 6px;
@@ -88,25 +84,21 @@ button:hover {
     background: #555;
 }
 
-button:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
 .primary {
     background: #1976d2;
-}
-
-.primary:hover {
-    background: #2196f3;
 }
 
 .danger {
     background: #b71c1c;
 }
 
-.danger:hover {
-    background: #d32f2f;
+.warning {
+    color: #ffb300;
+    background: #332600;
+    border: 1px solid #805f00;
+    padding: 10px;
+    border-radius: 7px;
+    margin-top: 10px;
 }
 
 .result {
@@ -121,7 +113,6 @@ button:disabled {
     font-size: 20px;
     font-weight: bold;
     color: #fff;
-    word-break: break-all;
 }
 
 .key {
@@ -162,18 +153,8 @@ button:disabled {
     border-radius: 7px;
 }
 
-.condition.warning {
-    border-color: #d32f2f;
-}
-
-.warning {
-    color: #ff8a80;
-    margin-top: 6px;
-    font-size: 13px;
-}
-
-.success {
-    color: #69f0ae;
+.condition.invalid {
+    border-color: #b71c1c;
 }
 
 table {
@@ -211,8 +192,8 @@ td {
     color: #999;
 }
 
-.small {
-    font-size: 13px;
+.good {
+    color: #4caf50;
 }
 
 </style>
@@ -286,7 +267,7 @@ td {
 
 <br>
 
-<b>12桁</b>：キーの12文字すべてを使用します。
+<b>12桁</b>：キーの12文字全体を使用します。
 表示するキーには <b>#</b> のみを先頭に付けます。
 
 </p>
@@ -295,9 +276,7 @@ td {
 
 <div>
 
-<label>
-トリップ長
-</label>
+<label>トリップ長</label>
 
 <select id="generateLength">
 
@@ -315,9 +294,7 @@ td {
 
 <div>
 
-<label>
-キー
-</label>
+<label>キー</label>
 
 <input
     id="generateKey"
@@ -356,13 +333,13 @@ td {
 <h2>🧪 自動検証</h2>
 
 <p class="muted">
+
 既知の計算を実行して、
 ライブラリとトリップ抽出処理を確認します。
+
 </p>
 
-<button
-    id="testButton"
->
+<button id="testButton">
 🧪 検証する
 </button>
 
@@ -380,9 +357,12 @@ td {
 <h2>🔎 トリップ検索</h2>
 
 <p class="muted">
+
 複数条件を追加した場合、
 <b>すべての条件</b>に一致するものを検索します。
+
 停止ボタンを押すまで検索を続けます。
+
 </p>
 
 
@@ -563,43 +543,55 @@ Worker数
 <div class="status">
 
 <div class="statusBox">
-    状態
-    <div
-        id="searchState"
-        class="statusValue"
-    >
-        停止中
-    </div>
+
+状態
+
+<div
+    id="searchState"
+    class="statusValue"
+>
+停止中
+</div>
+
 </div>
 
 <div class="statusBox">
-    試行キー
-    <div
-        id="attemptCount"
-        class="statusValue"
-    >
-        0
-    </div>
+
+試行キー
+
+<div
+    id="attemptCount"
+    class="statusValue"
+>
+0
+</div>
+
 </div>
 
 <div class="statusBox">
-    ヒット
-    <div
-        id="hitCount"
-        class="statusValue"
-    >
-        0
-    </div>
+
+ヒット
+
+<div
+    id="hitCount"
+    class="statusValue"
+>
+0
+</div>
+
 </div>
 
 <div class="statusBox">
-    速度
-    <div
-        id="speed"
-        class="statusValue"
-    >
-        0 / 秒
-    </div>
+
+速度
+
+<div
+    id="speed"
+    class="statusValue"
+>
+0 / 秒
+</div>
+
 </div>
 
 </div>
@@ -742,16 +734,11 @@ Worker数
 const WORKER_FILE =
     "./worker.js";
 
+
 const CPU_COUNT =
     navigator.hardwareConcurrency || 4;
 
 
-/*
- * 検索文字セット。
- *
- * 日本語は入れない。
- * 特殊文字・英数字は従来通り使用。
- */
 const SEARCH_CHARSET =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
     "abcdefghijklmnopqrstuvwxyz" +
@@ -775,8 +762,6 @@ let startTime = 0;
 
 let lastGeneratedTrip = "";
 
-let lastGeneratedKey = "";
-
 
 /* =========================================
    DOM
@@ -784,21 +769,6 @@ let lastGeneratedKey = "";
 
 const $ = id =>
     document.getElementById(id);
-
-
-/* =========================================
-   HTML escape
-========================================= */
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
 
 
 /* =========================================
@@ -827,121 +797,139 @@ function log(message) {
 
 
 /* =========================================
-   日本語文字チェック
+   HTML escape
 ========================================= */
 
-/*
- * ひらがな
- * カタカナ
- * CJK漢字
- */
-function containsJapanese(text) {
+function escapeHtml(value) {
 
-    return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/u
-        .test(text);
-}
-
-
-function getJapaneseCharacters(text) {
-
-    const matches =
-        text.match(
-            /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/gu
-        );
-
-    if (!matches) {
-        return [];
-    }
-
-    return [...new Set(matches)];
-}
-
-
-/*
- * 条件入力欄をチェック。
- */
-function validateConditionText(input) {
-
-    const text =
-        input.value;
-
-    const condition =
-        input.closest(".condition");
-
-    if (!condition) {
-        return true;
-    }
-
-    let warning =
-        condition.querySelector(
-            ".conditionWarning"
-        );
-
-    if (!warning) {
-
-        warning =
-            document.createElement("div");
-
-        warning.className =
-            "conditionWarning warning";
-
-        condition.appendChild(
-            warning
-        );
-    }
-
-
-    if (containsJapanese(text)) {
-
-        const chars =
-            getJapaneseCharacters(text);
-
-        warning.textContent =
-            "⚠️ ひらがな・カタカナ・漢字は検索条件に使用できません：" +
-            chars.join(" ");
-
-        condition.classList.add(
-            "warning"
-        );
-
-        return false;
-    }
-
-
-    warning.textContent = "";
-
-    condition.classList.remove(
-        "warning"
-    );
-
-    return true;
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
 /* =========================================
-   Generator key validation
+   日本語文字チェック
 ========================================= */
 
-function validateGenerateKey(key) {
+/*
+ * 検索条件に
+ *
+ * ひらがな
+ * カタカナ
+ * 漢字
+ *
+ * が入っているか確認する。
+ */
 
-    /*
-     * 生成側でも日本語を警告。
-     */
-    if (containsJapanese(key)) {
+function containsJapanese(value) {
 
-        const chars =
-            getJapaneseCharacters(key);
+    return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u
+        .test(String(value));
+}
 
-        alert(
-            "⚠️ キーにひらがな・カタカナ・漢字は使用できません。\n\n" +
-            "該当文字：" +
-            chars.join(" ")
-        );
 
-        return false;
+function getJapaneseType(value) {
+
+    const text =
+        String(value);
+
+
+    if (/[\u3040-\u309f]/u.test(text)) {
+        return "ひらがな";
     }
 
-    return true;
+
+    if (/[\u30a0-\u30ff]/u.test(text)) {
+        return "カタカナ";
+    }
+
+
+    if (
+        /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u
+            .test(text)
+    ) {
+        return "漢字";
+    }
+
+
+    return "日本語文字";
+}
+
+
+/* =========================================
+   条件警告
+========================================= */
+
+function validateConditions(showAlert = true) {
+
+    const elements =
+        document.querySelectorAll(
+            ".condition"
+        );
+
+
+    let valid = true;
+
+
+    for (const element of elements) {
+
+        const input =
+            element.querySelector(
+                ".conditionText"
+            );
+
+
+        if (!input) {
+            continue;
+        }
+
+
+        const text =
+            input.value;
+
+
+        element.classList.remove(
+            "invalid"
+        );
+
+
+        if (!text) {
+            continue;
+        }
+
+
+        if (containsJapanese(text)) {
+
+            valid = false;
+
+            element.classList.add(
+                "invalid"
+            );
+
+
+            if (showAlert) {
+
+                alert(
+                    "検索条件に" +
+                    getJapaneseType(text) +
+                    "が含まれています。\n\n" +
+                    "数字・アルファベット・記号で検索条件を入力してください。"
+                );
+
+                input.focus();
+            }
+
+
+            break;
+        }
+    }
+
+
+    return valid;
 }
 
 
@@ -951,18 +939,17 @@ function validateGenerateKey(key) {
 
 function terminateWorkers() {
 
-    const oldWorkers =
-        workers.slice();
-
-    workers = [];
-
-    for (const worker of oldWorkers) {
+    for (const worker of workers) {
 
         try {
             worker.terminate();
         } catch (e) {
         }
     }
+
+
+    workers = [];
+
 
     $("workerStatus").textContent =
         "待機";
@@ -978,8 +965,10 @@ function createWorker(index) {
     const worker =
         new Worker(WORKER_FILE);
 
+
     worker.__index =
         index;
+
 
     worker.onmessage =
         function(event) {
@@ -1017,36 +1006,8 @@ function handleWorkerMessage(
     data
 ) {
 
-    /*
-     * Workerによって type の名前が
-     * generate-result になっている場合にも対応。
-     */
-    let type =
-        data.type || "";
+    switch (data.type) {
 
-
-    if (
-        type === "generate-result"
-    ) {
-
-        type = "generated";
-    }
-
-
-    if (
-        type === "test-result"
-    ) {
-
-        type = "test-results";
-    }
-
-
-    switch (type) {
-
-
-        /* ================================
-           READY
-        ================================= */
 
         case "ready":
 
@@ -1060,52 +1021,14 @@ function handleWorkerMessage(
             break;
 
 
-        /* ================================
-           GENERATED
-        ================================= */
+        /* -------------------------------------
+           生成結果
+        ------------------------------------- */
 
-        case "generated": {
-
-            /*
-             * Worker側のプロパティ名の差を吸収。
-             */
-            const trip =
-                data.trip ??
-                data.result ??
-                data.value ??
-                data.trip10 ??
-                "";
-
-            const rawKey =
-                data.key ??
-                data.rawKey ??
-                data.input ??
-                "";
-
+        case "generate-result":
 
             lastGeneratedTrip =
-                String(trip);
-
-            lastGeneratedKey =
-                String(rawKey);
-
-
-            /*
-             * 表示キー。
-             *
-             * Workerからすでに # や .. が
-             * 付いている場合は二重に付けない。
-             */
-            const length =
-                Number(
-                    $("generateLength").value
-                );
-
-            const displayKey =
-                formatDisplayKey(
-                    rawKey,
-                    length
-                );
+                data.trip || "";
 
 
             $("generateResult").innerHTML =
@@ -1113,11 +1036,12 @@ function handleWorkerMessage(
                 <div class="result">
 
                     <div class="trip">
-                        ◆${escapeHtml(trip)}
+                        ◆${escapeHtml(data.trip)}
                     </div>
 
                     <div class="key">
-                        キー：${escapeHtml(displayKey)}
+                        キー：
+                        ${escapeHtml(data.key)}
                     </div>
 
                 </div>
@@ -1126,37 +1050,57 @@ function handleWorkerMessage(
 
             log(
                 `トリップ生成: ` +
-                `${displayKey} → ${trip}`
+                `${data.key} → ${data.trip}`
             );
 
             break;
-        }
 
 
-        /* ================================
-           TEST
-        ================================= */
+        /* -------------------------------------
+           旧形式にも対応
+        ------------------------------------- */
 
-        case "test-results": {
+        case "generated":
 
-            const results =
-                Array.isArray(data.results)
-                    ? data.results
-                    : Array.isArray(data.data)
-                        ? data.data
-                        : [];
+            lastGeneratedTrip =
+                data.trip || "";
+
+
+            $("generateResult").innerHTML =
+                `
+                <div class="result">
+
+                    <div class="trip">
+                        ◆${escapeHtml(data.trip)}
+                    </div>
+
+                    <div class="key">
+                        キー：
+                        ${escapeHtml(data.key)}
+                    </div>
+
+                </div>
+                `;
+
+            break;
+
+
+        /* -------------------------------------
+           自動検証
+        ------------------------------------- */
+
+        case "test-results":
 
             renderTests(
-                results
+                data.results || []
             );
 
             break;
-        }
 
 
-        /* ================================
-           PROGRESS
-        ================================= */
+        /* -------------------------------------
+           検索進捗
+        ------------------------------------- */
 
         case "progress":
 
@@ -1168,29 +1112,20 @@ function handleWorkerMessage(
             break;
 
 
-        /* ================================
-           HIT
-        ================================= */
+        /* -------------------------------------
+           ヒット
+        ------------------------------------- */
 
         case "hit":
 
-            /*
-             * 検索中でないWorkerからの
-             * 遅延メッセージは無視。
-             */
-            if (!searching) {
-                break;
-            }
-
             totalHits++;
 
+
             addResult(
-                data.trip ??
-                data.result ??
-                "",
-                data.key ??
-                ""
+                data.trip,
+                data.key
             );
+
 
             $("hitCount").textContent =
                 totalHits.toLocaleString();
@@ -1198,131 +1133,27 @@ function handleWorkerMessage(
             break;
 
 
-        /* ================================
-           STOPPED
-        ================================= */
-
         case "stopped":
 
-            /*
-             * 実際の停止処理は
-             * terminateWorkers() が担当。
-             */
             break;
 
-
-        /* ================================
-           ERROR
-        ================================= */
 
         case "error":
 
             log(
                 `Worker #${worker.__index}: ` +
-                (
-                    data.message ||
-                    data.error ||
-                    "Worker error"
-                )
+                data.message
             );
 
             break;
 
-
-        /* ================================
-           UNKNOWN
-        ================================= */
 
         default:
 
             log(
-                `Unknown Worker message: ${type}`
-            );
-
-            /*
-             * デバッグ用。
-             */
-            if (
-                type &&
-                type !== "stopping"
-            ) {
-
-                try {
-
-                    console.log(
-                        "Unknown Worker message:",
-                        data
-                    );
-
-                } catch (e) {
-                }
-            }
-
-            break;
-    }
-}
-
-
-/* =========================================
-   表示キー
-========================================= */
-
-function formatDisplayKey(
-    key,
-    length
-) {
-
-    let clean =
-        String(key ?? "");
-
-
-    /*
-     * Worker側から
-     * #aaaaaaaa..
-     * のように返ってきても
-     * 二重にならないようにする。
-     */
-    if (
-        clean.startsWith("#")
-    ) {
-        clean =
-            clean.slice(1);
-    }
-
-
-    if (
-        clean.endsWith("..")
-    ) {
-        clean =
-            clean.slice(
-                0,
-                -2
+                `Unknown Worker message: ${data.type}`
             );
     }
-
-
-    if (length === 10) {
-
-        /*
-         * 10桁は先頭8文字。
-         */
-        clean =
-            clean.slice(0, 8);
-
-        return "#" +
-            clean +
-            "..";
-    }
-
-
-    /*
-     * 12桁は12文字。
-     */
-    clean =
-        clean.slice(0, 12);
-
-    return "#" +
-        clean;
 }
 
 
@@ -1340,14 +1171,21 @@ $("generateButton")
                     $("generateLength").value
                 );
 
-            const key =
+
+            let key =
                 $("generateKey").value;
 
 
+            /*
+             * # が入力された場合でも対応
+             */
+
             if (
-                !validateGenerateKey(key)
+                key.startsWith("#")
             ) {
-                return;
+
+                key =
+                    key.substring(1);
             }
 
 
@@ -1377,12 +1215,6 @@ $("generateButton")
             }
 
 
-            /*
-             * 前回生成Workerを残さない。
-             */
-            terminateWorkers();
-
-
             const worker =
                 createWorker(0);
 
@@ -1399,11 +1231,14 @@ $("generateButton")
 
 
             /*
-             * ready / generate-result の
-             * 両方を待つ。
+             * ready → generate-result を待つ。
              *
-             * すぐterminateしない。
+             * すぐterminateすると12桁の
+             * Promise処理途中でWorkerが
+             * 消える可能性があるため、
+             * 十分な時間を確保する。
              */
+
             setTimeout(
                 function() {
 
@@ -1444,9 +1279,11 @@ $("copyButton")
                     lastGeneratedTrip
                 );
 
+
                 log(
                     "トリップをコピーしました"
                 );
+
 
             } catch (e) {
 
@@ -1480,81 +1317,22 @@ $("testButton")
             });
 
 
-            /*
-             * 2秒で切るのではなく、
-             * 結果を受け取った後に終了。
-             */
-            const originalHandler =
-                worker.onmessage;
+            setTimeout(
+                function() {
 
-
-            const timeout =
-                setTimeout(
-                    function() {
-
-                        try {
-                            worker.terminate();
-                        } catch (e) {
-                        }
-
-                    },
-                    10000
-                );
-
-
-            /*
-             * 既存handlerはそのまま。
-             * test-resultsが来たらWorkerを終了。
-             */
-            worker.addEventListener(
-                "message",
-                function(event) {
-
-                    const type =
-                        event.data?.type;
-
-                    if (
-                        type === "test-results" ||
-                        type === "test-result"
-                    ) {
-
-                        clearTimeout(
-                            timeout
-                        );
-
-                        setTimeout(
-                            function() {
-
-                                try {
-                                    worker.terminate();
-                                } catch (e) {
-                                }
-
-                            },
-                            100
-                        );
+                    try {
+                        worker.terminate();
+                    } catch (e) {
                     }
-                }
-            );
 
+                },
+                5000
+            );
         }
     );
 
 
-/* =========================================
-   Tests render
-========================================= */
-
 function renderTests(results) {
-
-    if (!Array.isArray(results)) {
-
-        $("testResult").innerHTML =
-            "検証結果がありません。";
-
-        return;
-    }
-
 
     if (!results.length) {
 
@@ -1570,55 +1348,27 @@ function renderTests(results) {
 
     for (const item of results) {
 
-        /*
-         * undefined対策。
-         */
-        const key =
-            item.key ??
-            item.input ??
-            "";
-
-
-        const raw =
-            item.raw ??
-            item.result ??
-            item.value ??
-            "";
-
-
-        const trip10 =
-            item.trip10 ??
-            item["10"] ??
-            "";
-
-
-        const trip12 =
-            item.trip12 ??
-            item["12"] ??
-            "";
-
-
         html +=
             `
             <div class="testItem">
 
                 <b>
-                    ${escapeHtml(key)}
+                    ${escapeHtml(item.key)}
                 </b>
 
                 <div>
                     raw :
-                    ${escapeHtml(raw)}
+                    ${escapeHtml(item.raw)}
                 </div>
 
                 <div>
                     10桁 :
-                    ${escapeHtml(trip10)}
+                    ${escapeHtml(item.trip10)}
                 </div>
 
                 <div>
                     12桁 :
-                    ${escapeHtml(trip12)}
+                    ${escapeHtml(item.trip12)}
                 </div>
 
             </div>
@@ -1639,6 +1389,7 @@ function addCondition() {
 
     const div =
         document.createElement("div");
+
 
     div.className =
         "condition";
@@ -1693,10 +1444,6 @@ function addCondition() {
 
         </div>
 
-        <div
-            class="conditionWarning warning"
-        ></div>
-
         <button
             class="deleteCondition danger"
         >
@@ -1712,15 +1459,29 @@ function addCondition() {
 
 
     /*
-     * 入力中に日本語を検知。
+     * 入力時にも日本語を検出
      */
+
     input.addEventListener(
         "input",
         function() {
 
-            validateConditionText(
-                input
-            );
+            if (
+                containsJapanese(
+                    input.value
+                )
+            ) {
+
+                div.classList.add(
+                    "invalid"
+                );
+
+            } else {
+
+                div.classList.remove(
+                    "invalid"
+                );
+            }
         }
     );
 
@@ -1732,7 +1493,6 @@ function addCondition() {
         function() {
 
             div.remove();
-
         }
     );
 
@@ -1749,9 +1509,6 @@ $("addCondition")
     );
 
 
-/*
- * 最初の条件
- */
 addCondition();
 
 
@@ -1776,31 +1533,14 @@ function getConditions() {
 
     for (const element of elements) {
 
-        const input =
+        const text =
             element.querySelector(
                 ".conditionText"
-            );
-
-
-        const text =
-            input.value;
+            ).value;
 
 
         if (!text) {
             continue;
-        }
-
-
-        /*
-         * 日本語があれば警告。
-         */
-        if (
-            !validateConditionText(
-                input
-            )
-        ) {
-
-            return null;
         }
 
 
@@ -1870,9 +1610,23 @@ function startSearch() {
 
 
     /*
-     * 既存Workerを完全停止。
+     * ★日本語チェック
+     *
+     * ここで止める。
      */
-    terminateWorkers();
+
+    if (!validateConditions(true)) {
+
+        log(
+            "検索開始を中止: " +
+            "検索条件に日本語文字が含まれています"
+        );
+
+        return;
+    }
+
+
+    stopSearch(false);
 
 
     const count =
@@ -1889,20 +1643,6 @@ function startSearch() {
         getConditions();
 
 
-    /*
-     * 日本語条件がある場合は開始しない。
-     */
-    if (conditions === null) {
-
-        alert(
-            "⚠️ 検索条件にひらがな・カタカナ・漢字が含まれています。\n" +
-            "英数字・記号のみ使用してください。"
-        );
-
-        return;
-    }
-
-
     const special =
         $("special").value;
 
@@ -1911,6 +1651,7 @@ function startSearch() {
 
     totalHits = 0;
 
+
     startTime =
         performance.now();
 
@@ -1918,15 +1659,17 @@ function startSearch() {
     $("attemptCount").textContent =
         "0";
 
+
     $("hitCount").textContent =
         "0";
+
 
     $("speed").textContent =
         "0 / 秒";
 
 
     $("results").innerHTML =
-        "検索結果はありません。";
+        "";
 
 
     searching = true;
@@ -1955,9 +1698,7 @@ function startSearch() {
             createWorker(i + 1);
 
 
-        workers.push(
-            worker
-        );
+        workers.push(worker);
 
 
         worker.postMessage({
@@ -1987,23 +1728,24 @@ $("stopSearch")
         function() {
 
             stopSearch(true);
-
         }
     );
 
 
 function stopSearch(writeLog) {
 
-    const hadWorkers =
-        workers.length > 0;
+    if (
+        !searching &&
+        workers.length === 0
+    ) {
+
+        return;
+    }
 
 
     searching = false;
 
 
-    /*
-     * まず配列から切り離す。
-     */
     const oldWorkers =
         workers.slice();
 
@@ -2011,10 +1753,6 @@ function stopSearch(writeLog) {
     workers = [];
 
 
-    /*
-     * postMessageは任意。
-     * terminateを必ず実行する。
-     */
     for (
         const worker of oldWorkers
     ) {
@@ -2046,10 +1784,7 @@ function stopSearch(writeLog) {
         "停止中";
 
 
-    if (
-        writeLog &&
-        hadWorkers
-    ) {
+    if (writeLog) {
 
         log(
             "検索停止"
@@ -2068,12 +1803,11 @@ function updateStatistics() {
         totalAttempts.toLocaleString();
 
 
-    const now =
-        performance.now();
-
-
     const elapsed =
-        (now - startTime) / 1000;
+        (
+            performance.now() -
+            startTime
+        ) / 1000;
 
 
     if (elapsed <= 0) {
@@ -2082,8 +1816,7 @@ function updateStatistics() {
 
 
     const speed =
-        totalAttempts /
-        elapsed;
+        totalAttempts / elapsed;
 
 
     $("speed").textContent =
@@ -2108,23 +1841,6 @@ function addResult(
         "result";
 
 
-    /*
-     * 検索結果のキー表示も
-     * 10桁 / 12桁に合わせる。
-     */
-    const length =
-        Number(
-            $("searchLength").value
-        );
-
-
-    const displayKey =
-        formatDisplayKey(
-            key,
-            length
-        );
-
-
     result.innerHTML =
         `
         <div class="trip">
@@ -2132,7 +1848,7 @@ function addResult(
         </div>
 
         <div class="key">
-            キー：${escapeHtml(displayKey)}
+            キー：${escapeHtml(key)}
         </div>
         `;
 
@@ -2162,48 +1878,8 @@ log(
     "Worker初期化準備完了"
 );
 
-
-/* =========================================
-   Worker確認
-========================================= */
-
-(function checkWorker() {
-
-    try {
-
-        const worker =
-            createWorker(0);
-
-
-        worker.postMessage({
-            type: "ping"
-        });
-
-
-        setTimeout(
-            function() {
-
-                try {
-                    worker.terminate();
-                } catch (e) {
-                }
-
-            },
-            1500
-        );
-
-    } catch (error) {
-
-        $("libraryStatus").textContent =
-            "エラー";
-
-        log(
-            "Worker初期化エラー: " +
-            error.message
-        );
-    }
-
-})();
+$("libraryStatus").textContent =
+    "確認中...";
 
 
 /* =========================================
@@ -2214,6 +1890,7 @@ setInterval(
     function() {
 
         if (searching) {
+
             updateStatistics();
         }
 
