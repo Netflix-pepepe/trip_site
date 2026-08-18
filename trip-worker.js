@@ -1,5 +1,15 @@
 "use strict";
 
+/*
+ * trip-worker.js
+ *
+ * unix-crypt-td.min.js
+ *   └─ self.unixCryptTD / self.z
+ *
+ * 既知のトリップキーを
+ * 10桁Unix crypt系Tripへ変換するWorker
+ */
+
 let crypt = null;
 
 
@@ -22,7 +32,7 @@ try {
     } else {
 
         throw new Error(
-            "unixCryptTD が見つかりません"
+            "unixCryptTD / z が見つかりません"
         );
     }
 
@@ -51,37 +61,6 @@ self.onmessage = function (event) {
     const data =
         event.data || {};
 
-    if (data.type === "test") {
-
-        try {
-
-            const key =
-                "aaaaaaaa";
-
-            const trip =
-                make10Trip(key);
-
-            self.postMessage({
-                type: "test-ok",
-                key: key,
-                trip: trip
-            });
-
-        } catch (e) {
-
-            self.postMessage({
-                type: "error",
-                message:
-                    e && e.stack
-                        ? e.stack
-                        : String(e)
-            });
-        }
-
-        return;
-    }
-
-
     if (data.type === "convert") {
 
         try {
@@ -94,14 +73,12 @@ self.onmessage = function (event) {
             if (!key) {
 
                 throw new Error(
-                    "キーが空です"
+                    "トリップキーが空です"
                 );
             }
 
-
             const result =
-                convertTrip(key);
-
+                makeTrip10(key);
 
             self.postMessage({
 
@@ -109,14 +86,50 @@ self.onmessage = function (event) {
 
                 key: key,
 
-                trip:
-                    result.trip,
+                trip: result.trip,
 
-                length:
-                    result.length,
+                salt: result.salt,
 
-                mode:
-                    result.mode
+                bytes: result.bytes
+
+            });
+
+        } catch (e) {
+
+            self.postMessage({
+
+                type: "error",
+
+                message:
+                    e && e.stack
+                        ? e.stack
+                        : String(e)
+            });
+        }
+
+        return;
+    }
+
+
+    if (data.type === "test") {
+
+        try {
+
+            const result =
+                makeTrip10("test");
+
+            self.postMessage({
+
+                type: "test-ok",
+
+                key: "test",
+
+                trip: result.trip,
+
+                salt: result.salt,
+
+                bytes: result.bytes
+
             });
 
         } catch (e) {
@@ -138,64 +151,12 @@ self.onmessage = function (event) {
 
 
 /* =========================================
-   メイン変換
+   10桁Trip生成
 ========================================= */
 
-function convertTrip(key) {
+function makeTrip10(key) {
 
-    /*
-     * ここでは通常の10桁方式を使用。
-     *
-     * 2ch系ではキーのバイト長などによって
-     * 10桁 / 12桁などの方式が分かれる。
-     */
-
-    const bytes =
-        utf8Bytes(key);
-
-
-    /*
-     * 10桁方式
-     */
-    if (bytes.length <= 11) {
-
-        const trip =
-            make10Trip(key);
-
-        return {
-
-            trip: trip,
-
-            length: 10,
-
-            mode: "unix-crypt"
-        };
-    }
-
-
-    /*
-     * 現在の z は10桁Unix crypt実装なので、
-     * 12桁方式をここで偽装しない。
-     *
-     * 12桁を完全互換にする場合は、
-     * 12桁用のアルゴリズムを別途実装する。
-     */
-
-    throw new Error(
-        "12桁キーには12桁方式の実装が必要です"
-    );
-}
-
-
-/* =========================================
-   10桁 Trip
-========================================= */
-
-function make10Trip(key) {
-
-    if (
-        typeof crypt !== "function"
-    ) {
+    if (typeof crypt !== "function") {
 
         throw new Error(
             "unixCryptTD unavailable"
@@ -203,28 +164,104 @@ function make10Trip(key) {
     }
 
 
-    key =
-        String(key);
+    /*
+     * 2ch系10桁Tripは
+     * キーのバイト列を基準に処理する。
+     *
+     * ここではASCIIキーを対象にする。
+     *
+     * 日本語などShift_JISが必要なキーは
+     * 別途Shift_JISエンコーダーが必要。
+     */
+
+    const bytes =
+        asciiBytes(key);
 
 
     /*
-     * Unix cryptではsaltに
-     * 先頭2文字を利用する。
+     * 11バイトを超えるキーは
+     * この10桁方式の対象外。
+     */
+
+    if (bytes.length > 11) {
+
+        throw new Error(
+            "10桁Tripは11バイト以下のキーを使用してください"
+        );
+    }
+
+
+    /*
+     * 先頭8バイトを使用
+     */
+
+    const used =
+        bytes.slice(0, 8);
+
+
+    /*
+     * ASCII文字列へ戻す
+     */
+
+    let password = "";
+
+    for (
+        let i = 0;
+        i < used.length;
+        i++
+    ) {
+
+        password +=
+            String.fromCharCode(
+                used[i]
+            );
+    }
+
+
+    /*
+     * Unix cryptのsalt生成
+     *
+     * 先頭2文字ではなく、
+     * Tripcode方式のsaltを生成する。
      */
 
     let salt =
-        key.substring(0, 2);
+        (
+            password +
+            "H."
+        ).substring(1, 3);
 
 
-    if (
-        salt.length < 2
-    ) {
+    /*
+     * saltに使用できない文字を
+     * "."へ置換
+     */
 
-        salt =
-            (
-                salt + "AA"
-            ).substring(0, 2);
-    }
+    salt =
+        salt.replace(
+            /[^.-z]/g,
+            "."
+        );
+
+
+    /*
+     * ":" → ";"
+     * ";" → "<"
+     *
+     * cryptのsalt範囲に合わせる
+     */
+
+    salt =
+        salt.replace(
+            /:/g,
+            ";"
+        );
+
+    salt =
+        salt.replace(
+            /;/g,
+            "<"
+        );
 
 
     /*
@@ -233,7 +270,7 @@ function make10Trip(key) {
 
     const result =
         crypt(
-            key,
+            password,
             salt
         );
 
@@ -249,65 +286,58 @@ function make10Trip(key) {
 
 
     /*
-     * saltの2文字を除外。
+     * Unix crypt結果:
      *
-     * ここでは従来コードと同じ
-     * 10文字を使用する。
+     * [salt 2文字]
+     * [trip部分]
+     *
+     * Tripは10文字取得
      */
 
-    return result.substring(
-        2,
-        12
-    );
+    const trip =
+        result.substring(3, 13);
+
+
+    return {
+
+        trip: trip,
+
+        salt: salt,
+
+        bytes: used
+
+    };
 }
 
 
 /* =========================================
-   UTF-8バイト列
+   ASCII byte
 ========================================= */
 
-function utf8Bytes(text) {
-
-    /*
-     * Worker環境で
-     * TextEncoderが利用可能なら使用。
-     */
-
-    if (
-        typeof TextEncoder !==
-        "undefined"
-    ) {
-
-        return Array.from(
-            new TextEncoder().encode(
-                String(text)
-            )
-        );
-    }
-
-
-    /*
-     * フォールバック
-     */
-
-    const encoded =
-        unescape(
-            encodeURIComponent(
-                String(text)
-            )
-        );
+function asciiBytes(text) {
 
     const result = [];
 
+    text =
+        String(text);
+
     for (
         let i = 0;
-        i < encoded.length;
+        i < text.length;
         i++
     ) {
 
-        result.push(
-            encoded.charCodeAt(i)
-        );
+        const code =
+            text.charCodeAt(i);
+
+        if (code > 0x7f) {
+
+            throw new Error(
+                "この版ではASCIIキーのみ対応しています。日本語キーにはShift_JIS変換が必要です。"
+            );
+        }
+
+        result.push(code);
     }
 
     return result;
