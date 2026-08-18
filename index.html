@@ -1,995 +1,1548 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>🐺 人狼オンライン トリップ検索機</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #111;
+    color: #eee;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+section {
+    background: #1b1b1b;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin: 10px 0 6px;
+}
+
+input,
+select,
+button {
+    font: inherit;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 9px;
+    background: #0e0e0e;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+button {
+    padding: 9px 14px;
+    margin: 5px 4px 5px 0;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #444;
+    color: white;
+}
+
+button:hover {
+    background: #555;
+}
+
+.primary {
+    background: #1976d2;
+}
+
+.danger {
+    background: #b71c1c;
+}
+
+.result {
+    padding: 10px;
+    margin: 8px 0;
+    background: #111;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.trip {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.key {
+    margin-top: 4px;
+    color: #aaa;
+    word-break: break-all;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.status {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.statusBox {
+    padding: 12px;
+    background: #111;
+    border-radius: 7px;
+}
+
+.statusValue {
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.condition {
+    border: 1px solid #333;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 7px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #333;
+    padding: 8px;
+    text-align: left;
+}
+
+#results {
+    min-height: 40px;
+}
+
+#log {
+    background: #080808;
+    padding: 10px;
+    height: 180px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.testItem {
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+}
+
+.muted {
+    color: #999;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🐺 人狼オンライン トリップ検索機</h1>
+
+
+<!-- =========================================
+     STATUS
+========================================= -->
+
+<section>
+
+<h2>⚙️ システム状態</h2>
+
+<div class="status">
+
+<div class="statusBox">
+    ライブラリ
+    <div
+        id="libraryStatus"
+        class="statusValue"
+    >
+        確認中...
+    </div>
+</div>
+
+<div class="statusBox">
+    Worker
+    <div
+        id="workerStatus"
+        class="statusValue"
+    >
+        待機
+    </div>
+</div>
+
+<div class="statusBox">
+    CPU
+    <div
+        id="cpuStatus"
+        class="statusValue"
+    >
+        確認中...
+    </div>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================
+     GENERATOR
+========================================= -->
+
+<section>
+
+<h2>🔑 トリップ生成</h2>
+
+<p class="muted">
+10桁はキーの先頭8文字を使用します。
+10桁の表示キーには <b>#</b> と <b>..</b> を付けます。
+12桁は12文字キー全体を使用し、
+表示キーには <b>#</b> のみ付けます。
+</p>
+
+<div class="grid">
+
+<div>
+
+<label>トリップ長</label>
+
+<select id="generateLength">
+
+<option value="10">
+10桁
+</option>
+
+<option value="12">
+12桁
+</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>キー</label>
+
+<input
+    id="generateKey"
+    autocomplete="off"
+    spellcheck="false"
+>
+
+</div>
+
+</div>
+
+<button
+    id="generateButton"
+    class="primary"
+>
+✨ トリップを生成
+</button>
+
+<button
+    id="copyButton"
+>
+📋 トリップをコピー
+</button>
+
+<div id="generateResult"></div>
+
+</section>
+
+
+<!-- =========================================
+     TEST
+========================================= -->
+
+<section>
+
+<h2>🧪 自動検証</h2>
+
+<p class="muted">
+既知の計算を実行して、
+ライブラリとトリップ抽出処理を確認します。
+</p>
+
+<button
+    id="testButton"
+>
+🧪 検証する
+</button>
+
+<div id="testResult"></div>
+
+</section>
+
+
+<!-- =========================================
+     SEARCH
+========================================= -->
+
+<section>
+
+<h2>🔎 トリップ検索</h2>
+
+<p class="muted">
+複数条件を追加した場合、
+<b>すべての条件</b>に一致するものを検索します。
+停止ボタンを押すまで検索を続けます。
+</p>
+
+
+<div class="grid">
+
+<div>
+
+<label>
+探索するトリップ長
+</label>
+
+<select id="searchLength">
+
+<option value="10">
+10文字
+</option>
+
+<option value="12">
+12文字
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>
+一致方式
+</label>
+
+<select id="searchMode">
+
+<option value="normal">
+通常検索
+</option>
+
+<option value="regex">
+🔥 正規表現
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>
+Worker数
+</label>
+
+<select id="workerCount">
+
+<option value="0">
+自動
+</option>
+
+<option value="1">1 Worker</option>
+<option value="2">2 Workers</option>
+<option value="4">4 Workers</option>
+<option value="6">6 Workers</option>
+<option value="8">8 Workers</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<h3>一致条件</h3>
+
+<div id="conditions"></div>
+
+<button id="addCondition">
+＋ 条件を追加
+</button>
+
+
+<h3>⭐ 特殊トリップ</h3>
+
+<select id="special">
+
+<option value="none">
+指定なし
+</option>
+
+<option value="pure">
+純n連（純8連以上）
+</option>
+
+<option value="quasi">
+準n連（準9連以上）
+</option>
+
+<option value="two">
+二構
+</option>
+
+<option value="longest">
+最長
+</option>
+
+<option value="shortest">
+最短
+</option>
+
+<option value="yakumo">
+八雲
+</option>
+
+<option value="mirror">
+鏡
+</option>
+
+<option value="palindrome">
+回文
+</option>
+
+<option value="echo">
+山彦
+</option>
+
+<option value="double">
+双連
+</option>
+
+<option value="numbers">
+全数
+</option>
+
+<option value="tobiishi">
+飛石
+</option>
+
+<option value="kakutobi">
+拡飛
+</option>
+
+</select>
+
+
+<div>
+
+<button
+    id="startSearch"
+    class="primary"
+>
+🔍 検索開始
+</button>
+
+<button
+    id="stopSearch"
+    class="danger"
+>
+⏹ 検索停止
+</button>
+
+</div>
+
+
+<div class="status">
+
+<div class="statusBox">
+    状態
+    <div
+        id="searchState"
+        class="statusValue"
+    >
+        停止中
+    </div>
+</div>
+
+<div class="statusBox">
+    試行キー
+    <div
+        id="attemptCount"
+        class="statusValue"
+    >
+        0
+    </div>
+</div>
+
+<div class="statusBox">
+    ヒット
+    <div
+        id="hitCount"
+        class="statusValue"
+    >
+        0
+    </div>
+</div>
+
+<div class="statusBox">
+    速度
+    <div
+        id="speed"
+        class="statusValue"
+    >
+        0 / 秒
+    </div>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================
+     RESULTS
+========================================= -->
+
+<section>
+
+<h2>🎯 検索結果</h2>
+
+<div id="results">
+検索結果はありません。
+</div>
+
+</section>
+
+
+<!-- =========================================
+     SPECIAL
+========================================= -->
+
+<section>
+
+<h2>📖 特殊トリップ一覧</h2>
+
+<table>
+
+<thead>
+
+<tr>
+<th>分類</th>
+<th>条件</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>純n連</td>
+<td>同じ文字が8文字以上連続</td>
+</tr>
+
+<tr>
+<td>準n連</td>
+<td>大文字小文字を無視して9文字以上連続</td>
+</tr>
+
+<tr>
+<td>二構</td>
+<td>2種類以下の文字だけ</td>
+</tr>
+
+<tr>
+<td>最長</td>
+<td>M / m / W のみ</td>
+</tr>
+
+<tr>
+<td>最短</td>
+<td>l / i / . のみ</td>
+</tr>
+
+<tr>
+<td>八雲</td>
+<td>3文字ずつ同じ文字</td>
+</tr>
+
+<tr>
+<td>鏡</td>
+<td>左右反転して見た目が対称</td>
+</tr>
+
+<tr>
+<td>回文</td>
+<td>文字列そのものが左右対称</td>
+</tr>
+
+<tr>
+<td>山彦</td>
+<td>前半と後半が同じ</td>
+</tr>
+
+<tr>
+<td>双連</td>
+<td>同じ文字2つずつ</td>
+</tr>
+
+<tr>
+<td>全数</td>
+<td>数字のみ</td>
+</tr>
+
+<tr>
+<td>飛石</td>
+<td>. または / が1文字おき</td>
+</tr>
+
+<tr>
+<td>拡飛</td>
+<td>同じ区切り文字が1文字おき</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</section>
+
+
+<!-- =========================================
+     LOG
+========================================= -->
+
+<section>
+
+<h2>📋 デバッグログ</h2>
+
+<div id="log"></div>
+
+</section>
+
+</div>
+
+
+<script>
+
 "use strict";
 
-let crypt = null;
-let running = false;
 
 /* =========================================
-   初期化
+   設定
 ========================================= */
 
-try {
+const WORKER_FILE =
+    "./worker.js";
 
-    importScripts("./unix-crypt-td.min.js");
 
-    if (typeof self.unixCryptTD === "function") {
-        crypt = self.unixCryptTD;
-    } else if (typeof self.z === "function") {
-        crypt = self.z;
-    } else {
-        throw new Error("unixCryptTD が見つかりません");
-    }
+const CPU_COUNT =
+    navigator.hardwareConcurrency || 4;
 
-    self.postMessage({
-        type: "ready"
-    });
 
-} catch (e) {
+/*
+ * 検索用文字セット。
+ *
+ * 同一文字連続はWorker側で除外する。
+ */
+const SEARCH_CHARSET =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "abcdefghijklmnopqrstuvwxyz" +
+    "0123456789" +
+    "./!@#$%^&*()_+-=[]{}<>?";
 
-    self.postMessage({
-        type: "error",
-        message: e && e.stack
-            ? e.stack
-            : String(e)
-    });
+
+/* =========================================
+   状態
+========================================= */
+
+let workers = [];
+
+let searching = false;
+
+let totalAttempts = 0;
+
+let totalHits = 0;
+
+let startTime = 0;
+
+let lastAttempts = 0;
+
+let lastTime = 0;
+
+let lastGeneratedTrip = "";
+
+
+/* =========================================
+   DOM
+========================================= */
+
+const $ = id =>
+    document.getElementById(id);
+
+
+/* =========================================
+   ログ
+========================================= */
+
+function log(message) {
+
+    const now =
+        new Date();
+
+    const time =
+        now.toLocaleTimeString(
+            "ja-JP",
+            {
+                hour12: false
+            }
+        );
+
+    $("log").textContent +=
+        `[${time}] ${message}\n`;
+
+    $("log").scrollTop =
+        $("log").scrollHeight;
 }
 
 
 /* =========================================
-   メッセージ
+   Worker破棄
 ========================================= */
 
-self.onmessage = function (event) {
+function terminateWorkers() {
 
-    const data = event.data || {};
-
-    if (data.type === "stop") {
-
-        running = false;
-
-        self.postMessage({
-            type: "stopped"
-        });
-
-        return;
-    }
-
-
-    if (data.type === "test") {
-
-        if (typeof crypt !== "function") {
-
-            self.postMessage({
-                type: "error",
-                message: "crypt is not a function"
-            });
-
-            return;
-        }
+    for (const worker of workers) {
 
         try {
-
-            const keys = [
-                "foob",
-                "Jim",
-                "aaaaaaaaaa",
-                "test"
-            ];
-
-            const results = keys.map(function (key) {
-
-                const raw = crypt(
-                    key,
-                    makeSalt(key)
-                );
-
-                if (typeof raw !== "string") {
-                    throw new Error(
-                        "crypt結果が文字列ではありません"
-                    );
-                }
-
-                return {
-                    key: key,
-                    raw: raw,
-                    trip10: makeTrip10(key),
-                    trip12: makeTrip12(key)
-                };
-            });
-
-            self.postMessage({
-                type: "test-results",
-                results: results
-            });
-
+            worker.terminate();
         } catch (e) {
-
-            self.postMessage({
-                type: "error",
-                message: e && e.stack
-                    ? e.stack
-                    : String(e)
-            });
         }
-
-        return;
     }
 
+    workers = [];
 
-    if (data.type === "generate") {
-
-        try {
-
-            const length =
-                Number(data.length) === 12
-                    ? 12
-                    : 10;
-
-            const key =
-                String(data.key || "");
-
-            const result =
-                generateTrip(key, length);
-
-            self.postMessage({
-                type: "generated",
-                key: result.displayKey,
-                rawKey: result.rawKey,
-                trip: result.trip,
-                length: length
-            });
-
-        } catch (e) {
-
-            self.postMessage({
-                type: "error",
-                message: e && e.message
-                    ? e.message
-                    : String(e)
-            });
-        }
-
-        return;
-    }
-
-
-    if (data.type === "search") {
-
-        if (typeof crypt !== "function") {
-
-            self.postMessage({
-                type: "error",
-                message: "unixCryptTD unavailable"
-            });
-
-            return;
-        }
-
-        running = true;
-
-        search(data);
-
-        return;
-    }
-};
-
-
-/* =========================================
-   Salt
-========================================= */
-
-function makeSalt(key) {
-
-    key = String(key);
-
-    let salt = key.substring(0, 2);
-
-    if (salt.length < 2) {
-        salt = (salt + "AA").substring(0, 2);
-    }
-
-    return salt;
+    $("workerStatus").textContent =
+        "待機";
 }
 
 
 /* =========================================
-   10桁 Trip
+   Worker作成
 ========================================= */
 
-function makeTrip10(key) {
+function createWorker(index) {
 
-    if (typeof crypt !== "function") {
-        throw new Error("unixCryptTD unavailable");
-    }
+    const worker =
+        new Worker(WORKER_FILE);
 
-    key = String(key);
+    worker.__index =
+        index;
 
-    /*
-     * 10桁の場合は先頭8文字だけ使用
-     */
-    key = key.substring(0, 8);
+    worker.onmessage =
+        function (event) {
 
-    if (!key.length) {
-        throw new Error("キーが空です");
-    }
-
-    const salt = makeSalt(key);
-
-    const raw = crypt(
-        key,
-        salt
-    );
-
-    if (typeof raw !== "string") {
-        throw new Error(
-            "crypt結果が文字列ではありません"
-        );
-    }
-
-    /*
-     * unix crypt:
-     *
-     * 先頭2文字 = salt
-     * その後ろ = crypt本体
-     *
-     * 10桁Tripでは本体の先頭10文字
-     */
-    return raw.substring(2, 12);
-}
-
-
-/* =========================================
-   12桁 Trip
-========================================= */
-
-function makeTrip12(key) {
-
-    if (typeof crypt !== "function") {
-        throw new Error("unixCryptTD unavailable");
-    }
-
-    key = String(key);
-
-    /*
-     * 12文字全部をキーとして使用
-     */
-    key = key.substring(0, 12);
-
-    if (!key.length) {
-        throw new Error("キーが空です");
-    }
-
-    const salt = makeSalt(key);
-
-    const raw = crypt(
-        key,
-        salt
-    );
-
-    if (typeof raw !== "string") {
-        throw new Error(
-            "crypt結果が文字列ではありません"
-        );
-    }
-
-    /*
-     * cryptのsalt 2文字を除いた本体。
-     *
-     * unix crypt の本体は11文字なので、
-     * 実際に取得できる文字数をそのまま返す。
-     */
-    return raw.substring(2);
-}
-
-
-/* =========================================
-   Trip生成
-========================================= */
-
-function generateTrip(key, length) {
-
-    const requestedLength =
-        Number(length) === 12
-            ? 12
-            : 10;
-
-    let rawKey =
-        String(key || "");
-
-    if (!rawKey) {
-        throw new Error("キーを入力してください");
-    }
-
-    if (requestedLength === 10) {
-
-        /*
-         * 10桁は先頭8文字のみ使用
-         */
-        rawKey =
-            rawKey.substring(0, 8);
-
-        if (rawKey.length < 8) {
-
-            throw new Error(
-                "10桁用キーは8文字以上入力してください"
+            handleWorkerMessage(
+                worker,
+                event.data || {}
             );
-        }
-
-        return {
-            rawKey: rawKey,
-            displayKey:
-                "#" + rawKey + "..",
-            trip:
-                makeTrip10(rawKey)
         };
-    }
 
 
-    /*
-     * 12桁は12文字全部使用
-     */
-    rawKey =
-        rawKey.substring(0, 12);
+    worker.onerror =
+        function (event) {
 
-    if (rawKey.length < 12) {
-
-        throw new Error(
-            "12桁用キーは12文字入力してください"
-        );
-    }
-
-    return {
-        rawKey: rawKey,
-        displayKey:
-            "#" + rawKey,
-        trip:
-            makeTrip12(rawKey)
-    };
-}
-
-
-/* =========================================
-   検索
-========================================= */
-
-function search(data) {
-
-    const length =
-        Number(data.length) === 12
-            ? 12
-            : 10;
-
-    const conditions =
-        Array.isArray(data.conditions)
-            ? data.conditions
-            : [];
-
-    const special =
-        data.special || "none";
-
-    const charset =
-        data.charset ||
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./!@#$%^&*()_+-=[]{}<>?";
-
-    let count = 0;
-
-    while (running) {
-
-        /*
-         * 10桁の場合は8文字キー
-         * 12桁の場合は12文字キー
-         */
-        const key =
-            randomKey(
-                charset,
-                length === 10 ? 8 : 12
+            log(
+                `Worker #${index} error: ` +
+                (
+                    event.message ||
+                    "Worker error"
+                )
             );
+        };
 
-        let trip;
-
-        try {
-
-            if (length === 10) {
-                trip = makeTrip10(key);
-            } else {
-                trip = makeTrip12(key);
-            }
-
-        } catch (e) {
-
-            self.postMessage({
-                type: "error",
-                message:
-                    e && e.message
-                        ? e.message
-                        : String(e)
-            });
-
-            running = false;
-            return;
-        }
-
-        count++;
-
-
-        /*
-         * 条件判定
-         */
-        if (
-            matchesConditions(
-                trip,
-                conditions
-            ) &&
-            matchesSpecial(
-                trip,
-                special
-            )
-        ) {
-
-            self.postMessage({
-                type: "hit",
-                key:
-                    length === 10
-                        ? "#" + key + ".."
-                        : "#" + key,
-                rawKey: key,
-                trip: trip
-            });
-        }
-
-
-        /*
-         * 2048回ごとに進捗
-         */
-        if ((count & 2047) === 0) {
-
-            self.postMessage({
-                type: "progress",
-                count: 2048
-            });
-        }
-    }
-
-
-    self.postMessage({
-        type: "stopped"
-    });
+    return worker;
 }
 
 
 /* =========================================
-   ランダムキー
+   Worker message
 ========================================= */
 
-function randomKey(charset, length) {
-
-    const result = [];
-
-    const size =
-        charset.length;
-
-    if (size < 2) {
-        throw new Error(
-            "文字セットが短すぎます"
-        );
-    }
-
-    const max =
-        256 -
-        (256 % size);
-
-    /*
-     * 直前と同じ文字を避ける。
-     *
-     * これにより
-     *
-     * aaaaaaaaa
-     * T!!!!!!!
-     * .......
-     *
-     * のような意図的な連続を避ける。
-     */
-    let previous = null;
-
-    while (
-        result.length < length
-    ) {
-
-        const buffer =
-            new Uint8Array(64);
-
-        crypto.getRandomValues(
-            buffer
-        );
-
-        for (
-            let i = 0;
-            i < buffer.length &&
-            result.length < length;
-            i++
-        ) {
-
-            const value =
-                buffer[i];
-
-            if (value >= max) {
-                continue;
-            }
-
-            const char =
-                charset[
-                    value % size
-                ];
-
-            if (
-                previous !== null &&
-                char === previous
-            ) {
-                continue;
-            }
-
-            result.push(char);
-
-            previous = char;
-        }
-    }
-
-    return result.join("");
-}
-
-
-/* =========================================
-   通常条件
-========================================= */
-
-function matchesConditions(
-    trip,
-    conditions
+function handleWorkerMessage(
+    worker,
+    data
 ) {
 
-    for (const condition of conditions) {
+    switch (data.type) {
 
-        if (!condition) {
-            continue;
+        case "ready":
+
+            log(
+                `Worker #${worker.__index}: ready`
+            );
+
+            $("libraryStatus").textContent =
+                "正常";
+
+            break;
+
+
+        case "generated":
+
+            lastGeneratedTrip =
+                data.trip || "";
+
+            $("generateResult").innerHTML =
+                `
+                <div class="result">
+                    <div class="trip">
+                        ◆${escapeHtml(data.trip)}
+                    </div>
+
+                    <div class="key">
+                        キー：${escapeHtml(data.key)}
+                    </div>
+                </div>
+                `;
+
+            log(
+                `トリップ生成: ` +
+                `${data.key} → ${data.trip}`
+            );
+
+            break;
+
+
+        case "test-results":
+
+            renderTests(
+                data.results || []
+            );
+
+            break;
+
+
+        case "progress":
+
+            totalAttempts +=
+                Number(data.count) || 0;
+
+            updateStatistics();
+
+            break;
+
+
+        case "hit":
+
+            totalHits++;
+
+            addResult(
+                data.trip,
+                data.key
+            );
+
+            $("hitCount").textContent =
+                totalHits.toLocaleString();
+
+            break;
+
+
+        case "stopped":
+
+            /*
+             * Worker個別の停止通知。
+             *
+             * terminateはメイン側で行うため、
+             * ここでは何もしない。
+             */
+
+            break;
+
+
+        case "error":
+
+            log(
+                `Worker #${worker.__index}: ` +
+                data.message
+            );
+
+            break;
+
+
+        default:
+
+            log(
+                `Unknown Worker message: ${data.type}`
+            );
+    }
+}
+
+
+/* =========================================
+   HTML escape
+========================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* =========================================
+   Generator
+========================================= */
+
+$("generateButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            const length =
+                Number(
+                    $("generateLength").value
+                );
+
+            const key =
+                $("generateKey").value;
+
+            if (
+                length === 10 &&
+                key.length < 8
+            ) {
+
+                alert(
+                    "10桁は8文字以上のキーを入力してください。"
+                );
+
+                return;
+            }
+
+            if (
+                length === 12 &&
+                key.length < 12
+            ) {
+
+                alert(
+                    "12桁は12文字のキーを入力してください。"
+                );
+
+                return;
+            }
+
+
+            const worker =
+                createWorker(0);
+
+            worker.postMessage({
+                type: "generate",
+                length: length,
+                key: key
+            });
+
+            setTimeout(
+                function () {
+                    worker.terminate();
+                },
+                1000
+            );
         }
+    );
+
+
+/* =========================================
+   Copy
+========================================= */
+
+$("copyButton")
+    .addEventListener(
+        "click",
+        async function () {
+
+            if (!lastGeneratedTrip) {
+                return;
+            }
+
+            try {
+
+                await navigator.clipboard.writeText(
+                    lastGeneratedTrip
+                );
+
+                log("トリップをコピーしました");
+
+            } catch (e) {
+
+                alert(
+                    "コピーできませんでした"
+                );
+            }
+        }
+    );
+
+
+/* =========================================
+   Tests
+========================================= */
+
+$("testButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            $("testResult").innerHTML =
+                "検証中...";
+
+            const worker =
+                createWorker(0);
+
+            worker.postMessage({
+                type: "test"
+            });
+
+            setTimeout(
+                function () {
+                    worker.terminate();
+                },
+                2000
+            );
+        }
+    );
+
+
+function renderTests(results) {
+
+    if (!results.length) {
+
+        $("testResult").innerHTML =
+            "検証結果がありません。";
+
+        return;
+    }
+
+
+    let html = "";
+
+    for (const item of results) {
+
+        html +=
+            `
+            <div class="testItem">
+
+                <b>${escapeHtml(item.key)}</b>
+
+                <div>
+                    raw :
+                    ${escapeHtml(item.raw)}
+                </div>
+
+                <div>
+                    10桁 :
+                    ${escapeHtml(item.trip10)}
+                </div>
+
+                <div>
+                    12桁 :
+                    ${escapeHtml(item.trip12)}
+                </div>
+
+            </div>
+            `;
+    }
+
+    $("testResult").innerHTML =
+        html;
+}
+
+
+/* =========================================
+   Conditions
+========================================= */
+
+function addCondition() {
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "condition";
+
+    div.innerHTML =
+        `
+        <div class="grid">
+
+            <div>
+
+                <label>一致文字列</label>
+
+                <input
+                    class="conditionText"
+                    autocomplete="off"
+                >
+
+            </div>
+
+            <div>
+
+                <label>一致方式</label>
+
+                <select class="conditionMode">
+
+                    <option value="contains">
+                        部分一致
+                    </option>
+
+                    <option value="starts">
+                        前方一致
+                    </option>
+
+                    <option value="ends">
+                        後方一致
+                    </option>
+
+                    <option value="exact">
+                        完全一致
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <button
+            class="deleteCondition danger"
+        >
+            🗑️ この条件を削除
+        </button>
+        `;
+
+
+    div.querySelector(
+        ".deleteCondition"
+    ).addEventListener(
+        "click",
+        function () {
+
+            div.remove();
+        }
+    );
+
+
+    $("conditions").appendChild(
+        div
+    );
+}
+
+
+$("addCondition")
+    .addEventListener(
+        "click",
+        addCondition
+    );
+
+
+/*
+ * 最初の条件
+ */
+addCondition();
+
+
+/* =========================================
+   Get conditions
+========================================= */
+
+function getConditions() {
+
+    const mode =
+        $("searchMode").value;
+
+    const elements =
+        document.querySelectorAll(
+            ".condition"
+        );
+
+    const conditions = [];
+
+    for (const element of elements) {
 
         const text =
-            String(
-                condition.text || ""
-            );
+            element.querySelector(
+                ".conditionText"
+            ).value;
 
         if (!text) {
             continue;
         }
 
-        if (condition.regex) {
-
-            try {
-
-                const re =
-                    new RegExp(text);
-
-                if (!re.test(trip)) {
-                    return false;
-                }
-
-            } catch (e) {
-
-                return false;
-            }
-
-            continue;
-        }
-
-        const mode =
-            condition.mode ||
-            "contains";
-
-        if (
-            mode === "contains" &&
-            !trip.includes(text)
-        ) {
-            return false;
-        }
-
-        if (
-            mode === "starts" &&
-            !trip.startsWith(text)
-        ) {
-            return false;
-        }
-
-        if (
-            mode === "ends" &&
-            !trip.endsWith(text)
-        ) {
-            return false;
-        }
-
-        if (
-            mode === "exact" &&
-            trip !== text
-        ) {
-            return false;
-        }
+        conditions.push({
+            text: text,
+            mode:
+                element.querySelector(
+                    ".conditionMode"
+                ).value,
+            regex:
+                mode === "regex"
+        });
     }
 
-    return true;
+    return conditions;
 }
 
 
 /* =========================================
-   特殊Trip
+   Worker count
 ========================================= */
 
-function matchesSpecial(
-    s,
-    type
-) {
+function getWorkerCount() {
 
-    switch (type) {
+    const selected =
+        Number(
+            $("workerCount").value
+        );
 
-        case "none":
-        case "":
-            return true;
-
-        case "pure":
-            return pureN(s);
-
-        case "quasi":
-            return quasiN(s);
-
-        case "two":
-            return twoKind(s);
-
-        case "longest":
-            return /^[MmW]+$/.test(s);
-
-        case "shortest":
-            return /^[li.]+$/.test(s);
-
-        case "yakumo":
-            return yakumo(s);
-
-        case "mirror":
-            return mirror(s);
-
-        case "palindrome":
-            return palindrome(s);
-
-        case "echo":
-            return echo(s);
-
-        case "double":
-            return doublePair(s);
-
-        case "numbers":
-            return /^[0-9]+$/.test(s);
-
-        case "tobiishi":
-            return tobiishi(s);
-
-        case "kakutobi":
-            return kakutobi(s);
-
-        default:
-            return true;
-    }
-}
-
-
-/* =========================================
-   純n連
-========================================= */
-
-function pureN(s) {
-
-    let count = 1;
-
-    for (
-        let i = 1;
-        i < s.length;
-        i++
-    ) {
-
-        if (s[i] === s[i - 1]) {
-
-            count++;
-
-            if (count >= 8) {
-                return true;
-            }
-
-        } else {
-
-            count = 1;
-        }
+    if (selected > 0) {
+        return selected;
     }
 
-    return false;
-}
-
-
-/* =========================================
-   準n連
-========================================= */
-
-function quasiN(s) {
-
-    let count = 1;
-
-    for (
-        let i = 1;
-        i < s.length;
-        i++
-    ) {
-
-        if (
-            s[i].toLowerCase() ===
-            s[i - 1].toLowerCase()
-        ) {
-
-            count++;
-
-            if (count >= 9) {
-                return true;
-            }
-
-        } else {
-
-            count = 1;
-        }
-    }
-
-    return false;
-}
-
-
-/* =========================================
-   二構
-========================================= */
-
-function twoKind(s) {
-
-    return new Set(s).size <= 2;
-}
-
-
-/* =========================================
-   八雲
-========================================= */
-
-function yakumo(s) {
-
-    if (s.length < 6) {
-        return false;
-    }
-
-    const groups =
-        Math.floor(s.length / 3);
-
-    if (groups < 2) {
-        return false;
-    }
-
-    for (
-        let i = 0;
-        i < groups * 3;
-        i += 3
-    ) {
-
-        if (
-            s[i] !== s[i + 1] ||
-            s[i] !== s[i + 2]
-        ) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-/* =========================================
-   鏡
-========================================= */
-
-function mirror(s) {
-
-    const pair = {
-
-        ".": ".",
-        "0": "0",
-        "8": "8",
-
-        "A": "A",
-        "H": "H",
-        "I": "I",
-        "M": "M",
-        "O": "O",
-        "T": "T",
-        "U": "U",
-        "V": "V",
-        "W": "W",
-        "X": "X",
-        "Y": "Y",
-
-        "b": "d",
-        "d": "b",
-
-        "i": "i",
-        "l": "l",
-        "o": "o",
-
-        "p": "q",
-        "q": "p",
-
-        "v": "v",
-        "w": "w"
-    };
-
-    for (
-        let i = 0;
-        i < s.length;
-        i++
-    ) {
-
-        const left = s[i];
-
-        const right =
-            s[
-                s.length - 1 - i
-            ];
-
-        if (
-            pair[left] !== right
-        ) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-/* =========================================
-   回文
-========================================= */
-
-function palindrome(s) {
-
-    for (
-        let i = 0;
-        i < Math.floor(s.length / 2);
-        i++
-    ) {
-
-        if (
-            s[i] !==
-            s[
-                s.length - 1 - i
-            ]
-        ) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-/* =========================================
-   山彦
-========================================= */
-
-function echo(s) {
-
-    if (s.length % 2 !== 0) {
-        return false;
-    }
-
-    const half =
-        s.length / 2;
-
-    return (
-        s.substring(0, half) ===
-        s.substring(half)
+    return Math.max(
+        1,
+        Math.min(
+            CPU_COUNT,
+            8
+        )
     );
 }
 
 
 /* =========================================
-   双連
+   Start search
 ========================================= */
 
-function doublePair(s) {
+$("startSearch")
+    .addEventListener(
+        "click",
+        startSearch
+    );
 
-    if (s.length % 2 !== 0) {
-        return false;
+
+function startSearch() {
+
+    if (searching) {
+        return;
     }
+
+
+    stopSearch(false);
+
+
+    const count =
+        getWorkerCount();
+
+    const length =
+        Number(
+            $("searchLength").value
+        );
+
+    const conditions =
+        getConditions();
+
+    const special =
+        $("special").value;
+
+
+    totalAttempts = 0;
+    totalHits = 0;
+
+    startTime =
+        performance.now();
+
+    lastTime =
+        startTime;
+
+    lastAttempts = 0;
+
+
+    $("attemptCount").textContent =
+        "0";
+
+    $("hitCount").textContent =
+        "0";
+
+    $("speed").textContent =
+        "0 / 秒";
+
+    $("results").innerHTML =
+        "";
+
+
+    searching = true;
+
+
+    $("searchState").textContent =
+        "🔎 検索中...";
+
+    $("workerStatus").textContent =
+        `${count} Worker 起動中`;
+
+
+    log(
+        `検索開始: ${length}文字 / ${count} Worker`
+    );
+
 
     for (
         let i = 0;
-        i < s.length;
-        i += 2
+        i < count;
+        i++
     ) {
 
-        if (
-            s[i] !== s[i + 1]
-        ) {
-            return false;
-        }
-    }
+        const worker =
+            createWorker(i + 1);
 
-    return true;
+        workers.push(worker);
+
+        worker.postMessage({
+
+            type: "search",
+
+            length: length,
+
+            conditions: conditions,
+
+            special: special,
+
+            charset: SEARCH_CHARSET
+        });
+    }
 }
 
 
 /* =========================================
-   全数
+   Stop search
 ========================================= */
 
-function numbers(s) {
+$("stopSearch")
+    .addEventListener(
+        "click",
+        function () {
+            stopSearch(true);
+        }
+    );
 
-    return /^[0-9]+$/.test(s);
+
+function stopSearch(writeLog) {
+
+    if (!searching && workers.length === 0) {
+        return;
+    }
+
+
+    searching = false;
+
+
+    /*
+     * postMessage("stop") だけに頼らない。
+     *
+     * Workerのwhileループが止まるまで待つと
+     * 「停止を押したのに検索が続く」状態が
+     * 発生する可能性があるため、
+     * 即座にterminateする。
+     */
+    const oldWorkers =
+        workers.slice();
+
+    workers = [];
+
+
+    for (const worker of oldWorkers) {
+
+        try {
+
+            worker.postMessage({
+                type: "stop"
+            });
+
+        } catch (e) {
+        }
+
+        try {
+
+            worker.terminate();
+
+        } catch (e) {
+        }
+    }
+
+
+    $("workerStatus").textContent =
+        "待機";
+
+    $("searchState").textContent =
+        "停止中";
+
+
+    if (writeLog) {
+
+        log("検索停止");
+    }
 }
 
 
 /* =========================================
-   飛石
+   Statistics
 ========================================= */
 
-function tobiishi(s) {
+function updateStatistics() {
 
-    for (
-        let i = 1;
-        i < s.length;
-        i += 2
-    ) {
+    $("attemptCount").textContent =
+        totalAttempts.toLocaleString();
 
-        if (
-            s[i] !== "." &&
-            s[i] !== "/"
-        ) {
-            return false;
-        }
+
+    const now =
+        performance.now();
+
+    const elapsed =
+        (now - startTime) / 1000;
+
+    if (elapsed <= 0) {
+        return;
     }
 
-    return true;
+
+    const speed =
+        totalAttempts / elapsed;
+
+
+    $("speed").textContent =
+        `${Math.floor(speed).toLocaleString()} / 秒`;
 }
 
 
 /* =========================================
-   拡飛
+   Result
 ========================================= */
 
-function kakutobi(s) {
+function addResult(
+    trip,
+    key
+) {
 
-    if (s.length < 2) {
-        return false;
-    }
+    const result =
+        document.createElement("div");
 
-    const separator =
-        s[1];
+    result.className =
+        "result";
 
-    if (
-        separator !== "." &&
-        separator !== "/"
-    ) {
-        return false;
-    }
+    result.innerHTML =
+        `
+        <div class="trip">
+            ◆${escapeHtml(trip)}
+        </div>
 
-    for (
-        let i = 1;
-        i < s.length;
-        i += 2
-    ) {
+        <div class="key">
+            キー：${escapeHtml(key)}
+        </div>
+        `;
 
-        if (
-            s[i] !== separator
-        ) {
-            return false;
-        }
-    }
 
-    return true;
+    $("results")
+        .prepend(result);
 }
+
+
+/* =========================================
+   CPU
+========================================= */
+
+$("cpuStatus").textContent =
+    `${CPU_COUNT} cores`;
+
+
+/* =========================================
+   初期ログ
+========================================= */
+
+log(
+    `Worker: ${WORKER_FILE}`
+);
+
+log(
+    "Worker初期化準備完了"
+);
+
+$("libraryStatus").textContent =
+    "確認中...";
+
+
+/* =========================================
+   定期更新
+========================================= */
+
+setInterval(
+    function () {
+
+        if (searching) {
+            updateStatistics();
+        }
+
+    },
+    500
+);
+
+</script>
+
+</body>
+</html>
