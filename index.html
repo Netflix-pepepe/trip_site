@@ -70,11 +70,6 @@ select {
     border-radius: 6px;
 }
 
-input.warning {
-    border-color: #ff9800;
-    box-shadow: 0 0 0 1px #ff9800;
-}
-
 button {
     padding: 9px 14px;
     margin: 5px 4px 5px 0;
@@ -89,17 +84,16 @@ button:hover {
     background: #555;
 }
 
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
 .primary {
     background: #1976d2;
 }
 
 .danger {
     background: #b71c1c;
+}
+
+.warning {
+    background: #8a5a00;
 }
 
 .result {
@@ -154,15 +148,18 @@ button:disabled {
     border-radius: 7px;
 }
 
+.condition.warningBorder {
+    border-color: #d99a00;
+}
+
 .warningMessage {
     display: none;
     margin-top: 8px;
-    padding: 8px 10px;
-    background: #3b2500;
-    border: 1px solid #ff9800;
-    color: #ffb74d;
+    padding: 9px;
     border-radius: 6px;
-    font-size: 14px;
+    background: #4a3000;
+    border: 1px solid #9a6a00;
+    color: #ffd66b;
 }
 
 .warningMessage.show {
@@ -202,6 +199,10 @@ td {
 
 .muted {
     color: #999;
+}
+
+.small {
+    font-size: 12px;
 }
 
 </style>
@@ -268,20 +269,19 @@ td {
 <h2>🔑 トリップ生成</h2>
 
 <p class="muted">
-10桁はキーの先頭8文字を使用します。
-10桁の表示キーには <b>#</b> と <b>..</b> を付けます。<br>
+<b>10桁</b>：キーの先頭8文字を使用します。
+表示するキーには <b>#</b> を先頭に付け、末尾に <b>..</b> を付けます。
+<br>
 
-12桁はキーの12文字全体を使用します。
-12桁の表示キーには <b>#</b> のみ付けます。
+<b>12桁</b>：キーの12文字すべてを使用します。
+表示するキーには <b>#</b> のみを先頭に付けます。
 </p>
 
 <div class="grid">
 
 <div>
 
-<label for="generateLength">
-トリップ長
-</label>
+<label>トリップ長</label>
 
 <select id="generateLength">
 
@@ -299,15 +299,11 @@ td {
 
 <div>
 
-<label for="generateKey">
-キー
-</label>
+<label>キー</label>
 
 <input
     id="generateKey"
-    type="text"
     autocomplete="off"
-    autocapitalize="off"
     spellcheck="false"
 >
 
@@ -318,14 +314,12 @@ td {
 <button
     id="generateButton"
     class="primary"
-    type="button"
 >
 ✨ トリップを生成
 </button>
 
 <button
     id="copyButton"
-    type="button"
 >
 📋 トリップをコピー
 </button>
@@ -350,7 +344,6 @@ td {
 
 <button
     id="testButton"
-    type="button"
 >
 🧪 検証する
 </button>
@@ -374,6 +367,7 @@ td {
 停止ボタンを押すまで検索を続けます。
 </p>
 
+
 <div class="grid">
 
 <div>
@@ -396,6 +390,7 @@ td {
 
 </div>
 
+
 <div>
 
 <label>
@@ -415,6 +410,7 @@ td {
 </select>
 
 </div>
+
 
 <div>
 
@@ -445,10 +441,7 @@ Worker数
 
 <div id="conditions"></div>
 
-<button
-    id="addCondition"
-    type="button"
->
+<button id="addCondition">
 ＋ 条件を追加
 </button>
 
@@ -521,7 +514,6 @@ Worker数
 <button
     id="startSearch"
     class="primary"
-    type="button"
 >
 🔍 検索開始
 </button>
@@ -529,7 +521,6 @@ Worker数
 <button
     id="stopSearch"
     class="danger"
-    type="button"
 >
 ⏹ 検索停止
 </button>
@@ -719,6 +710,7 @@ Worker数
 const WORKER_FILE =
     "./worker.js";
 
+
 const CPU_COUNT =
     navigator.hardwareConcurrency || 4;
 
@@ -726,7 +718,8 @@ const CPU_COUNT =
 /*
  * 検索用文字セット。
  *
- * Worker側で同一文字連続を除外する。
+ * 日本語は含めない。
+ * 同一文字連続の制御などはWorker側に任せる。
  */
 const SEARCH_CHARSET =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -755,6 +748,8 @@ let lastTime = 0;
 
 let lastGeneratedTrip = "";
 
+let lastGeneratedDisplayKey = "";
+
 
 /* =========================================
    DOM
@@ -762,116 +757,6 @@ let lastGeneratedTrip = "";
 
 const $ = id =>
     document.getElementById(id);
-
-
-/* =========================================
-   日本語文字チェック
-========================================= */
-
-/*
- * ひらがな
- * U+3040 - U+309F
- *
- * カタカナ
- * U+30A0 - U+30FF
- *
- * CJK漢字
- * U+3400 - U+4DBF
- * U+4E00 - U+9FFF
- * U+F900 - U+FAFF
- *
- * 長音・句読点などのカタカナ関連文字も
- * まとめてチェックする。
- */
-const JAPANESE_CHAR_REGEX =
-    /[\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/;
-
-
-/*
- * 入力文字列に日本語が含まれているか。
- */
-function containsJapanese(text) {
-
-    return JAPANESE_CHAR_REGEX.test(
-        String(text || "")
-    );
-}
-
-
-/*
- * 警告対象文字を抽出。
- */
-function getJapaneseCharacters(text) {
-
-    const matches =
-        String(text || "").match(
-            new RegExp(
-                JAPANESE_CHAR_REGEX.source,
-                "g"
-            )
-        );
-
-    if (!matches) {
-        return [];
-    }
-
-    return [
-        ...new Set(matches)
-    ];
-}
-
-
-/*
- * 検索条件の日本語チェック。
- */
-function validateSearchConditions() {
-
-    const elements =
-        document.querySelectorAll(
-            ".conditionText"
-        );
-
-    for (const input of elements) {
-
-        const value =
-            input.value;
-
-        if (!value) {
-            input.classList.remove(
-                "warning"
-            );
-
-            continue;
-        }
-
-        if (containsJapanese(value)) {
-
-            input.classList.add(
-                "warning"
-            );
-
-            const chars =
-                getJapaneseCharacters(value)
-                    .join("");
-
-            alert(
-                "検索条件にひらがな・カタカナ・漢字は使用できません。\n\n" +
-                `使用された文字：${chars}\n\n` +
-                "英数字・記号を入力してください。"
-            );
-
-            input.focus();
-
-            return false;
-        }
-
-        input.classList.remove(
-            "warning"
-        );
-    }
-
-    return true;
-}
 
 
 /* =========================================
@@ -900,20 +785,74 @@ function log(message) {
 
 
 /* =========================================
+   HTML escape
+========================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* =========================================
+   表示用キー
+========================================= */
+
+/*
+ * 10桁
+ *   計算用     → 先頭8文字
+ *   表示用     → # + 8文字 + ..
+ *
+ * 12桁
+ *   計算用     → 12文字
+ *   表示用     → # + 12文字
+ */
+function makeDisplayKey(
+    originalKey,
+    length
+) {
+
+    const key =
+        String(originalKey ?? "");
+
+    if (length === 10) {
+
+        const calculationKey =
+            key.substring(0, 8);
+
+        return "#" +
+            calculationKey +
+            "..";
+    }
+
+    return "#" +
+        key.substring(0, 12);
+}
+
+
+/* =========================================
    Worker破棄
 ========================================= */
 
 function terminateWorkers() {
 
-    for (const worker of workers) {
+    const oldWorkers =
+        workers.slice();
+
+    workers = [];
+
+    for (const worker of oldWorkers) {
 
         try {
             worker.terminate();
         } catch (e) {
         }
     }
-
-    workers = [];
 
     $("workerStatus").textContent =
         "待機";
@@ -967,7 +906,17 @@ function handleWorkerMessage(
     data
 ) {
 
+    if (!data || typeof data !== "object") {
+        return;
+    }
+
+
     switch (data.type) {
+
+
+        /* ===============================
+           READY
+        =============================== */
 
         case "ready":
 
@@ -981,44 +930,127 @@ function handleWorkerMessage(
             break;
 
 
+        /* ===============================
+           GENERATE
+           
+           worker.js のバージョンによって
+           generated / generate-result
+           のどちらでも受け取る。
+        =============================== */
+
         case "generated":
+        case "generate-result": {
+
+            const length =
+                Number(
+                    data.length ??
+                    $("generateLength").value
+                );
+
+            const trip =
+                data.trip ??
+                data.result ??
+                data.trip10 ??
+                data.value ??
+                "";
+
+            const originalKey =
+                data.key ??
+                data.input ??
+                data.tripKey ??
+                $("generateKey").value ??
+                "";
+
+
+            if (!trip) {
+
+                log(
+                    "トリップ生成結果を受信しましたが、trip が空です"
+                );
+
+                console.warn(
+                    "Worker generate result:",
+                    data
+                );
+
+                break;
+            }
+
+
+            /*
+             * Workerから返されたキーそのものではなく、
+             * 現在のUI仕様に合わせて表示キーを作る。
+             */
+            const displayKey =
+                makeDisplayKey(
+                    originalKey,
+                    length
+                );
+
 
             lastGeneratedTrip =
-                data.trip || "";
+                String(trip);
+
+            lastGeneratedDisplayKey =
+                displayKey;
+
 
             $("generateResult").innerHTML =
                 `
                 <div class="result">
 
                     <div class="trip">
-                        ◆${escapeHtml(data.trip)}
+                        ◆${escapeHtml(trip)}
                     </div>
 
                     <div class="key">
-                        キー：${escapeHtml(data.key)}
+                        キー：${escapeHtml(displayKey)}
                     </div>
 
                 </div>
                 `;
 
+
             log(
                 `トリップ生成: ` +
-                `${data.key} → ${data.trip}`
+                `${displayKey} → ${trip}`
             );
 
             break;
+        }
 
 
-        case "test-results":
+        /* ===============================
+           TEST
+        =============================== */
 
-            renderTests(
-                data.results || []
-            );
+        case "test-results": {
+
+            const results =
+                data.results ??
+                data.data ??
+                data.tests ??
+                [];
+
+            renderTests(results);
 
             break;
+        }
 
+
+        /* ===============================
+           PROGRESS
+        =============================== */
 
         case "progress":
+
+            /*
+             * 検索停止後に遅れて届いた
+             * progressは無視。
+             */
+            if (!searching) {
+                break;
+            }
 
             totalAttempts +=
                 Number(data.count) || 0;
@@ -1028,13 +1060,24 @@ function handleWorkerMessage(
             break;
 
 
+        /* ===============================
+           HIT
+        =============================== */
+
         case "hit":
+
+            if (!searching) {
+                break;
+            }
 
             totalHits++;
 
             addResult(
                 data.trip,
-                data.key
+                data.key,
+                Number(
+                    $("searchLength").value
+                )
             );
 
             $("hitCount").textContent =
@@ -1043,42 +1086,63 @@ function handleWorkerMessage(
             break;
 
 
+        /* ===============================
+           STOPPED
+        =============================== */
+
         case "stopped":
+
+            /*
+             * Worker個別の停止通知。
+             *
+             * メイン側ではterminateしているので、
+             * ここでは何もしない。
+             */
 
             break;
 
+
+        /* ===============================
+           STOPPING
+           
+           以前 Unknown Worker message
+           になっていたもの。
+        =============================== */
+
+        case "stopping":
+
+            break;
+
+
+        /* ===============================
+           ERROR
+        =============================== */
 
         case "error":
 
             log(
                 `Worker #${worker.__index}: ` +
-                data.message
+                (
+                    data.message ??
+                    "Worker error"
+                )
             );
 
             break;
 
+
+        /* ===============================
+           UNKNOWN
+        =============================== */
 
         default:
 
             log(
                 `Unknown Worker message: ${data.type}`
             );
+
+            break;
     }
-}
-
-
-/* =========================================
-   HTML escape
-========================================= */
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
 }
 
 
@@ -1100,35 +1164,47 @@ $("generateButton")
                 $("generateKey").value;
 
 
-            if (
-                length === 10 &&
-                key.length < 8
-            ) {
+            if (length === 10) {
 
-                alert(
-                    "10桁は8文字以上のキーを入力してください。"
-                );
+                if (key.length < 8) {
 
-                return;
+                    alert(
+                        "10桁は8文字以上のキーを入力してください。"
+                    );
+
+                    return;
+                }
+
             }
 
 
-            if (
-                length === 12 &&
-                key.length < 12
-            ) {
+            if (length === 12) {
 
-                alert(
-                    "12桁は12文字のキーを入力してください。"
-                );
+                if (key.length < 12) {
 
-                return;
+                    alert(
+                        "12桁は12文字のキーを入力してください。"
+                    );
+
+                    return;
+                }
+
             }
 
 
+            /*
+             * 既存の生成Workerを残さない。
+             */
             const worker =
                 createWorker(0);
 
+
+            /*
+             * Worker側には元キーを渡す。
+             *
+             * 10桁ならWorker側で先頭8文字を
+             * 計算に使用する実装を想定。
+             */
             worker.postMessage({
 
                 type: "generate",
@@ -1136,10 +1212,17 @@ $("generateButton")
                 length: length,
 
                 key: key
-
             });
 
 
+            /*
+             * 結果を受信してから破棄する。
+             *
+             * 以前のように1000ms固定でterminateすると、
+             * Workerの処理が遅い環境で結果を受信できない
+             * 可能性があるため、ここではready後も
+             * 少し待ってから終了する。
+             */
             setTimeout(
                 function () {
 
@@ -1149,7 +1232,7 @@ $("generateButton")
                     }
 
                 },
-                1000
+                5000
             );
         }
     );
@@ -1167,11 +1250,12 @@ $("copyButton")
             if (!lastGeneratedTrip) {
 
                 alert(
-                    "コピーするトリップがありません。"
+                    "先にトリップを生成してください。"
                 );
 
                 return;
             }
+
 
             try {
 
@@ -1185,9 +1269,41 @@ $("copyButton")
 
             } catch (e) {
 
-                alert(
-                    "コピーできませんでした"
-                );
+                /*
+                 * clipboard APIが使えない環境用。
+                 */
+                try {
+
+                    const textarea =
+                        document.createElement(
+                            "textarea"
+                        );
+
+                    textarea.value =
+                        lastGeneratedTrip;
+
+                    document.body.appendChild(
+                        textarea
+                    );
+
+                    textarea.select();
+
+                    document.execCommand(
+                        "copy"
+                    );
+
+                    textarea.remove();
+
+                    log(
+                        "トリップをコピーしました"
+                    );
+
+                } catch (e2) {
+
+                    alert(
+                        "コピーできませんでした"
+                    );
+                }
             }
         }
     );
@@ -1205,13 +1321,19 @@ $("testButton")
             $("testResult").innerHTML =
                 "検証中...";
 
+
             const worker =
                 createWorker(0);
+
 
             worker.postMessage({
                 type: "test"
             });
 
+
+            /*
+             * 十分な時間を確保。
+             */
             setTimeout(
                 function () {
 
@@ -1221,7 +1343,7 @@ $("testButton")
                     }
 
                 },
-                2000
+                10000
             );
         }
     );
@@ -1229,7 +1351,10 @@ $("testButton")
 
 function renderTests(results) {
 
-    if (!results.length) {
+    if (
+        !Array.isArray(results) ||
+        !results.length
+    ) {
 
         $("testResult").innerHTML =
             "検証結果がありません。";
@@ -1243,27 +1368,54 @@ function renderTests(results) {
 
     for (const item of results) {
 
+        const key =
+            item.key ??
+            item.input ??
+            "";
+
+
+        const raw =
+            item.raw ??
+            item.result ??
+            item.trip ??
+            "";
+
+
+        const trip10 =
+            item.trip10 ??
+            item.ten ??
+            item.trip_10 ??
+            "";
+
+
+        const trip12 =
+            item.trip12 ??
+            item.twelve ??
+            item.trip_12 ??
+            "";
+
+
         html +=
             `
             <div class="testItem">
 
                 <b>
-                    ${escapeHtml(item.key)}
+                    ${escapeHtml(key)}
                 </b>
 
                 <div>
                     raw :
-                    ${escapeHtml(item.raw)}
+                    ${escapeHtml(raw)}
                 </div>
 
                 <div>
                     10桁 :
-                    ${escapeHtml(item.trip10)}
+                    ${escapeHtml(trip10)}
                 </div>
 
                 <div>
                     12桁 :
-                    ${escapeHtml(item.trip12)}
+                    ${escapeHtml(trip12)}
                 </div>
 
             </div>
@@ -1277,6 +1429,99 @@ function renderTests(results) {
 
 
 /* =========================================
+   Japanese detection
+========================================= */
+
+/*
+ * ひらがな
+ * U+3040 - U+309F
+ *
+ * カタカナ
+ * U+30A0 - U+30FF
+ *
+ * 漢字
+ * U+4E00 - U+9FFF
+ *
+ * 拡張漢字なども一部対象。
+ */
+function containsJapanese(text) {
+
+    return /[\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/u
+        .test(String(text));
+}
+
+
+function getJapaneseCharacters(text) {
+
+    const matches =
+        String(text).match(
+            /[\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/gu
+        );
+
+    return matches || [];
+}
+
+
+/* =========================================
+   Condition warning
+========================================= */
+
+function updateConditionWarning(
+    condition
+) {
+
+    const input =
+        condition.querySelector(
+            ".conditionText"
+        );
+
+    const warning =
+        condition.querySelector(
+            ".warningMessage"
+        );
+
+
+    const text =
+        input.value;
+
+
+    if (containsJapanese(text)) {
+
+        const chars =
+            getJapaneseCharacters(text);
+
+
+        warning.textContent =
+            "⚠️ ひらがな・カタカナ・漢字は検索条件に使用できません。" +
+            " 入力文字：" +
+            chars.join(" ");
+
+
+        warning.classList.add(
+            "show"
+        );
+
+        condition.classList.add(
+            "warningBorder"
+        );
+
+    } else {
+
+        warning.textContent =
+            "";
+
+        warning.classList.remove(
+            "show"
+        );
+
+        condition.classList.remove(
+            "warningBorder"
+        );
+    }
+}
+
+
+/* =========================================
    Conditions
 ========================================= */
 
@@ -1285,8 +1530,10 @@ function addCondition() {
     const div =
         document.createElement("div");
 
+
     div.className =
         "condition";
+
 
     div.innerHTML =
         `
@@ -1294,30 +1541,21 @@ function addCondition() {
 
             <div>
 
-                <label>
-                    一致文字列
-                </label>
+                <label>一致文字列</label>
 
                 <input
                     class="conditionText"
-                    type="text"
                     autocomplete="off"
                     spellcheck="false"
                 >
 
-                <div class="warningMessage">
-                    ⚠️ ひらがな・カタカナ・漢字は
-                    検索条件に使用できません。
-                    英数字・記号を使用してください。
-                </div>
+                <div class="warningMessage"></div>
 
             </div>
 
             <div>
 
-                <label>
-                    一致方式
-                </label>
+                <label>一致方式</label>
 
                 <select class="conditionMode">
 
@@ -1345,7 +1583,6 @@ function addCondition() {
 
         <button
             class="deleteCondition danger"
-            type="button"
         >
             🗑️ この条件を削除
         </button>
@@ -1357,70 +1594,14 @@ function addCondition() {
             ".conditionText"
         );
 
-    const warning =
-        div.querySelector(
-            ".warningMessage"
-        );
 
-
-    /*
-     * 入力中にも日本語を検出。
-     */
     input.addEventListener(
         "input",
         function () {
 
-            if (
-                containsJapanese(
-                    input.value
-                )
-            ) {
-
-                input.classList.add(
-                    "warning"
-                );
-
-                warning.classList.add(
-                    "show"
-                );
-
-            } else {
-
-                input.classList.remove(
-                    "warning"
-                );
-
-                warning.classList.remove(
-                    "show"
-                );
-            }
-        }
-    );
-
-
-    /*
-     * フォーカスが外れたときにも確認。
-     */
-    input.addEventListener(
-        "blur",
-        function () {
-
-            if (
-                containsJapanese(
-                    input.value
-                )
-            ) {
-
-                const chars =
-                    getJapaneseCharacters(
-                        input.value
-                    ).join("");
-
-                alert(
-                    "検索条件にひらがな・カタカナ・漢字は使用できません。\n\n" +
-                    `使用された文字：${chars}`
-                );
-            }
+            updateConditionWarning(
+                div
+            );
         }
     );
 
@@ -1464,10 +1645,12 @@ function getConditions() {
     const mode =
         $("searchMode").value;
 
+
     const elements =
         document.querySelectorAll(
             ".condition"
         );
+
 
     const conditions = [];
 
@@ -1496,12 +1679,65 @@ function getConditions() {
 
             regex:
                 mode === "regex"
-
         });
     }
 
 
     return conditions;
+}
+
+
+/* =========================================
+   Validate search conditions
+========================================= */
+
+function validateSearchConditions() {
+
+    const elements =
+        document.querySelectorAll(
+            ".condition"
+        );
+
+
+    for (const element of elements) {
+
+        const input =
+            element.querySelector(
+                ".conditionText"
+            );
+
+
+        const text =
+            input.value;
+
+
+        if (!text) {
+            continue;
+        }
+
+
+        if (containsJapanese(text)) {
+
+            updateConditionWarning(
+                element
+            );
+
+
+            input.focus();
+
+
+            alert(
+                "検索条件に、ひらがな・カタカナ・漢字が含まれています。\n\n" +
+                "数字・アルファベット・対応する記号などで指定してください。"
+            );
+
+
+            return false;
+        }
+    }
+
+
+    return true;
 }
 
 
@@ -1551,18 +1787,9 @@ function startSearch() {
 
 
     /*
-     * 検索開始前に日本語チェック。
-     *
-     * 日本語が含まれていた場合、
-     * Workerは起動しない。
+     * 検索条件の日本語チェック。
      */
     if (!validateSearchConditions()) {
-
-        log(
-            "検索開始を中止: " +
-            "検索条件に日本語文字が含まれています"
-        );
-
         return;
     }
 
@@ -1573,13 +1800,16 @@ function startSearch() {
     const count =
         getWorkerCount();
 
+
     const length =
         Number(
             $("searchLength").value
         );
 
+
     const conditions =
         getConditions();
+
 
     const special =
         $("special").value;
@@ -1593,8 +1823,10 @@ function startSearch() {
     startTime =
         performance.now();
 
+
     lastTime =
         startTime;
+
 
     lastAttempts = 0;
 
@@ -1602,8 +1834,10 @@ function startSearch() {
     $("attemptCount").textContent =
         "0";
 
+
     $("hitCount").textContent =
         "0";
+
 
     $("speed").textContent =
         "0 / 秒";
@@ -1638,7 +1872,10 @@ function startSearch() {
         const worker =
             createWorker(i + 1);
 
-        workers.push(worker);
+
+        workers.push(
+            worker
+        );
 
 
         worker.postMessage({
@@ -1652,7 +1889,6 @@ function startSearch() {
             special: special,
 
             charset: SEARCH_CHARSET
-
         });
     }
 }
@@ -1668,7 +1904,6 @@ $("stopSearch")
         function () {
 
             stopSearch(true);
-
         }
     );
 
@@ -1687,6 +1922,10 @@ function stopSearch(writeLog) {
     searching = false;
 
 
+    /*
+     * postMessage("stop") だけに頼らず、
+     * 即座にterminateする。
+     */
     const oldWorkers =
         workers.slice();
 
@@ -1770,11 +2009,37 @@ function updateStatistics() {
 
 function addResult(
     trip,
-    key
+    key,
+    length
 ) {
 
+    if (!trip) {
+        return;
+    }
+
+
+    /*
+     * 検索結果のキーも、
+     * 生成側と同じ表示ルールにする。
+     *
+     * 10文字:
+     * # + 8文字 + ..
+     *
+     * 12文字:
+     * # + 12文字
+     */
+    const displayKey =
+        makeDisplayKey(
+            key,
+            length
+        );
+
+
     const result =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     result.className =
         "result";
@@ -1787,13 +2052,15 @@ function addResult(
         </div>
 
         <div class="key">
-            キー：${escapeHtml(key)}
+            キー：${escapeHtml(displayKey)}
         </div>
         `;
 
 
     $("results")
-        .prepend(result);
+        .prepend(
+            result
+        );
 }
 
 
@@ -1813,9 +2080,11 @@ log(
     `Worker: ${WORKER_FILE}`
 );
 
+
 log(
     "Worker初期化準備完了"
 );
+
 
 $("libraryStatus").textContent =
     "確認中...";
@@ -1831,7 +2100,6 @@ setInterval(
         if (searching) {
 
             updateStatistics();
-
         }
 
     },
