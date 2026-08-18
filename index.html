@@ -70,6 +70,11 @@ select {
     border-radius: 6px;
 }
 
+input.warning {
+    border-color: #ff9800;
+    box-shadow: 0 0 0 1px #ff9800;
+}
+
 button {
     padding: 9px 14px;
     margin: 5px 4px 5px 0;
@@ -84,22 +89,17 @@ button:hover {
     background: #555;
 }
 
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .primary {
     background: #1976d2;
 }
 
 .danger {
     background: #b71c1c;
-}
-
-.warning {
-    color: #ffb300;
-    background: #332900;
-    border: 1px solid #806600;
-    padding: 8px 10px;
-    border-radius: 6px;
-    margin-top: 8px;
-    display: none;
 }
 
 .result {
@@ -154,8 +154,19 @@ button:hover {
     border-radius: 7px;
 }
 
-.condition.invalid {
-    border-color: #ff9800;
+.warningMessage {
+    display: none;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #3b2500;
+    border: 1px solid #ff9800;
+    color: #ffb74d;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.warningMessage.show {
+    display: block;
 }
 
 table {
@@ -257,96 +268,69 @@ td {
 <h2>🔑 トリップ生成</h2>
 
 <p class="muted">
-    <b>10桁</b>：キーの先頭8文字を使用します。
-    表示するキーには <b>#</b> を先頭に付け、
-    末尾に <b>..</b> を付けます。<br>
+10桁はキーの先頭8文字を使用します。
+10桁の表示キーには <b>#</b> と <b>..</b> を付けます。<br>
 
-    <b>12桁</b>：キーの12文字すべてを使用します。
-    表示するキーには <b>#</b> のみを先頭に付けます。
+12桁はキーの12文字全体を使用します。
+12桁の表示キーには <b>#</b> のみ付けます。
 </p>
 
 <div class="grid">
 
-    <div>
+<div>
 
-        <label for="generateLength">
-            トリップ長
-        </label>
+<label for="generateLength">
+トリップ長
+</label>
 
-        <select id="generateLength">
+<select id="generateLength">
 
-            <option value="10">
-                10桁
-            </option>
+<option value="10">
+10桁
+</option>
 
-            <option value="12">
-                12桁
-            </option>
+<option value="12">
+12桁
+</option>
 
-        </select>
-
-    </div>
-
-    <div>
-
-        <label for="generateKey">
-            キー
-        </label>
-
-        <input
-            id="generateKey"
-            type="text"
-            autocomplete="off"
-            autocapitalize="off"
-            spellcheck="false"
-            placeholder="トリップキーを入力"
-        >
-
-    </div>
+</select>
 
 </div>
 
-<div style="margin-top:10px;">
+<div>
 
-    <button
-        id="generateButton"
-        class="primary"
-        type="button"
-    >
-        ✨ トリップを生成
-    </button>
+<label for="generateKey">
+キー
+</label>
 
-    <button
-        id="copyButton"
-        type="button"
-    >
-        📋 トリップをコピー
-    </button>
+<input
+    id="generateKey"
+    type="text"
+    autocomplete="off"
+    autocapitalize="off"
+    spellcheck="false"
+>
 
 </div>
 
-<div id="generateResult"></div>
-
-</section>
-
-
-<section>
-
-<h2>🧪 自動検証</h2>
-
-<p class="muted">
-    既知の計算を実行して、
-    ライブラリとトリップ抽出処理を確認します。
-</p>
+</div>
 
 <button
-    id="testButton"
+    id="generateButton"
+    class="primary"
     type="button"
 >
-    🧪 検証する
+✨ トリップを生成
 </button>
 
-<div id="testResult"></div>
+<button
+    id="copyButton"
+    type="button"
+>
+📋 トリップをコピー
+</button>
+
+<div id="generateResult"></div>
 
 </section>
 
@@ -366,6 +350,7 @@ td {
 
 <button
     id="testButton"
+    type="button"
 >
 🧪 検証する
 </button>
@@ -389,7 +374,6 @@ td {
 停止ボタンを押すまで検索を続けます。
 </p>
 
-
 <div class="grid">
 
 <div>
@@ -412,7 +396,6 @@ td {
 
 </div>
 
-
 <div>
 
 <label>
@@ -432,7 +415,6 @@ td {
 </select>
 
 </div>
-
 
 <div>
 
@@ -463,7 +445,10 @@ Worker数
 
 <div id="conditions"></div>
 
-<button id="addCondition">
+<button
+    id="addCondition"
+    type="button"
+>
 ＋ 条件を追加
 </button>
 
@@ -536,6 +521,7 @@ Worker数
 <button
     id="startSearch"
     class="primary"
+    type="button"
 >
 🔍 検索開始
 </button>
@@ -543,6 +529,7 @@ Worker数
 <button
     id="stopSearch"
     class="danger"
+    type="button"
 >
 ⏹ 検索停止
 </button>
@@ -732,13 +719,14 @@ Worker数
 const WORKER_FILE =
     "./worker.js";
 
-
 const CPU_COUNT =
     navigator.hardwareConcurrency || 4;
 
 
 /*
- * 検索用文字セット
+ * 検索用文字セット。
+ *
+ * Worker側で同一文字連続を除外する。
  */
 const SEARCH_CHARSET =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -774,6 +762,116 @@ let lastGeneratedTrip = "";
 
 const $ = id =>
     document.getElementById(id);
+
+
+/* =========================================
+   日本語文字チェック
+========================================= */
+
+/*
+ * ひらがな
+ * U+3040 - U+309F
+ *
+ * カタカナ
+ * U+30A0 - U+30FF
+ *
+ * CJK漢字
+ * U+3400 - U+4DBF
+ * U+4E00 - U+9FFF
+ * U+F900 - U+FAFF
+ *
+ * 長音・句読点などのカタカナ関連文字も
+ * まとめてチェックする。
+ */
+const JAPANESE_CHAR_REGEX =
+    /[\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/;
+
+
+/*
+ * 入力文字列に日本語が含まれているか。
+ */
+function containsJapanese(text) {
+
+    return JAPANESE_CHAR_REGEX.test(
+        String(text || "")
+    );
+}
+
+
+/*
+ * 警告対象文字を抽出。
+ */
+function getJapaneseCharacters(text) {
+
+    const matches =
+        String(text || "").match(
+            new RegExp(
+                JAPANESE_CHAR_REGEX.source,
+                "g"
+            )
+        );
+
+    if (!matches) {
+        return [];
+    }
+
+    return [
+        ...new Set(matches)
+    ];
+}
+
+
+/*
+ * 検索条件の日本語チェック。
+ */
+function validateSearchConditions() {
+
+    const elements =
+        document.querySelectorAll(
+            ".conditionText"
+        );
+
+    for (const input of elements) {
+
+        const value =
+            input.value;
+
+        if (!value) {
+            input.classList.remove(
+                "warning"
+            );
+
+            continue;
+        }
+
+        if (containsJapanese(value)) {
+
+            input.classList.add(
+                "warning"
+            );
+
+            const chars =
+                getJapaneseCharacters(value)
+                    .join("");
+
+            alert(
+                "検索条件にひらがな・カタカナ・漢字は使用できません。\n\n" +
+                `使用された文字：${chars}\n\n` +
+                "英数字・記号を入力してください。"
+            );
+
+            input.focus();
+
+            return false;
+        }
+
+        input.classList.remove(
+            "warning"
+        );
+    }
+
+    return true;
+}
 
 
 /* =========================================
@@ -975,7 +1073,7 @@ function handleWorkerMessage(
 
 function escapeHtml(value) {
 
-    return String(value)
+    return String(value ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -1001,6 +1099,7 @@ $("generateButton")
             const key =
                 $("generateKey").value;
 
+
             if (
                 length === 10 &&
                 key.length < 8
@@ -1012,6 +1111,7 @@ $("generateButton")
 
                 return;
             }
+
 
             if (
                 length === 12 &&
@@ -1043,12 +1143,14 @@ $("generateButton")
             setTimeout(
                 function () {
 
-                    worker.terminate();
+                    try {
+                        worker.terminate();
+                    } catch (e) {
+                    }
 
                 },
                 1000
             );
-
         }
     );
 
@@ -1063,6 +1165,11 @@ $("copyButton")
         async function () {
 
             if (!lastGeneratedTrip) {
+
+                alert(
+                    "コピーするトリップがありません。"
+                );
+
                 return;
             }
 
@@ -1107,7 +1214,12 @@ $("testButton")
 
             setTimeout(
                 function () {
-                    worker.terminate();
+
+                    try {
+                        worker.terminate();
+                    } catch (e) {
+                    }
+
                 },
                 2000
             );
@@ -1128,13 +1240,16 @@ function renderTests(results) {
 
     let html = "";
 
+
     for (const item of results) {
 
         html +=
             `
             <div class="testItem">
 
-                <b>${escapeHtml(item.key)}</b>
+                <b>
+                    ${escapeHtml(item.key)}
+                </b>
 
                 <div>
                     raw :
@@ -1155,61 +1270,9 @@ function renderTests(results) {
             `;
     }
 
+
     $("testResult").innerHTML =
         html;
-}
-
-
-/* =========================================
-   日本語チェック
-========================================= */
-
-/*
- * ひらがな
- * U+3040 - U+309F
- *
- * カタカナ
- * U+30A0 - U+30FF
- *
- * CJK漢字
- * U+3400 - U+4DBF
- * U+4E00 - U+9FFF
- * U+F900 - U+FAFF
- */
-function containsJapanese(text) {
-
-    return /[\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/u
-        .test(String(text));
-}
-
-
-/* =========================================
-   日本語文字の種類を取得
-========================================= */
-
-function getJapaneseTypes(text) {
-
-    const types = [];
-
-    if (
-        /[\u3040-\u309F]/u.test(text)
-    ) {
-        types.push("ひらがな");
-    }
-
-    if (
-        /[\u30A0-\u30FF]/u.test(text)
-    ) {
-        types.push("カタカナ");
-    }
-
-    if (
-        /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/u.test(text)
-    ) {
-        types.push("漢字");
-    }
-
-    return types;
 }
 
 
@@ -1231,24 +1294,30 @@ function addCondition() {
 
             <div>
 
-                <label>一致文字列</label>
+                <label>
+                    一致文字列
+                </label>
 
                 <input
                     class="conditionText"
+                    type="text"
                     autocomplete="off"
                     spellcheck="false"
                 >
 
-                <div class="conditionWarning warning">
+                <div class="warningMessage">
                     ⚠️ ひらがな・カタカナ・漢字は
                     検索条件に使用できません。
+                    英数字・記号を使用してください。
                 </div>
 
             </div>
 
             <div>
 
-                <label>一致方式</label>
+                <label>
+                    一致方式
+                </label>
 
                 <select class="conditionMode">
 
@@ -1276,6 +1345,7 @@ function addCondition() {
 
         <button
             class="deleteCondition danger"
+            type="button"
         >
             🗑️ この条件を削除
         </button>
@@ -1289,43 +1359,66 @@ function addCondition() {
 
     const warning =
         div.querySelector(
-            ".conditionWarning"
+            ".warningMessage"
         );
 
 
     /*
-     * 入力中にもリアルタイム判定
+     * 入力中にも日本語を検出。
      */
     input.addEventListener(
         "input",
         function () {
 
-            const value =
-                input.value;
+            if (
+                containsJapanese(
+                    input.value
+                )
+            ) {
 
-            if (containsJapanese(value)) {
+                input.classList.add(
+                    "warning"
+                );
 
-                const types =
-                    getJapaneseTypes(value);
-
-                warning.textContent =
-                    `⚠️ ${types.join("・")}は ` +
-                    `検索条件に使用できません。`;
-
-                warning.style.display =
-                    "block";
-
-                div.classList.add(
-                    "invalid"
+                warning.classList.add(
+                    "show"
                 );
 
             } else {
 
-                warning.style.display =
-                    "none";
+                input.classList.remove(
+                    "warning"
+                );
 
-                div.classList.remove(
-                    "invalid"
+                warning.classList.remove(
+                    "show"
+                );
+            }
+        }
+    );
+
+
+    /*
+     * フォーカスが外れたときにも確認。
+     */
+    input.addEventListener(
+        "blur",
+        function () {
+
+            if (
+                containsJapanese(
+                    input.value
+                )
+            ) {
+
+                const chars =
+                    getJapaneseCharacters(
+                        input.value
+                    ).join("");
+
+                alert(
+                    "検索条件にひらがな・カタカナ・漢字は使用できません。\n\n" +
+                    `使用された文字：${chars}`
                 );
             }
         }
@@ -1339,7 +1432,6 @@ function addCondition() {
         function () {
 
             div.remove();
-
         }
     );
 
@@ -1379,6 +1471,7 @@ function getConditions() {
 
     const conditions = [];
 
+
     for (const element of elements) {
 
         const text =
@@ -1386,9 +1479,11 @@ function getConditions() {
                 ".conditionText"
             ).value;
 
+
         if (!text) {
             continue;
         }
+
 
         conditions.push({
 
@@ -1405,81 +1500,8 @@ function getConditions() {
         });
     }
 
+
     return conditions;
-}
-
-
-/* =========================================
-   検索条件の日本語チェック
-========================================= */
-
-function validateSearchConditions() {
-
-    const elements =
-        document.querySelectorAll(
-            ".condition"
-        );
-
-    const errors = [];
-
-    for (
-        let i = 0;
-        i < elements.length;
-        i++
-    ) {
-
-        const element =
-            elements[i];
-
-        const input =
-            element.querySelector(
-                ".conditionText"
-            );
-
-        const value =
-            input.value;
-
-        if (!value) {
-            continue;
-        }
-
-        if (
-            containsJapanese(value)
-        ) {
-
-            const types =
-                getJapaneseTypes(value);
-
-            errors.push(
-                `条件 ${i + 1}: ` +
-                `${types.join("・")}が含まれています`
-            );
-
-            element.classList.add(
-                "invalid"
-            );
-
-        } else {
-
-            element.classList.remove(
-                "invalid"
-            );
-        }
-    }
-
-    if (errors.length) {
-
-        alert(
-            "検索条件に使用できない文字があります。\n\n" +
-            errors.join("\n") +
-            "\n\n" +
-            "ひらがな・カタカナ・漢字を削除してください。"
-        );
-
-        return false;
-    }
-
-    return true;
 }
 
 
@@ -1494,9 +1516,11 @@ function getWorkerCount() {
             $("workerCount").value
         );
 
+
     if (selected > 0) {
         return selected;
     }
+
 
     return Math.max(
         1,
@@ -1527,13 +1551,17 @@ function startSearch() {
 
 
     /*
-     * 検索開始前に
-     * ひらがな・カタカナ・漢字をチェック
+     * 検索開始前に日本語チェック。
+     *
+     * 日本語が含まれていた場合、
+     * Workerは起動しない。
      */
     if (!validateSearchConditions()) {
 
-        $("searchState").textContent =
-            "⚠️ 条件エラー";
+        log(
+            "検索開始を中止: " +
+            "検索条件に日本語文字が含まれています"
+        );
 
         return;
     }
@@ -1558,7 +1586,9 @@ function startSearch() {
 
 
     totalAttempts = 0;
+
     totalHits = 0;
+
 
     startTime =
         performance.now();
@@ -1578,8 +1608,9 @@ function startSearch() {
     $("speed").textContent =
         "0 / 秒";
 
+
     $("results").innerHTML =
-        "検索結果はありません。";
+        "検索中...";
 
 
     searching = true;
@@ -1587,6 +1618,7 @@ function startSearch() {
 
     $("searchState").textContent =
         "🔎 検索中...";
+
 
     $("workerStatus").textContent =
         `${count} Worker 起動中`;
@@ -1607,6 +1639,7 @@ function startSearch() {
             createWorker(i + 1);
 
         workers.push(worker);
+
 
         worker.postMessage({
 
@@ -1646,6 +1679,7 @@ function stopSearch(writeLog) {
         !searching &&
         workers.length === 0
     ) {
+
         return;
     }
 
@@ -1655,6 +1689,7 @@ function stopSearch(writeLog) {
 
     const oldWorkers =
         workers.slice();
+
 
     workers = [];
 
@@ -1683,6 +1718,7 @@ function stopSearch(writeLog) {
     $("workerStatus").textContent =
         "待機";
 
+
     $("searchState").textContent =
         "停止中";
 
@@ -1708,6 +1744,7 @@ function updateStatistics() {
 
     const now =
         performance.now();
+
 
     const elapsed =
         (now - startTime) / 1000;
@@ -1741,6 +1778,7 @@ function addResult(
 
     result.className =
         "result";
+
 
     result.innerHTML =
         `
