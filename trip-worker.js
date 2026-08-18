@@ -3,6 +3,7 @@
 let crypt = null;
 let running = false;
 
+
 /* =========================================
    初期化
 ========================================= */
@@ -51,6 +52,7 @@ self.onmessage = function (event) {
     const data =
         event.data || {};
 
+
     /* -------------------------------------
        停止
     ------------------------------------- */
@@ -58,55 +60,6 @@ self.onmessage = function (event) {
     if (data.type === "stop") {
 
         running = false;
-
-        return;
-    }
-
-
-    /* -------------------------------------
-       テスト
-    ------------------------------------- */
-
-    if (data.type === "test") {
-
-        try {
-
-            const tests = [
-                "foob",
-                "Jim",
-                "aaaaaaaa",
-                "aaaaaaaaaa",
-                "test"
-            ];
-
-            const result = [];
-
-            for (
-                const key of tests
-            ) {
-
-                result.push({
-                    key: key,
-                    trip10: makeTrip10(key),
-                    trip12: makeTrip12(key)
-                });
-            }
-
-            self.postMessage({
-                type: "test-ok",
-                result: result
-            });
-
-        } catch (e) {
-
-            self.postMessage({
-                type: "error",
-                message:
-                    e && e.stack
-                        ? e.stack
-                        : String(e)
-            });
-        }
 
         return;
     }
@@ -158,26 +111,28 @@ self.onmessage = function (event) {
 
     if (data.type === "generate12") {
 
-        try {
-
-            const key =
-                String(
-                    data.key == null
-                        ? ""
-                        : data.key
-                );
-
-            const trip =
-                makeTrip12(key);
+        makeTrip12(
+            String(
+                data.key == null
+                    ? ""
+                    : data.key
+            )
+        )
+        .then(function (trip) {
 
             self.postMessage({
                 type: "generated",
-                key: key,
+                key: String(
+                    data.key == null
+                        ? ""
+                        : data.key
+                ),
                 trip: trip,
                 length: 12
             });
 
-        } catch (e) {
+        })
+        .catch(function (e) {
 
             self.postMessage({
                 type: "error",
@@ -186,7 +141,19 @@ self.onmessage = function (event) {
                         ? e.stack
                         : String(e)
             });
-        }
+        });
+
+        return;
+    }
+
+
+    /* -------------------------------------
+       検証
+    ------------------------------------- */
+
+    if (data.type === "test") {
+
+        testAll();
 
         return;
     }
@@ -221,23 +188,115 @@ self.onmessage = function (event) {
 
 
 /* =========================================
-   文字コード
+   テスト
 ========================================= */
 
-/*
- * 12桁側はWeb CryptoのSHA-1を使用する。
- *
- * 日本語等を厳密な2ch互換にする場合は
- * Shift-JIS変換が必要になるため、
- * このWorkerではまずUTF-8を使用する。
- *
- * ASCIIの複雑キーについては問題ない。
- */
+async function testAll() {
+
+    try {
+
+        /*
+         * 10桁では
+         *
+         * aaaaaaaaXX
+         *
+         * のXXは無視される。
+         */
+
+        const a =
+            makeTrip10(
+                "aaaaaaaaaa"
+            );
+
+        const b =
+            makeTrip10(
+                "aaaaaaaaZZ"
+            );
+
+        const c =
+            makeTrip10(
+                "aaaaaaaabc"
+            );
+
+        const d =
+            makeTrip10(
+                "aaaaaaaa11"
+            );
+
+
+        /*
+         * 12桁
+         */
+
+        const t12 =
+            await makeTrip12(
+                "aaaaaaaaaaaa"
+            );
+
+
+        self.postMessage({
+
+            type: "test-ok",
+
+            result: {
+
+                trip10_a:
+                    a,
+
+                trip10_b:
+                    b,
+
+                trip10_c:
+                    c,
+
+                trip10_d:
+                    d,
+
+                trip10_same:
+                    (
+                        a === b &&
+                        b === c &&
+                        c === d
+                    ),
+
+                trip12:
+                    t12
+            }
+        });
+
+    } catch (e) {
+
+        self.postMessage({
+            type: "error",
+            message:
+                e && e.stack
+                    ? e.stack
+                    : String(e)
+        });
+    }
+}
 
 
 /* =========================================
    10桁トリップ
 ========================================= */
+
+/*
+ * 10桁トリップの仕様
+ *
+ * キー:
+ *
+ *   12345678AA
+ *
+ * 実際に使用:
+ *
+ *   12345678
+ *
+ * 9文字目・10文字目は無視。
+ *
+ * crypt結果の末尾10文字を
+ * トリップとして使用。
+ */
 
 function makeTrip10(key) {
 
@@ -250,58 +309,47 @@ function makeTrip10(key) {
         );
     }
 
+
     key =
         String(key);
 
 
     /*
-     * 10桁トリップは
+     * 10桁キーとして扱う。
      *
-     * crypt結果の末尾10文字
-     *
-     * を使用する。
-     *
-     * 重要：
-     *
-     * substring(2, 12)
-     *
-     * ではない。
+     * 8文字未満でも計算可能だが、
+     * UIからの通常入力では10文字を推奨。
      */
+
+    const usedKey =
+        key.substring(0, 8);
 
 
     /*
-     * 2ch系10桁トリップでは
-     * saltは key + "H." の
-     * 2文字目・3文字目から作る。
+     * salt生成用。
+     *
+     * 2ch方式:
+     *
+     * substr($tripkey.'H.', 1, 2)
      */
 
-    const keyForSalt =
-        key + "H.";
-
-    let salt1 =
-        keyForSalt.charAt(1);
-
-    let salt2 =
-        keyForSalt.charAt(2);
+    let salt =
+        (
+            usedKey + "H."
+        ).substring(1, 3);
 
 
-    salt1 =
-        normalizeSalt(salt1);
+    salt =
+        normalizeSalt(
+            salt
+        );
 
-    salt2 =
-        normalizeSalt(salt2);
-
-
-    const salt =
-        salt1 + salt2;
-
-
-    /*
-     * unix crypt
-     */
 
     const result =
-        crypt(key, salt);
+        crypt(
+            usedKey,
+            salt
+        );
 
 
     if (
@@ -315,9 +363,7 @@ function makeTrip10(key) {
 
 
     /*
-     * crypt() は通常13文字。
-     *
-     * 10桁トリップは末尾10文字。
+     * crypt() の末尾10文字
      */
 
     return result.slice(-10);
@@ -325,57 +371,114 @@ function makeTrip10(key) {
 
 
 /* =========================================
-   Salt変換
+   Salt
 ========================================= */
 
-function normalizeSalt(c) {
+function normalizeSalt(salt) {
 
-    if (!c) {
-        return ".";
-    }
+    let result = "";
 
-    let code =
-        c.charCodeAt(0);
-
-
-    /*
-     * 2chのsalt変換
-     */
-
-    if (
-        code >= 0x3A &&
-        code <= 0x40
+    for (
+        let i = 0;
+        i < 2;
+        i++
     ) {
 
-        code += 7;
+        let c =
+            salt.charAt(i);
+
+
+        if (!c) {
+
+            c = ".";
+        }
+
+
+        let code =
+            c.charCodeAt(0);
+
+
+        /*
+         * [.-z] 以外は .
+         */
+
+        if (
+            code < 0x2E ||
+            code > 0x7A
+        ) {
+
+            c = ".";
+
+        } else {
+
+            /*
+             * Perl:
+             *
+             * tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/
+             */
+
+            switch (c) {
+
+                case ":":
+                    c = "A";
+                    break;
+
+                case ";":
+                    c = "B";
+                    break;
+
+                case "<":
+                    c = "C";
+                    break;
+
+                case "=":
+                    c = "D";
+                    break;
+
+                case ">":
+                    c = "E";
+                    break;
+
+                case "?":
+                    c = "F";
+                    break;
+
+                case "@":
+                    c = "G";
+                    break;
+
+                case "[":
+                    c = "a";
+                    break;
+
+                case "\\":
+                    c = "b";
+                    break;
+
+                case "]":
+                    c = "c";
+                    break;
+
+                case "^":
+                    c = "d";
+                    break;
+
+                case "_":
+                    c = "e";
+                    break;
+
+                case "`":
+                    c = "f";
+                    break;
+            }
+        }
+
+
+        result += c;
     }
 
 
-    if (
-        code >= 0x5B &&
-        code <= 0x60
-    ) {
-
-        code += 6;
-    }
-
-
-    /*
-     * . ～ z 以外は .
-     */
-
-    if (
-        code < 0x2E ||
-        code > 0x7A
-    ) {
-
-        code = 0x2E;
-    }
-
-
-    return String.fromCharCode(
-        code
-    );
+    return result;
 }
 
 
@@ -383,16 +486,20 @@ function normalizeSalt(c) {
    12桁トリップ
 ========================================= */
 
+/*
+ * 12桁はキー全体をSHA-1へ投入。
+ *
+ * SHA-1
+ *   ↓
+ * Base64
+ *   ↓
+ * 先頭12文字
+ */
+
 async function makeTrip12(key) {
 
     key =
         String(key);
-
-
-    if (!key.length) {
-
-        key = "\0";
-    }
 
 
     const encoder =
@@ -430,18 +537,14 @@ async function makeTrip12(key) {
     }
 
 
-    /*
-     * Base64
-     */
-
-    let base64 =
+    const base64 =
         btoa(binary);
 
 
     /*
-     * 先頭12文字
+     * 2ch系12桁
      *
-     * + → .
+     * + を . に変更
      */
 
     return base64
@@ -454,7 +557,22 @@ async function makeTrip12(key) {
    検索
 ========================================= */
 
-function search(data) {
+async function search(data) {
+
+    /*
+     * 10:
+     *
+     * キー10文字
+     * ↓
+     * 先頭8文字だけ使用
+     *
+     *
+     * 12:
+     *
+     * キー12文字
+     * ↓
+     * 全12文字使用
+     */
 
     const length =
         Number(data.length) === 12
@@ -478,8 +596,8 @@ function search(data) {
     /*
      * 複雑キー用文字セット
      *
-     * . / はもちろん
-     * ! @ # $ % ^ & * なども使用
+     * 同じ文字の連続は
+     * randomComplexKey() 側で禁止。
      */
 
     const charset =
@@ -497,35 +615,16 @@ function search(data) {
     while (running) {
 
         /*
-         * 10桁と12桁で
-         * 実際に使うキー長を変える。
+         * 10桁なら10文字。
          *
-         * 10桁：
-         * 最初の8文字が実質的なキー。
-         *
-         * 12桁：
-         * 12文字以上。
+         * 12桁なら12文字。
          */
 
-        let key;
-
-
-        if (length === 10) {
-
-            key =
-                randomComplexKey(
-                    charset,
-                    8
-                );
-
-        } else {
-
-            key =
-                randomComplexKey(
-                    charset,
-                    12
-                );
-        }
+        const key =
+            randomComplexKey(
+                charset,
+                length
+            );
 
 
         let trip;
@@ -536,12 +635,16 @@ function search(data) {
             if (length === 10) {
 
                 trip =
-                    makeTrip10(key);
+                    makeTrip10(
+                        key
+                    );
 
             } else {
 
                 trip =
-                    await makeTrip12(key);
+                    await makeTrip12(
+                        key
+                    );
             }
 
         } catch (e) {
@@ -564,7 +667,7 @@ function search(data) {
 
 
         /*
-         * 条件判定
+         * 条件一致
          */
 
         if (
@@ -579,12 +682,14 @@ function search(data) {
         ) {
 
             /*
-             * ここで返すkeyは
-             * 実際にtrip生成に使用した
-             * keyそのもの。
+             * 必ず実際に使ったキーを返す。
              *
-             * 生成欄へコピーしても
-             * 同じtripになる。
+             * 10桁:
+             * 末尾2文字も返すが
+             * トリップ計算には無関係。
+             *
+             * 12桁:
+             * 12文字すべてが計算対象。
              */
 
             self.postMessage({
@@ -597,7 +702,7 @@ function search(data) {
 
 
         /*
-         * 2048回ごと
+         * 2048回ごとに進捗
          */
 
         if (
@@ -619,8 +724,41 @@ function search(data) {
 
 
 /* =========================================
-   複雑キー生成
+   ランダムキー生成
 ========================================= */
+
+/*
+ * ここが今回の重要部分。
+ *
+ * 以前:
+ *
+ *   T!!!!
+ *   aaaa
+ *   .....
+ *
+ * のようなキーが出る可能性があった。
+ *
+ *
+ * 今回:
+ *
+ *   隣接する同一文字を禁止。
+ *
+ * 例:
+ *
+ *   !fa4K{0]
+ *   T@3!v]x
+ *   a#7K!p$2
+ *   ]x4@F!9{
+ *
+ * OK
+ *
+ *
+ *   T!!!!@]v
+ *   aaaaaaaa
+ *   ..../...
+ *
+ * NG
+ */
 
 function randomComplexKey(
     charset,
@@ -631,22 +769,6 @@ function randomComplexKey(
 
     const size =
         charset.length;
-
-
-    /*
-     * 同じ文字が連続しないようにする。
-     *
-     * 例：
-     *
-     * NG
-     * T!!!!
-     * aaaa
-     * .....
-     *
-     * OK
-     * !fa4K{0
-     * T@3!v]x
-     */
 
 
     let previous =
@@ -668,6 +790,8 @@ function randomComplexKey(
 
         /*
          * rejection sampling
+         *
+         * 文字ごとの偏りを抑える。
          */
 
         const max =
@@ -704,7 +828,7 @@ function randomComplexKey(
 
 
             /*
-             * 同一文字連続禁止
+             * 隣と同じ文字は禁止
              */
 
             if (
@@ -715,7 +839,10 @@ function randomComplexKey(
             }
 
 
-            result.push(char);
+            result.push(
+                char
+            );
+
 
             previous =
                 char;
@@ -728,7 +855,7 @@ function randomComplexKey(
 
 
 /* =========================================
-   条件判定
+   通常条件
 ========================================= */
 
 function matchesConditions(
@@ -846,58 +973,44 @@ function matchesSpecial(
         case "":
             return true;
 
-
         case "pure":
             return pureN(s);
-
 
         case "quasi":
             return quasiN(s);
 
-
         case "two":
             return twoKind(s);
-
 
         case "longest":
             return /^[MmW]+$/.test(s);
 
-
         case "shortest":
             return /^[li.]+$/.test(s);
-
 
         case "yakumo":
             return yakumo(s);
 
-
         case "mirror":
             return mirror(s);
-
 
         case "palindrome":
             return palindrome(s);
 
-
         case "echo":
             return echo(s);
-
 
         case "double":
             return doublePair(s);
 
-
         case "numbers":
             return numbers(s);
-
 
         case "tobiishi":
             return tobiishi(s);
 
-
         case "kakutobi":
             return kakutobi(s);
-
 
         default:
             return true;
