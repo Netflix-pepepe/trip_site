@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>🐺 人狼オンライン トリップ検索機</title>
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+>
+
+<title>
+🐺 人狼オンライン トリップ検索機
+</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    padding: 20px;
-    background: #101217;
-    color: #eee;
+    background: #111827;
+    color: #f3f4f6;
     font-family:
-        system-ui,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
@@ -25,32 +32,30 @@ body {
 }
 
 .container {
-    max-width: 1100px;
-    margin: auto;
+    width: min(1100px, 94%);
+    margin: 0 auto;
+    padding: 24px 0 60px;
 }
 
 h1 {
-    font-size: 25px;
-    margin-bottom: 24px;
-}
-
-h2 {
-    font-size: 19px;
-    margin-top: 0;
+    margin-bottom: 30px;
 }
 
 section {
-    background: #181b22;
-    border: 1px solid #292e38;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 18px;
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin-top: 0;
 }
 
 label {
     display: block;
-    margin-bottom: 6px;
-    color: #bbb;
+    margin: 12px 0 6px;
 }
 
 input,
@@ -59,105 +64,133 @@ button {
     font: inherit;
 }
 
-input,
+input[type="text"],
 select {
     width: 100%;
+    background: #111827;
+    color: #fff;
+    border: 1px solid #4b5563;
+    border-radius: 8px;
     padding: 10px;
-    border-radius: 7px;
-    border: 1px solid #3b414d;
-    background: #0f1116;
-    color: white;
 }
 
 button {
-    padding: 10px 16px;
-    border: 0;
-    border-radius: 7px;
-    cursor: pointer;
-    background: #3b82f6;
+    background: #2563eb;
     color: white;
-    font-weight: 600;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    margin: 6px 4px 6px 0;
 }
 
 button:hover {
-    filter: brightness(1.1);
+    background: #1d4ed8;
 }
 
-button.stop {
+button.danger {
     background: #dc2626;
 }
 
 button.secondary {
-    background: #374151;
+    background: #4b5563;
 }
 
 button:disabled {
-    opacity: .45;
+    opacity: .5;
     cursor: not-allowed;
 }
 
 .row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
-.actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
+.row > * {
+    flex: 1;
+    min-width: 180px;
 }
 
 .status {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
 }
 
-.stat {
-    background: #0f1116;
-    border-radius: 8px;
-    padding: 12px;
+.status-box {
+    background: #111827;
+    padding: 14px;
+    border-radius: 10px;
 }
 
-.stat-title {
-    color: #999;
-    font-size: 13px;
-}
-
-.stat-value {
-    margin-top: 4px;
+.value {
     font-size: 20px;
     font-weight: bold;
+    margin-top: 5px;
 }
 
-.result {
-    background: #0e1015;
-    border: 1px solid #303640;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 8px;
-}
-
-.trip {
-    color: #60a5fa;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.key {
-    margin-top: 4px;
-    color: #ddd;
+.trip-output {
+    margin-top: 20px;
+    background: #020617;
+    border-radius: 10px;
+    padding: 18px;
     font-family: monospace;
     word-break: break-all;
 }
 
+.trip {
+    font-size: 24px;
+    font-weight: bold;
+    color: #facc15;
+}
+
+.key {
+    margin-top: 8px;
+    color: #93c5fd;
+}
+
 .condition {
+    border: 1px solid #374151;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.result {
+    background: #020617;
+    border: 1px solid #374151;
+    border-radius: 10px;
+    padding: 12px;
+    margin: 8px 0;
+}
+
+.result-trip {
+    color: #facc15;
+    font-family: monospace;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.result-key {
+    color: #93c5fd;
+    font-family: monospace;
+    margin-top: 5px;
+}
+
+.stats {
     display: grid;
-    grid-template-columns: 1fr 150px auto;
-    gap: 8px;
-    margin-bottom: 8px;
+    grid-template-columns:
+        repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.stat {
+    background: #111827;
+    padding: 12px;
+    border-radius: 8px;
 }
 
 table {
@@ -167,52 +200,45 @@ table {
 
 th,
 td {
-    text-align: left;
     padding: 8px;
-    border-bottom: 1px solid #30343d;
+    border-bottom: 1px solid #374151;
+    text-align: left;
 }
 
-.log {
-    background: #080a0d;
-    color: #9ca3af;
-    padding: 10px;
-    border-radius: 7px;
-    font-family: monospace;
-    font-size: 12px;
-    max-height: 220px;
-    overflow: auto;
+pre {
     white-space: pre-wrap;
+    word-break: break-word;
+    color: #9ca3af;
 }
 
-.help {
-    color: #aaa;
-    font-size: 13px;
-    line-height: 1.6;
+.ok {
+    color: #4ade80;
 }
 
-@media (max-width: 700px) {
-
-    .row,
-    .status {
-        grid-template-columns: 1fr;
-    }
-
-    .condition {
-        grid-template-columns: 1fr;
-    }
+.error {
+    color: #f87171;
 }
+
+.searching {
+    color: #facc15;
+}
+
 </style>
+
 </head>
+
 
 <body>
 
 <div class="container">
 
-<h1>🐺 人狼オンライン トリップ検索機</h1>
+<h1>
+🐺 人狼オンライン トリップ検索機
+</h1>
 
 
 <!-- =====================================
-     システム状態
+     システム
 ===================================== -->
 
 <section>
@@ -221,33 +247,33 @@ td {
 
 <div class="status">
 
-<div class="stat">
-<div class="stat-title">ライブラリ</div>
+<div class="status-box">
+<div>ライブラリ</div>
 <div
     id="libraryStatus"
-    class="stat-value"
+    class="value"
 >
 確認中...
 </div>
 </div>
 
-<div class="stat">
-<div class="stat-title">Worker</div>
+<div class="status-box">
+<div>Worker</div>
 <div
     id="workerStatus"
-    class="stat-value"
+    class="value"
 >
-0 Worker
+停止
 </div>
 </div>
 
-<div class="stat">
-<div class="stat-title">CPU</div>
+<div class="status-box">
+<div>CPU</div>
 <div
     id="cpuStatus"
-    class="stat-value"
+    class="value"
 >
-0 cores
+1 core
 </div>
 </div>
 
@@ -264,45 +290,62 @@ td {
 
 <h2>🔑 トリップ生成</h2>
 
-<p class="help">
-10桁はキーの先頭8文字を使用し、
-表示キーは <b>#8文字..</b> になります。<br>
-12桁は12文字キーを使用し、
-Tripは12文字表示します。
+<p>
+10桁はキーの先頭8文字を使用します。
+10桁の表示キーには
+<strong>#</strong> と
+<strong>..</strong>
+を付けます。
+12桁は12文字キー全体を使用し、
+表示キーには<strong>#</strong>のみ付けます。
 </p>
+
 
 <div class="row">
 
 <div>
 
-<label>トリップ長</label>
+<label>
+トリップ長
+</label>
 
 <select id="generateLength">
-<option value="10">10桁</option>
-<option value="12">12桁</option>
+
+<option value="10">
+10桁
+</option>
+
+<option value="12">
+12桁
+</option>
+
 </select>
 
 </div>
 
+
 <div>
 
-<label>キー</label>
+<label>
+キー
+</label>
 
 <input
     id="generateKey"
     type="text"
     autocomplete="off"
     spellcheck="false"
-    placeholder="複雑なキーを入力"
+    placeholder="キーを入力"
 />
 
 </div>
 
 </div>
 
-<div class="actions">
 
-<button id="generateButton">
+<button
+    id="generateButton"
+>
 ✨ トリップを生成
 </button>
 
@@ -314,12 +357,24 @@ Tripは12文字表示します。
 📋 トリップをコピー
 </button>
 
-</div>
 
 <div
-    id="generateResult"
-    style="margin-top:15px"
+    id="generateOutput"
+    class="trip-output"
+    style="display:none"
+>
+
+<div
+    id="generateTrip"
+    class="trip"
 ></div>
+
+<div
+    id="generateDisplayKey"
+    class="key"
+></div>
+
+</div>
 
 </section>
 
@@ -332,25 +387,18 @@ Tripは12文字表示します。
 
 <h2>🧪 自動検証</h2>
 
-<p class="help">
+<p>
 既知の計算を実行して、
 ライブラリとトリップ抽出処理を確認します。
 </p>
 
-button
-
-<div class="actions">
-
-<button id="testButton">
+<button
+    id="testButton"
+>
 🧪 検証する
 </button>
 
-</div>
-
-<div
-    id="testResult"
-    style="margin-top:15px"
-></div>
+<div id="testOutput"></div>
 
 </section>
 
@@ -363,60 +411,86 @@ button
 
 <h2>🔎 トリップ検索</h2>
 
-<p class="help">
-複数条件を追加した場合、すべての条件に一致するものを検索します。
+<p>
+複数条件を追加した場合、
+<strong>すべての条件</strong>
+に一致するものを検索します。
 停止ボタンを押すまで検索を続けます。
 </p>
 
 
-<div class="row">
-
-<div>
-
-<label>探索するトリップ長</label>
+<label>
+探索するトリップ長
+</label>
 
 <select id="searchLength">
-<option value="10">10文字</option>
-<option value="12">12文字</option>
+
+<option value="10">
+10文字
+</option>
+
+<option value="12">
+12文字
+</option>
+
 </select>
 
-</div>
 
-<div>
+<label>
+一致方式
+</label>
 
-<label>一致方式</label>
+<select id="searchRegex">
 
-<select id="regexMode">
-<option value="normal">通常検索</option>
-<option value="regex">🔥 正規表現</option>
+<option value="false">
+通常検索
+</option>
+
+<option value="true">
+🔥 正規表現
+</option>
+
 </select>
 
-</div>
 
-</div>
-
-
-<div style="margin-top:12px">
-
-<label>Worker数</label>
+<label>
+Worker数
+</label>
 
 <select id="workerCount">
-<option value="0">自動</option>
-<option value="1">1 Worker</option>
-<option value="2">2 Workers</option>
-<option value="4">4 Workers</option>
-<option value="6">6 Workers</option>
-<option value="8">8 Workers</option>
+
+<option value="0">
+自動
+</option>
+
+<option value="1">
+1 Worker
+</option>
+
+<option value="2">
+2 Workers
+</option>
+
+<option value="4">
+4 Workers
+</option>
+
+<option value="6">
+6 Workers
+</option>
+
+<option value="8">
+8 Workers
+</option>
+
 </select>
 
-</div>
 
-
-<h3>一致条件</h3>
+<h3>
+一致条件
+</h3>
 
 <div id="conditions"></div>
-
-<div class="actions">
 
 <button
     id="addCondition"
@@ -425,10 +499,10 @@ button
 ＋ 条件を追加
 </button>
 
-</div>
 
-
-<h3>⭐ 特殊トリップ</h3>
+<h3>
+⭐ 特殊トリップ
+</h3>
 
 <select id="special">
 
@@ -491,15 +565,18 @@ button
 </select>
 
 
-<div class="actions">
+<div>
 
-<button id="startButton">
+<button
+    id="startSearch"
+>
 🔍 検索開始
 </button>
 
 <button
-    id="stopButton"
-    class="stop"
+    id="stopSearch"
+    class="danger"
+    disabled
 >
 ⏹ 検索停止
 </button>
@@ -507,53 +584,35 @@ button
 </div>
 
 
-<div style="margin-top:15px">
-
-<div class="status">
-
-<div class="stat">
-<div class="stat-title">状態</div>
 <div
     id="searchState"
-    class="stat-value"
+    class="searching"
 >
 停止中
 </div>
+
+
+<div class="stats">
+
+<div class="stat">
+<div>試行キー</div>
+<strong id="attemptCount">
+0
+</strong>
 </div>
 
 <div class="stat">
-<div class="stat-title">試行キー</div>
-<div
-    id="attempts"
-    class="stat-value"
->
+<div>ヒット</div>
+<strong id="hitCount">
 0
-</div>
+</strong>
 </div>
 
 <div class="stat">
-<div class="stat-title">ヒット</div>
-<div
-    id="hits"
-    class="stat-value"
->
-0
-</div>
-</div>
-
-</div>
-
-<div
-    style="margin-top:10px"
-    class="stat"
->
-<div class="stat-title">速度</div>
-<div
-    id="speed"
-    class="stat-value"
->
+<div>速度</div>
+<strong id="speed">
 0 / 秒
-</div>
+</strong>
 </div>
 
 </div>
@@ -562,7 +621,7 @@ button
 
 
 <!-- =====================================
-     検索結果
+     結果
 ===================================== -->
 
 <section>
@@ -570,14 +629,14 @@ button
 <h2>🎯 検索結果</h2>
 
 <div id="results">
-検索を開始してください。
+検索結果はありません。
 </div>
 
 </section>
 
 
 <!-- =====================================
-     特殊一覧
+     特殊トリップ
 ===================================== -->
 
 <section>
@@ -587,10 +646,12 @@ button
 <table>
 
 <thead>
+
 <tr>
 <th>分類</th>
 <th>条件</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -675,10 +736,7 @@ button
 
 <h2>📋 デバッグログ</h2>
 
-<div
-    id="log"
-    class="log"
-></div>
+<pre id="log"></pre>
 
 </section>
 
@@ -688,17 +746,12 @@ button
 <script>
 
 /* =========================================
-   設定
+   状態
 ========================================= */
 
-const WORKER_FILE =
+const workerFile =
     "./worker.js";
 
-const CPU_COUNT =
-    navigator.hardwareConcurrency || 4;
-
-const MAX_RESULTS =
-    200;
 
 let workers = [];
 
@@ -708,17 +761,162 @@ let totalAttempts = 0;
 
 let totalHits = 0;
 
-let lastTime = performance.now();
+let startTime = 0;
 
 let lastAttempts = 0;
+
+let lastTime = 0;
+
+let lastTrip = "";
+
+let lastDisplayKey = "";
 
 
 /* =========================================
    DOM
 ========================================= */
 
-const $ = id =>
-    document.getElementById(id);
+const libraryStatus =
+    document.getElementById(
+        "libraryStatus"
+    );
+
+const workerStatus =
+    document.getElementById(
+        "workerStatus"
+    );
+
+const cpuStatus =
+    document.getElementById(
+        "cpuStatus"
+    );
+
+const generateLength =
+    document.getElementById(
+        "generateLength"
+    );
+
+const generateKey =
+    document.getElementById(
+        "generateKey"
+    );
+
+const generateButton =
+    document.getElementById(
+        "generateButton"
+    );
+
+const copyButton =
+    document.getElementById(
+        "copyButton"
+    );
+
+const generateOutput =
+    document.getElementById(
+        "generateOutput"
+    );
+
+const generateTrip =
+    document.getElementById(
+        "generateTrip"
+    );
+
+const generateDisplayKey =
+    document.getElementById(
+        "generateDisplayKey"
+    );
+
+const testButton =
+    document.getElementById(
+        "testButton"
+    );
+
+const testOutput =
+    document.getElementById(
+        "testOutput"
+    );
+
+const searchLength =
+    document.getElementById(
+        "searchLength"
+    );
+
+const searchRegex =
+    document.getElementById(
+        "searchRegex"
+    );
+
+const workerCount =
+    document.getElementById(
+        "workerCount"
+    );
+
+const conditions =
+    document.getElementById(
+        "conditions"
+    );
+
+const addCondition =
+    document.getElementById(
+        "addCondition"
+    );
+
+const special =
+    document.getElementById(
+        "special"
+    );
+
+const startSearch =
+    document.getElementById(
+        "startSearch"
+    );
+
+const stopSearch =
+    document.getElementById(
+        "stopSearch"
+    );
+
+const searchState =
+    document.getElementById(
+        "searchState"
+    );
+
+const attemptCount =
+    document.getElementById(
+        "attemptCount"
+    );
+
+const hitCount =
+    document.getElementById(
+        "hitCount"
+    );
+
+const speed =
+    document.getElementById(
+        "speed"
+    );
+
+const results =
+    document.getElementById(
+        "results"
+    );
+
+const logElement =
+    document.getElementById(
+        "log"
+    );
+
+
+/* =========================================
+   CPU
+========================================= */
+
+const cpu =
+    navigator.hardwareConcurrency ||
+    1;
+
+cpuStatus.textContent =
+    cpu + " cores";
 
 
 /* =========================================
@@ -728,16 +926,302 @@ const $ = id =>
 function log(message) {
 
     const time =
-        new Date().toLocaleTimeString();
+        new Date()
+            .toLocaleTimeString();
 
-    const line =
-        "[" + time + "] " + message;
+    logElement.textContent +=
+        "[" +
+        time +
+        "] " +
+        message +
+        "\n";
 
-    $("log").textContent +=
-        line + "\n";
+    logElement.scrollTop =
+        logElement.scrollHeight;
+}
 
-    $("log").scrollTop =
-        $("log").scrollHeight;
+
+/* =========================================
+   HTML escape
+========================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================
+   表示キー
+=========================================
+
+   10:
+      # + 8文字 + ..
+
+   12:
+      # + 12文字
+
+========================================= */
+
+function formatDisplayKey(
+    key,
+    tripLength
+) {
+
+    key =
+        String(key || "");
+
+    /*
+     * 既に # が付いていても除去
+     */
+
+    key =
+        key.replace(/^#/, "");
+
+    /*
+     * 既に .. が付いていても除去
+     */
+
+    key =
+        key.replace(/\.\.$/, "");
+
+
+    if (
+        Number(tripLength) === 10
+    ) {
+
+        return (
+            "#" +
+            key.substring(0, 8) +
+            ".."
+        );
+    }
+
+
+    return (
+        "#" +
+        key.substring(0, 12)
+    );
+}
+
+
+/* =========================================
+   条件
+========================================= */
+
+function addConditionRow(
+    text = "",
+    mode = "contains"
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "condition";
+
+
+    div.innerHTML = `
+
+        <div class="row">
+
+            <input
+                type="text"
+                class="condition-text"
+                value="${escapeHtml(text)}"
+                placeholder="一致させる文字"
+            >
+
+            <select class="condition-mode">
+
+                <option
+                    value="contains"
+                    ${mode === "contains" ? "selected" : ""}
+                >
+                    部分一致
+                </option>
+
+                <option
+                    value="starts"
+                    ${mode === "starts" ? "selected" : ""}
+                >
+                    前方一致
+                </option>
+
+                <option
+                    value="ends"
+                    ${mode === "ends" ? "selected" : ""}
+                >
+                    後方一致
+                </option>
+
+                <option
+                    value="exact"
+                    ${mode === "exact" ? "selected" : ""}
+                >
+                    完全一致
+                </option>
+
+            </select>
+
+            <button
+                type="button"
+                class="delete-condition secondary"
+            >
+                🗑️ この条件を削除
+            </button>
+
+        </div>
+    `;
+
+
+    div.querySelector(
+        ".delete-condition"
+    ).addEventListener(
+        "click",
+        function () {
+
+            div.remove();
+
+        }
+    );
+
+
+    conditions.appendChild(div);
+}
+
+
+/* 初期条件 */
+
+addConditionRow();
+
+
+addCondition.addEventListener(
+    "click",
+    function () {
+
+        addConditionRow();
+
+    }
+);
+
+
+/* =========================================
+   条件取得
+========================================= */
+
+function getConditions() {
+
+    const rows =
+        conditions.querySelectorAll(
+            ".condition"
+        );
+
+    const result = [];
+
+
+    rows.forEach(function (row) {
+
+        const text =
+            row.querySelector(
+                ".condition-text"
+            ).value;
+
+        const mode =
+            row.querySelector(
+                ".condition-mode"
+            ).value;
+
+
+        if (text) {
+
+            result.push({
+
+                text: text,
+
+                mode: mode,
+
+                regex:
+                    searchRegex.value ===
+                    "true"
+
+            });
+        }
+
+    });
+
+
+    return result;
+}
+
+
+/* =========================================
+   Worker作成
+========================================= */
+
+function createWorker() {
+
+    const worker =
+        new Worker(workerFile);
+
+    return worker;
+}
+
+
+/* =========================================
+   Worker停止
+========================================= */
+
+function terminateWorkers() {
+
+    const current =
+        workers.slice();
+
+    workers = [];
+
+
+    current.forEach(
+        function (worker) {
+
+            try {
+
+                worker.postMessage({
+                    type: "stop"
+                });
+
+            } catch (e) {
+            }
+
+
+            /*
+             * postMessageだけでは、
+             * cryptの計算中に即座に止まらない場合がある。
+             *
+             * terminate() で確実に終了させる。
+             */
+
+            try {
+
+                worker.terminate();
+
+            } catch (e) {
+            }
+        }
+    );
+
+
+    workerStatus.textContent =
+        "停止";
+
+    workerStatus.className =
+        "value";
 }
 
 
@@ -747,716 +1231,730 @@ function log(message) {
 
 function getWorkerCount() {
 
-    const value =
+    const selected =
         Number(
-            $("workerCount").value
+            workerCount.value
         );
 
-    if (!value) {
-        return Math.max(
-            1,
-            Math.min(
-                CPU_COUNT,
-                8
-            )
-        );
+
+    if (selected > 0) {
+        return selected;
     }
 
-    return value;
+
+    /*
+     * 自動
+     */
+
+    return Math.max(
+        1,
+        Math.min(
+            cpu,
+            8
+        )
+    );
 }
 
 
 /* =========================================
-   Worker生成
+   生成
 ========================================= */
 
-function createWorker() {
+generateButton.addEventListener(
+    "click",
+    function () {
 
-    const worker =
-        new Worker(WORKER_FILE);
-
-    return worker;
-}
-
-
-/* =========================================
-   Worker終了
-========================================= */
-
-function terminateWorkers() {
-
-    for (const worker of workers) {
-
-        try {
-            worker.postMessage({
-                type: "stop"
-            });
-        } catch (_) {}
-
-        try {
-            worker.terminate();
-        } catch (_) {}
-    }
-
-    workers = [];
-
-    $("workerStatus").textContent =
-        "0 Worker";
-}
+        const length =
+            Number(
+                generateLength.value
+            );
 
 
-/* =========================================
-   Worker起動
-========================================= */
+        let input =
+            generateKey.value.trim();
 
-function startWorkers(count) {
 
-    terminateWorkers();
+        if (!input) {
 
-    for (
-        let i = 0;
-        i < count;
-        i++
-    ) {
+            alert(
+                "キーを入力してください。"
+            );
+
+            return;
+        }
+
+
+        /*
+         * 10桁
+         *
+         * 入力が
+         * #aaaaaaaa..
+         * のようになっていても対応
+         */
+
+        input =
+            input.replace(/^#/, "");
+
+        input =
+            input.replace(/\.\.$/, "");
+
+
+        let cryptKey;
+
+
+        if (length === 10) {
+
+            cryptKey =
+                input.substring(0, 8) +
+                "..";
+
+        } else {
+
+            cryptKey =
+                input.substring(0, 12);
+        }
+
+
+        /*
+         * 一時Workerで計算
+         */
 
         const worker =
             createWorker();
 
-        worker.__id =
-            i + 1;
+
+        let done = false;
+
 
         worker.onmessage =
             function (event) {
 
-                handleWorkerMessage(
-                    worker,
-                    event.data
-                );
+                const data =
+                    event.data || {};
+
+
+                if (
+                    data.type === "ready"
+                ) {
+
+                    worker.postMessage({
+
+                        type: "generate",
+
+                        key: cryptKey,
+
+                        length: length
+
+                    });
+
+                    /*
+                     * generate専用処理はworker.jsに
+                     * search以外として実装する
+                     */
+
+                    return;
+                }
+
+
+                if (
+                    data.type === "generated"
+                ) {
+
+                    done = true;
+
+
+                    const trip =
+                        data.trip;
+
+                    const displayKey =
+                        formatDisplayKey(
+                            cryptKey,
+                            length
+                        );
+
+
+                    lastTrip =
+                        trip;
+
+                    lastDisplayKey =
+                        displayKey;
+
+
+                    generateTrip.textContent =
+                        "◆" + trip;
+
+                    generateDisplayKey.textContent =
+                        "キー：" +
+                        displayKey;
+
+
+                    generateOutput.style.display =
+                        "block";
+
+                    copyButton.disabled =
+                        false;
+
+
+                    worker.terminate();
+
+                    libraryStatus.textContent =
+                        "正常";
+
+                    libraryStatus.className =
+                        "value ok";
+
+                    log(
+                        "トリップ生成: " +
+                        displayKey +
+                        " → " +
+                        trip
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    data.type === "error"
+                ) {
+
+                    if (!done) {
+
+                        alert(
+                            data.message ||
+                            "Worker error"
+                        );
+
+                        log(
+                            "Worker error: " +
+                            (
+                                data.message ||
+                                "unknown"
+                            )
+                        );
+                    }
+
+                    worker.terminate();
+                }
             };
+
 
         worker.onerror =
             function (event) {
 
                 log(
-                    "Worker #" +
-                    worker.__id +
-                    " error: " +
+                    "Worker error: " +
                     (
                         event.message ||
-                        "unknown error"
+                        "unknown"
                     )
                 );
+
+                libraryStatus.textContent =
+                    "エラー";
+
+                libraryStatus.className =
+                    "value error";
+
+                worker.terminate();
             };
-
-        workers.push(worker);
     }
-
-    $("workerStatus").textContent =
-        count + " Worker";
-
-    log(
-        "Worker: " +
-        WORKER_FILE +
-        " × " +
-        count
-    );
-}
-
-
-/* =========================================
-   Workerメッセージ
-========================================= */
-
-function handleWorkerMessage(
-    worker,
-    data
-) {
-
-    if (!data) {
-        return;
-    }
-
-    switch (data.type) {
-
-        case "ready":
-
-            $("libraryStatus").textContent =
-                "正常";
-
-            log(
-                "Worker #" +
-                worker.__id +
-                ": ready"
-            );
-
-            break;
-
-
-        case "generated":
-
-            showGenerated(
-                data
-            );
-
-            break;
-
-
-        case "test-results":
-
-            showTests(
-                data.results || []
-            );
-
-            break;
-
-
-        case "hit":
-
-            addResult(
-                data
-            );
-
-            break;
-
-
-        case "progress":
-
-            totalAttempts +=
-                Number(data.count || 0);
-
-            updateProgress();
-
-            break;
-
-
-        case "stopped":
-
-            /*
-             * stop後にWorkerから来ても
-             * UIを再度検索中にしない。
-             */
-            if (!searching) {
-                return;
-            }
-
-            break;
-
-
-        case "error":
-
-            log(
-                "Worker #" +
-                worker.__id +
-                " error: " +
-                (
-                    data.message ||
-                    "unknown"
-                )
-            );
-
-            break;
-
-
-        default:
-
-            log(
-                "Unknown Worker message: " +
-                data.type
-            );
-
-            break;
-    }
-}
-
-
-/* =========================================
-   トリップ生成
-========================================= */
-
-let lastGeneratedTrip = "";
-
-$("generateButton")
-    .addEventListener(
-        "click",
-        function () {
-
-            const length =
-                Number(
-                    $("generateLength").value
-                );
-
-            const key =
-                $("generateKey").value;
-
-            if (!key) {
-                alert(
-                    "キーを入力してください。"
-                );
-                return;
-            }
-
-            if (
-                length === 10 &&
-                key.length < 8
-            ) {
-                alert(
-                    "10桁の場合は8文字以上のキーを入力してください。"
-                );
-                return;
-            }
-
-            if (
-                length === 12 &&
-                key.length < 2
-            ) {
-                alert(
-                    "12桁の場合はキーを入力してください。"
-                );
-                return;
-            }
-
-            $("generateResult").textContent =
-                "生成中...";
-
-            const worker =
-                createWorker();
-
-            worker.onmessage =
-                function (event) {
-
-                    const data =
-                        event.data || {};
-
-                    if (
-                        data.type ===
-                        "generated"
-                    ) {
-
-                        showGenerated(
-                            data
-                        );
-
-                        worker.terminate();
-
-                    } else if (
-                        data.type ===
-                        "error"
-                    ) {
-
-                        $("generateResult")
-                            .textContent =
-                            "エラー: " +
-                            data.message;
-
-                        worker.terminate();
-                    }
-                };
-
-            worker.onerror =
-                function (event) {
-
-                    $("generateResult")
-                        .textContent =
-                        "Worker error: " +
-                        (
-                            event.message ||
-                            "unknown"
-                        );
-
-                    worker.terminate();
-                };
-
-            worker.postMessage({
-                type: "generate",
-                length: length,
-                key: key
-            });
-        }
-    );
-
-
-/* =========================================
-   生成結果表示
-========================================= */
-
-function showGenerated(data) {
-
-    lastGeneratedTrip =
-        data.trip || "";
-
-    $("generateResult").innerHTML =
-        "<div class='result'>" +
-            "<div class='trip'>◆" +
-                escapeHtml(
-                    data.trip || ""
-                ) +
-            "</div>" +
-            "<div class='key'>キー：" +
-                escapeHtml(
-                    data.displayKey ||
-                    data.key ||
-                    ""
-                ) +
-            "</div>" +
-        "</div>";
-
-    $("copyButton").disabled =
-        !lastGeneratedTrip;
-}
+);
 
 
 /* =========================================
    コピー
 ========================================= */
 
-$("copyButton")
-    .addEventListener(
-        "click",
-        async function () {
+copyButton.addEventListener(
+    "click",
+    async function () {
 
-            if (!lastGeneratedTrip) {
-                return;
-            }
-
-            try {
-
-                await navigator.clipboard.writeText(
-                    lastGeneratedTrip
-                );
-
-                $("copyButton").textContent =
-                    "✅ コピーしました";
-
-                setTimeout(
-                    function () {
-                        $("copyButton").textContent =
-                            "📋 トリップをコピー";
-                    },
-                    1200
-                );
-
-            } catch (e) {
-
-                alert(
-                    "コピーできませんでした"
-                );
-            }
+        if (!lastTrip) {
+            return;
         }
-    );
+
+
+        try {
+
+            await navigator.clipboard.writeText(
+                lastTrip
+            );
+
+            copyButton.textContent =
+                "✅ コピーしました";
+
+            setTimeout(
+                function () {
+
+                    copyButton.textContent =
+                        "📋 トリップをコピー";
+
+                },
+                1200
+            );
+
+        } catch (e) {
+
+            alert(
+                "コピーできませんでした。"
+            );
+        }
+    }
+);
 
 
 /* =========================================
    自動検証
 ========================================= */
 
-$("testButton")
-    .addEventListener(
-        "click",
-        function () {
+testButton.addEventListener(
+    "click",
+    function () {
 
-            $("testResult").textContent =
-                "検証中...";
+        testButton.disabled =
+            true;
 
-            const worker =
-                createWorker();
+        testOutput.innerHTML =
+            "<p>検証中...</p>";
 
-            worker.onmessage =
-                function (event) {
 
-                    const data =
-                        event.data || {};
+        const worker =
+            createWorker();
 
-                    if (
-                        data.type ===
-                        "test-results"
-                    ) {
 
-                        showTests(
-                            data.results || []
-                        );
+        worker.onmessage =
+            function (event) {
 
-                        worker.terminate();
+                const data =
+                    event.data || {};
 
-                    } else if (
-                        data.type ===
-                        "error"
-                    ) {
 
-                        $("testResult")
-                            .textContent =
-                            "エラー: " +
-                            data.message;
+                if (
+                    data.type === "ready"
+                ) {
 
-                        worker.terminate();
-                    }
-                };
+                    worker.postMessage({
+                        type: "test"
+                    });
 
-            worker.onerror =
-                function (event) {
+                    return;
+                }
 
-                    $("testResult")
-                        .textContent =
-                        "Worker error: " +
-                        (
-                            event.message ||
-                            "unknown"
-                        );
+
+                if (
+                    data.type ===
+                    "test-results"
+                ) {
+
+                    let html = "";
+
+
+                    data.results.forEach(
+                        function (item) {
+
+                            html += `
+
+                            <div class="trip-output">
+
+                                <strong>
+                                    ${escapeHtml(item.key)}
+                                </strong>
+
+                                <div>
+                                    raw :
+                                    ${escapeHtml(item.raw)}
+                                </div>
+
+                                <div>
+                                    10桁 :
+                                    ${escapeHtml(item.trip10)}
+                                </div>
+
+                                <div>
+                                    12桁 :
+                                    ${escapeHtml(item.trip12)}
+                                </div>
+
+                            </div>
+                            `;
+                        }
+                    );
+
+
+                    testOutput.innerHTML =
+                        html;
+
+
+                    testButton.disabled =
+                        false;
+
 
                     worker.terminate();
-                };
 
-            worker.postMessage({
-                type: "test"
-            });
-        }
-    );
+                    libraryStatus.textContent =
+                        "正常";
 
+                    libraryStatus.className =
+                        "value ok";
 
-function showTests(results) {
-
-    $("testResult").innerHTML =
-        results.map(function (item) {
-
-            return (
-                "<div class='result'>" +
-                    "<b>" +
-                    escapeHtml(
-                        item.key
-                    ) +
-                    "</b> : " +
-                    "<span class='trip'>" +
-                    escapeHtml(
-                        item.trip
-                    ) +
-                    "</span>" +
-                    "<div class='key'>" +
-                    escapeHtml(
-                        item.displayKey
-                    ) +
-                    "</div>" +
-                "</div>"
-            );
-
-        }).join("");
-}
+                    return;
+                }
 
 
-/* =========================================
-   条件
-========================================= */
+                if (
+                    data.type === "error"
+                ) {
 
-function addCondition() {
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
-        "condition";
-
-    wrapper.innerHTML =
-
-        "<input " +
-        "type='text' " +
-        "class='conditionText' " +
-        "placeholder='一致させる文字'>" +
-
-        "<select class='conditionMode'>" +
-
-        "<option value='contains'>" +
-        "部分一致" +
-        "</option>" +
-
-        "<option value='starts'>" +
-        "前方一致" +
-        "</option>" +
-
-        "<option value='ends'>" +
-        "後方一致" +
-        "</option>" +
-
-        "<option value='exact'>" +
-        "完全一致" +
-        "</option>" +
-
-        "</select>" +
-
-        "<button " +
-        "type='button' " +
-        "class='secondary removeCondition'>" +
-        "🗑️ この条件を削除" +
-        "</button>";
-
-    wrapper
-        .querySelector(
-            ".removeCondition"
-        )
-        .addEventListener(
-            "click",
-            function () {
-
-                wrapper.remove();
-            }
-        );
-
-    $("conditions")
-        .appendChild(
-            wrapper
-        );
-}
+                    testOutput.innerHTML =
+                        `<p class="error">
+                            ${escapeHtml(
+                                data.message ||
+                                "エラー"
+                            )}
+                        </p>`;
 
 
-$("addCondition")
-    .addEventListener(
-        "click",
-        addCondition
-    );
+                    testButton.disabled =
+                        false;
 
 
-/*
- * 初期条件
- */
-addCondition();
+                    worker.terminate();
+                }
+            };
 
 
-/* =========================================
-   条件取得
-========================================= */
+        worker.onerror =
+            function (event) {
 
-function getConditions() {
+                testOutput.innerHTML =
+                    `<p class="error">
+                        Worker error:
+                        ${escapeHtml(
+                            event.message ||
+                            "unknown"
+                        )}
+                    </p>`;
 
-    const regex =
-        $("regexMode").value ===
-        "regex";
 
-    const elements =
-        document.querySelectorAll(
-            ".condition"
-        );
+                testButton.disabled =
+                    false;
 
-    const result = [];
 
-    for (const element of elements) {
-
-        const text =
-            element
-                .querySelector(
-                    ".conditionText"
-                )
-                .value;
-
-        const mode =
-            element
-                .querySelector(
-                    ".conditionMode"
-                )
-                .value;
-
-        if (!text) {
-            continue;
-        }
-
-        result.push({
-            text: text,
-            mode: mode,
-            regex: regex
-        });
+                worker.terminate();
+            };
     }
-
-    return result;
-}
+);
 
 
 /* =========================================
    検索開始
 ========================================= */
 
-$("startButton")
-    .addEventListener(
-        "click",
-        startSearch
-    );
+startSearch.addEventListener(
+    "click",
+    function () {
+
+        if (searching) {
+            return;
+        }
 
 
-function startSearch() {
+        /*
+         * 前回Workerを確実に終了
+         */
 
-    /*
-     * 既存検索が残っている場合は
-     * 完全停止してから開始。
-     */
-    stopSearch(false);
+        terminateWorkers();
 
-    const length =
-        Number(
-            $("searchLength").value
+
+        const length =
+            Number(
+                searchLength.value
+            );
+
+
+        const count =
+            getWorkerCount();
+
+
+        const conditionList =
+            getConditions();
+
+
+        const specialType =
+            special.value;
+
+
+        searching = true;
+
+        totalAttempts = 0;
+
+        totalHits = 0;
+
+        startTime =
+            performance.now();
+
+        lastAttempts = 0;
+
+        lastTime =
+            startTime;
+
+
+        attemptCount.textContent =
+            "0";
+
+        hitCount.textContent =
+            "0";
+
+        speed.textContent =
+            "0 / 秒";
+
+
+        results.innerHTML = "";
+
+
+        searchState.textContent =
+            "🔎 検索中...";
+
+        searchState.className =
+            "searching";
+
+
+        startSearch.disabled =
+            true;
+
+        stopSearch.disabled =
+            false;
+
+
+        workerStatus.textContent =
+            count +
+            " Worker 起動中";
+
+
+        workerStatus.className =
+            "value ok";
+
+
+        log(
+            "検索開始: " +
+            length +
+            "文字 / " +
+            count +
+            " Worker"
         );
 
-    const count =
-        getWorkerCount();
 
-    const conditions =
-        getConditions();
+        for (
+            let i = 0;
+            i < count;
+            i++
+        ) {
 
-    const special =
-        $("special").value;
+            const worker =
+                createWorker();
 
-    searching = true;
 
-    totalAttempts = 0;
+            workers.push(worker);
 
-    totalHits = 0;
 
-    lastTime =
-        performance.now();
+            worker.onmessage =
+                function (event) {
 
-    lastAttempts = 0;
+                    handleSearchMessage(
+                        worker,
+                        event.data || {},
+                        length
+                    );
+                };
 
-    $("attempts").textContent =
-        "0";
 
-    $("hits").textContent =
-        "0";
+            worker.onerror =
+                function (event) {
 
-    $("speed").textContent =
-        "0 / 秒";
+                    /*
+                     * stop後のterminateによる
+                     * エラーは無視
+                     */
 
-    $("searchState").textContent =
-        "検索中";
+                    if (!searching) {
+                        return;
+                    }
 
-    $("results").innerHTML =
-        "";
 
-    startWorkers(count);
+                    log(
+                        "Worker error: " +
+                        (
+                            event.message ||
+                            "unknown"
+                        )
+                    );
+                };
+        }
 
-    log(
-        "検索開始: " +
-        length +
-        "文字 / " +
-        count +
-        " Worker"
-    );
 
-    for (const worker of workers) {
+        /*
+         * Workerがreadyになったら検索を開始
+         */
 
-        worker.postMessage({
-            type: "search",
-            length: length,
-            conditions: conditions,
-            special: special,
+        workers.forEach(
+            function (worker) {
 
-            /*
-             * 検索用文字セット
-             *
-             * 同じ文字の連続はWorker側で除外。
-             */
-            charset:
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                "abcdefghijklmnopqrstuvwxyz" +
-                "0123456789" +
-                "./" +
-                "!@#$%^&*()_+-=[]{}<>?"
-        });
+                /*
+                 * worker.js側でready後に
+                 * searchを受け取れるように、
+                 * すぐ送っても問題ない。
+                 */
+
+                worker.postMessage({
+
+                    type: "search",
+
+                    length: length,
+
+                    conditions:
+                        conditionList,
+
+                    special:
+                        specialType,
+
+                    charset:
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./!@#$%^&*()_+-=[]{}<>?"
+
+                });
+            }
+        );
+
+
+        updateSpeed();
+    }
+);
+
+
+/* =========================================
+   検索メッセージ
+========================================= */
+
+function handleSearchMessage(
+    worker,
+    data,
+    length
+) {
+
+    if (
+        data.type === "ready"
+    ) {
+
+        return;
+    }
+
+
+    if (
+        data.type === "progress"
+    ) {
+
+        totalAttempts +=
+            Number(
+                data.count || 0
+            );
+
+
+        attemptCount.textContent =
+            totalAttempts.toLocaleString();
+
+
+        return;
+    }
+
+
+    if (
+        data.type === "hit"
+    ) {
+
+        totalHits++;
+
+
+        hitCount.textContent =
+            totalHits.toLocaleString();
+
+
+        const displayKey =
+            formatDisplayKey(
+                data.key,
+                length
+            );
+
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.className =
+            "result";
+
+
+        div.innerHTML = `
+
+            <div class="result-trip">
+                ◆${escapeHtml(data.trip)}
+            </div>
+
+            <div class="result-key">
+                キー：
+                ${escapeHtml(displayKey)}
+            </div>
+
+        `;
+
+
+        if (
+            results.textContent.trim() ===
+            "検索結果はありません。"
+        ) {
+
+            results.innerHTML = "";
+        }
+
+
+        results.prepend(div);
+
+        return;
+    }
+
+
+    if (
+        data.type === "error"
+    ) {
+
+        log(
+            "Worker error: " +
+            (
+                data.message ||
+                "unknown"
+            )
+        );
+
+
+        /*
+         * 1 Workerのエラーだけで
+         * 全検索を止めない。
+         */
+
+        return;
+    }
+
+
+    if (
+        data.type === "stopped"
+    ) {
+
+        /*
+         * stop処理はUI側で管理する。
+         */
+
+        return;
     }
 }
 
@@ -1465,203 +1963,193 @@ function startSearch() {
    検索停止
 ========================================= */
 
-$("stopButton")
-    .addEventListener(
-        "click",
-        function () {
+stopSearch.addEventListener(
+    "click",
+    function () {
 
-            stopSearch(true);
-
-        }
-    );
+        stopSearch.disabled =
+            true;
 
 
-function stopSearch(writeLog) {
+        /*
+         * まず状態をfalseにする
+         */
 
-    /*
-     * 先にfalseにする。
-     *
-     * これが重要。
-     * Workerのstoppedが後から来ても
-     * 検索中へ戻らない。
-     */
-    searching = false;
+        searching = false;
 
-    for (const worker of workers) {
 
-        try {
+        /*
+         * その後全Worker terminate
+         */
 
-            worker.postMessage({
-                type: "stop"
-            });
+        terminateWorkers();
 
-        } catch (_) {}
+
+        startSearch.disabled =
+            false;
+
+
+        searchState.textContent =
+            "⏹ 検索停止";
+
+
+        searchState.className =
+            "";
+
+
+        log(
+            "検索停止"
+        );
+
+
+        updateSpeed();
     }
-
-    /*
-     * stopメッセージを送った直後に
-     * terminateする。
-     *
-     * while(running) のWorkerを確実に
-     * ブラウザ側から終了させる。
-     */
-    for (const worker of workers) {
-
-        try {
-            worker.terminate();
-        } catch (_) {}
-    }
-
-    workers = [];
-
-    $("workerStatus").textContent =
-        "0 Worker";
-
-    $("searchState").textContent =
-        "停止中";
-
-    if (writeLog) {
-        log("検索停止");
-    }
-}
+);
 
 
 /* =========================================
-   進捗
+   速度
 ========================================= */
 
-function updateProgress() {
+function updateSpeed() {
 
-    $("attempts").textContent =
-        totalAttempts.toLocaleString();
+    if (!searching) {
+
+        return;
+    }
+
 
     const now =
         performance.now();
 
+
     const elapsed =
-        now - lastTime;
+        now -
+        startTime;
 
-    if (elapsed >= 500) {
 
-        const diff =
-            totalAttempts -
-            lastAttempts;
+    if (elapsed > 0) {
 
-        const speed =
-            diff /
+        const currentSpeed =
+            totalAttempts /
             (elapsed / 1000);
 
-        $("speed").textContent =
-            Math.round(speed)
-                .toLocaleString() +
+
+        speed.textContent =
+            Math.floor(
+                currentSpeed
+            ).toLocaleString() +
             " / 秒";
-
-        lastTime = now;
-
-        lastAttempts =
-            totalAttempts;
-    }
-}
-
-
-/* =========================================
-   結果追加
-========================================= */
-
-function addResult(data) {
-
-    totalHits++;
-
-    $("hits").textContent =
-        totalHits.toLocaleString();
-
-    if (
-        totalHits > MAX_RESULTS
-    ) {
-        return;
     }
 
-    const div =
-        document.createElement(
-            "div"
-        );
 
-    div.className =
-        "result";
-
-    div.innerHTML =
-        "<div class='trip'>◆" +
-            escapeHtml(
-                data.trip || ""
-            ) +
-        "</div>" +
-
-        "<div class='key'>キー：" +
-            escapeHtml(
-                data.displayKey ||
-                data.key ||
-                ""
-            ) +
-        "</div>";
-
-    $("results")
-        .prepend(div);
+    setTimeout(
+        updateSpeed,
+        500
+    );
 }
 
 
 /* =========================================
-   HTMLエスケープ
+   初期Worker確認
 ========================================= */
 
-function escapeHtml(value) {
+(function init() {
 
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
+    log(
+        "Worker: " +
+        workerFile
+    );
 
 
-/* =========================================
-   CPU
-========================================= */
-
-$("cpuStatus").textContent =
-    CPU_COUNT + " cores";
+    const worker =
+        createWorker();
 
 
-/* =========================================
-   初期Worker
-========================================= */
+    worker.onmessage =
+        function (event) {
 
-startWorkers(
-    Math.max(
-        1,
-        Math.min(
-            CPU_COUNT,
-            4
-        )
-    )
-);
+            const data =
+                event.data || {};
 
-log("初期化完了");
+
+            if (
+                data.type === "ready"
+            ) {
+
+                libraryStatus.textContent =
+                    "正常";
+
+                libraryStatus.className =
+                    "value ok";
+
+
+                workerStatus.textContent =
+                    "待機";
+
+                workerStatus.className =
+                    "value ok";
+
+
+                log(
+                    "Worker初期化完了"
+                );
+
+
+                worker.terminate();
+
+                return;
+            }
+
+
+            if (
+                data.type === "error"
+            ) {
+
+                libraryStatus.textContent =
+                    "エラー";
+
+                libraryStatus.className =
+                    "value error";
+
+
+                log(
+                    "Worker error: " +
+                    (
+                        data.message ||
+                        "unknown"
+                    )
+                );
+
+
+                worker.terminate();
+            }
+        };
+
+
+    worker.onerror =
+        function (event) {
+
+            libraryStatus.textContent =
+                "エラー";
+
+            libraryStatus.className =
+                "value error";
+
+
+            log(
+                "Worker error: " +
+                (
+                    event.message ||
+                    "unknown"
+                )
+            );
+
+
+            worker.terminate();
+        };
+
+})();
 
 </script>
 
