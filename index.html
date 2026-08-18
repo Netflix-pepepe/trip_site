@@ -2,233 +2,223 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>🐺 人狼オンライン トリップ検索機</title>
 
 <style>
-*{
-  box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
-body{
-  margin:0;
-  padding:16px;
-  background:#111827;
-  color:#f3f4f6;
-  font-family:-apple-system,BlinkMacSystemFont,
-    "Segoe UI","Hiragino Kaku Gothic ProN",
-    "Yu Gothic",sans-serif;
+body {
+    margin: 0;
+    padding: 20px;
+    background: #111827;
+    color: #e5e7eb;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
-.container{
-  max-width:1100px;
-  margin:auto;
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
-h1{
-  margin-top:0;
-  font-size:28px;
+h1 {
+    margin-top: 0;
+    font-size: 26px;
 }
 
-h2{
-  margin-top:26px;
+h2 {
+    font-size: 20px;
+    margin-top: 0;
 }
 
-h3{
-  margin-bottom:8px;
+.card {
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
 }
 
-.card{
-  background:#1f2937;
-  border:1px solid #374151;
-  border-radius:12px;
-  padding:16px;
-  margin:14px 0;
-}
-
-.row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
+.row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 input,
 select,
-button{
-  font-size:16px;
-  border-radius:8px;
-  border:1px solid #4b5563;
-  padding:10px 12px;
+button {
+    font-size: 15px;
+    border-radius: 7px;
+    border: 1px solid #4b5563;
+    padding: 9px 12px;
 }
 
 input,
-select{
-  background:#111827;
-  color:#fff;
+select {
+    background: #111827;
+    color: #fff;
 }
 
-button{
-  background:#2563eb;
-  color:#fff;
-  cursor:pointer;
-  border:none;
-  font-weight:bold;
+input {
+    min-width: 250px;
 }
 
-button:hover{
-  background:#1d4ed8;
+button {
+    cursor: pointer;
+    color: white;
+    background: #2563eb;
+    border: none;
 }
 
-button.stop{
-  background:#dc2626;
+button:hover {
+    background: #1d4ed8;
 }
 
-button.stop:hover{
-  background:#b91c1c;
+button.danger {
+    background: #dc2626;
 }
 
-button.gray{
-  background:#4b5563;
+button.secondary {
+    background: #4b5563;
 }
 
-button.gray:hover{
-  background:#374151;
+button.green {
+    background: #059669;
 }
 
-.status{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:10px;
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
 }
 
-.statusBox{
-  background:#111827;
-  border-radius:8px;
-  padding:12px;
+.label {
+    color: #9ca3af;
+    font-size: 13px;
+    margin-bottom: 5px;
 }
 
-.ok{
-  color:#4ade80;
+.value {
+    font-size: 16px;
+    font-weight: bold;
 }
 
-.warn{
-  color:#facc15;
+.status-ok {
+    color: #34d399;
 }
 
-.error{
-  color:#f87171;
+.status-error {
+    color: #f87171;
 }
 
-.trip{
-  font-size:28px;
-  font-weight:bold;
-  color:#fbbf24;
-  word-break:break-all;
-  margin:12px 0;
+.trip {
+    color: #fbbf24;
+    font-family: monospace;
+    font-size: 24px;
+    font-weight: bold;
 }
 
-.condition{
-  background:#111827;
-  border:1px solid #374151;
-  border-radius:10px;
-  padding:12px;
-  margin:10px 0;
+.key {
+    color: #93c5fd;
+    font-family: monospace;
+    font-size: 16px;
+    word-break: break-all;
 }
 
-.conditionGrid{
-  display:grid;
-  grid-template-columns:1fr 180px auto;
-  gap:10px;
-  align-items:center;
+.result {
+    padding: 14px;
+    margin-top: 10px;
+    border-radius: 8px;
+    background: #111827;
+    border: 1px solid #374151;
 }
 
-@media(max-width:700px){
-  .conditionGrid{
-    grid-template-columns:1fr;
-  }
+.result-title {
+    font-weight: bold;
+    margin-bottom: 6px;
 }
 
-.results{
-  max-height:500px;
-  overflow:auto;
+.grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
 }
 
-.result{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  align-items:center;
-  padding:10px;
-  border-bottom:1px solid #374151;
+.stat {
+    background: #111827;
+    border-radius: 8px;
+    padding: 14px;
 }
 
-.resultTrip{
-  color:#fbbf24;
-  font-size:20px;
-  font-weight:bold;
+.condition {
+    background: #111827;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 8px;
 }
 
-.resultKey{
-  color:#93c5fd;
-  word-break:break-all;
+.condition .row {
+    align-items: stretch;
 }
 
-.specialList{
-  width:100%;
-  border-collapse:collapse;
+.condition input {
+    flex: 1;
 }
 
-.specialList th,
-.specialList td{
-  padding:8px;
-  border-bottom:1px solid #374151;
-  text-align:left;
+.small {
+    font-size: 12px;
+    color: #9ca3af;
 }
 
-.progress{
-  height:10px;
-  background:#111827;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:10px;
+.log {
+    max-height: 250px;
+    overflow-y: auto;
+    background: #030712;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
 }
 
-.progressBar{
-  height:100%;
-  background:#22c55e;
-  width:0%;
-  transition:width .2s;
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.small{
-  color:#9ca3af;
-  font-size:13px;
+th,
+td {
+    border-bottom: 1px solid #374151;
+    padding: 9px;
+    text-align: left;
 }
 
-.stat{
-  font-size:20px;
-  font-weight:bold;
+th {
+    color: #9ca3af;
 }
 
-.hidden{
-  display:none;
-}
+@media(max-width:600px) {
+    body {
+        padding: 10px;
+    }
 
-label{
-  font-weight:bold;
-}
+    input {
+        min-width: 0;
+        width: 100%;
+    }
 
-textarea{
-  width:100%;
-  min-height:100px;
-  background:#111827;
-  color:#fff;
-  border:1px solid #4b5563;
-  border-radius:8px;
-  padding:10px;
+    .row > input {
+        flex: 1 1 100%;
+    }
 }
 </style>
 </head>
@@ -239,371 +229,285 @@ textarea{
 
 <h1>🐺 人狼オンライン トリップ検索機</h1>
 
-<p>
-10桁・12桁キー対応 / 複雑キー / 正規表現 / 特殊トリップ / マルチWorker
-</p>
-
-<!-- ========================= -->
-<!-- STATUS -->
-<!-- ========================= -->
-
 <div class="card">
 
 <h2>⚙️ システム状態</h2>
 
-<div class="status">
+<div class="grid">
 
-<div class="statusBox">
-<div>ライブラリ</div>
-<strong id="libStatus" class="warn">
-確認中…
-</strong>
+<div class="stat">
+<div class="label">ライブラリ</div>
+<div id="libraryStatus" class="value">確認中...</div>
 </div>
 
-<div class="statusBox">
-<div>Worker</div>
-<strong id="workerStatus">
-停止中
-</strong>
+<div class="stat">
+<div class="label">Worker</div>
+<div id="workerStatus" class="value">停止</div>
 </div>
 
-<div class="statusBox">
-<div>CPU</div>
-<strong id="cpuStatus">
-確認中…
-</strong>
+<div class="stat">
+<div class="label">CPU</div>
+<div id="cpuStatus" class="value">
+    <script>
+        document.write(
+            Math.max(
+                1,
+                navigator.hardwareConcurrency || 1
+            ) + " cores"
+        );
+    </script>
+</div>
 </div>
 
 </div>
-
 </div>
 
 
-<!-- ========================= -->
-<!-- GENERATOR -->
-<!-- ========================= -->
+<!-- =====================================================
+     トリップ生成
+===================================================== -->
 
 <div class="card">
 
 <h2>🔑 トリップ生成</h2>
 
-<p class="small">
+<div class="small">
 トリップキーを入力してください。
-複雑な記号・英数字を含む8文字キーにも対応しています。
-</p>
+複雑な記号・英数字を含むキーに対応しています。
+</div>
+
+<br>
 
 <div class="row">
 
-<label for="generateKey">キー</label>
-
-<input
-  id="generateKey"
-  type="text"
-  maxlength="128"
-  placeholder="例：!fa4K{0X"
-  autocomplete="off"
->
-
-<label for="generateLength">
-トリップ長
-</label>
+<div>
+<div class="label">トリップ長</div>
 
 <select id="generateLength">
 <option value="10">10桁</option>
 <option value="12">12桁</option>
 </select>
+</div>
 
-<button id="generateBtn">
-✨ トリップを生成
+<div style="flex:1;min-width:250px;">
+<div class="label">キー</div>
+
+<input
+    id="generateKey"
+    type="text"
+    autocomplete="off"
+    spellcheck="false"
+    placeholder="例: .T!!!@]x">
+</div>
+
+<button
+    id="generateButton"
+    class="green">
+    ✨ トリップを生成
 </button>
 
 </div>
 
-<div id="generateResult" class="trip">
-◆—
-</div>
+<br>
 
-<button id="copyTripBtn" class="gray">
-📋 トリップをコピー
-</button>
+<div id="generatedResult"></div>
 
 </div>
 
 
-<!-- ========================= -->
-<!-- VERIFY -->
-<!-- ========================= -->
+<!-- =====================================================
+     自動検証
+===================================================== -->
 
 <div class="card">
 
 <h2>🧪 自動検証</h2>
 
-<p>
-既知の計算をWorkerで実行して、
-ライブラリが正常に動作しているか確認します。
-</p>
-
-<div id="verifyResult">
-未実行
+<div class="small">
+既知の計算を実行して、ライブラリとトリップ抽出処理を確認します。
 </div>
 
-<button id="verifyBtn">
-🧪 4件を検証
+<br>
+
+<button
+    id="verifyButton"
+    class="secondary">
+    🧪 検証する
 </button>
 
+<div id="verifyResult" style="margin-top:12px;"></div>
+
 </div>
 
 
-<!-- ========================= -->
-<!-- SEARCH -->
-<!-- ========================= -->
+<!-- =====================================================
+     検索
+===================================================== -->
 
 <div class="card">
 
 <h2>🔎 トリップ検索</h2>
 
-<p>
-複数条件を追加した場合、
-<strong>すべての条件</strong>に一致するものを検索します。
-</p>
-
-<p>
-<strong>最大試行回数はありません。</strong>
+<div class="small">
+複数条件を追加した場合、すべての条件に一致するものを検索します。
 停止ボタンを押すまで検索を続けます。
-</p>
+</div>
 
-
-<h3>探索するトリップ長</h3>
+<br>
 
 <div class="row">
 
-<label>
-<input
-  type="radio"
-  name="searchLength"
-  value="10"
-  checked
->
-10文字
-</label>
+<div>
+<div class="label">探索するトリップ長</div>
 
-<label>
-<input
-  type="radio"
-  name="searchLength"
-  value="12"
->
-12文字
-</label>
-
-</div>
-
-
-<h3>一致方式</h3>
-
-<div class="row">
-
-<label>
-<input
-  type="radio"
-  name="matchMode"
-  value="normal"
-  checked
->
-通常検索
-</label>
-
-<label>
-<input
-  type="radio"
-  name="matchMode"
-  value="regex"
->
-🔥 正規表現
-</label>
-
-</div>
-
-
-<h3>一致条件</h3>
-
-<div id="conditions"></div>
-
-<button id="addConditionBtn" class="gray">
-＋ 条件を追加
-</button>
-
-
-<h3>⭐ 特殊トリップ</h3>
-
-<select id="specialType">
-
-<option value="none">
-指定なし
-</option>
-
-<option value="pure">
-純n連（純8連以上）
-</option>
-
-<option value="semi">
-準n連（準9連以上）
-</option>
-
-<option value="two">
-二構
-</option>
-
-<option value="long">
-最長
-</option>
-
-<option value="short">
-最短
-</option>
-
-<option value="yakumo">
-八雲
-</option>
-
-<option value="mirror">
-鏡
-</option>
-
-<option value="palindrome">
-回文
-</option>
-
-<option value="echo">
-山彦
-</option>
-
-<option value="double">
-双連
-</option>
-
-<option value="number">
-全数
-</option>
-
-<option value="skip">
-飛石
-</option>
-
-<option value="wideSkip">
-拡飛
-</option>
-
+<select id="searchLength">
+<option value="10">10文字</option>
+<option value="12">12文字</option>
 </select>
+</div>
 
-<p class="small">
-特殊トリップを選ぶと、その分類条件に一致する
-トリップだけを表示します。
-</p>
+<div>
+<div class="label">一致方式</div>
 
+<select id="matchType">
+<option value="normal">通常検索</option>
+<option value="regex">🔥 正規表現</option>
+</select>
+</div>
 
-<h3>高速化 Worker数</h3>
+<div>
+<div class="label">Worker数</div>
 
 <select id="workerCount">
-
-<option value="auto">
-自動（CPUコア数に合わせる）
-</option>
-
+<option value="auto">自動</option>
 <option value="1">1 Worker</option>
 <option value="2">2 Workers</option>
 <option value="4">4 Workers</option>
 <option value="6">6 Workers</option>
 <option value="8">8 Workers</option>
+</select>
+</div>
+
+</div>
+
+<br>
+
+<h3>一致条件</h3>
+
+<div id="conditions"></div>
+
+<br>
+
+<button
+    id="addCondition"
+    class="secondary">
+    ＋ 条件を追加
+</button>
+
+
+<h3 style="margin-top:25px;">
+⭐ 特殊トリップ
+</h3>
+
+<select id="special">
+
+<option value="none">指定なし</option>
+<option value="pure">純n連（純8連以上）</option>
+<option value="quasi">準n連（準9連以上）</option>
+<option value="two">二構</option>
+<option value="longest">最長</option>
+<option value="shortest">最短</option>
+<option value="yakumo">八雲</option>
+<option value="mirror">鏡</option>
+<option value="palindrome">回文</option>
+<option value="echo">山彦</option>
+<option value="double">双連</option>
+<option value="numbers">全数</option>
+<option value="tobiishi">飛石</option>
+<option value="kakutobi">拡飛</option>
 
 </select>
 
-
-<div class="row" style="margin-top:20px">
-
-<button id="startBtn">
-🔍 検索開始
-</button>
-
-<button id="stopBtn" class="stop">
-⏹ 検索停止
-</button>
-
-</div>
-
-
-<div class="card">
-
-<div id="searchStatus">
-待機中
-</div>
+<br><br>
 
 <div class="row">
 
-<div>
-<div class="small">試行キー</div>
-<div id="keyCount" class="stat">0</div>
-</div>
+<button
+    id="startSearch"
+    class="green">
+    🔍 検索開始
+</button>
 
-<div>
-<div class="small">ヒット</div>
-<div id="hitCount" class="stat">0</div>
-</div>
-
-<div>
-<div class="small">速度</div>
-<div id="speed" class="stat">0 / 秒</div>
-</div>
+<button
+    id="stopSearch"
+    class="danger"
+    disabled>
+    ⏹ 検索停止
+</button>
 
 </div>
 
-<div class="progress">
-<div id="progressBar" class="progressBar"></div>
+<br>
+
+<div id="searchState">
+    🔎 待機中
 </div>
 
-<p>
-探索空間：
-<strong id="space">-</strong>
-通り
-</p>
+<br>
 
-<p class="small">
-検索キー：8文字 / 複雑文字セット
-</p>
+<div class="grid">
 
+<div class="stat">
+<div class="label">試行キー</div>
+<div id="count" class="value">0</div>
+</div>
+
+<div class="stat">
+<div class="label">ヒット</div>
+<div id="hitCount" class="value">0</div>
+</div>
+
+<div class="stat">
+<div class="label">速度</div>
+<div id="speed" class="value">0 / 秒</div>
 </div>
 
 </div>
 
+</div>
 
-<!-- ========================= -->
-<!-- RESULTS -->
-<!-- ========================= -->
+
+<!-- =====================================================
+     結果
+===================================================== -->
 
 <div class="card">
 
 <h2>🎯 検索結果</h2>
 
-<div id="results" class="results">
+<div id="results">
+    <div class="small">
+        まだ結果はありません。
+    </div>
 </div>
 
 </div>
 
 
-<!-- ========================= -->
-<!-- SPECIAL INFO -->
-<!-- ========================= -->
+<!-- =====================================================
+     特殊トリップ一覧
+===================================================== -->
 
 <div class="card">
 
 <h2>📖 特殊トリップ一覧</h2>
 
-<table class="specialList">
+<table>
 
 <thead>
 <tr>
-<th>分類条件</th>
-<th>意味</th>
+<th>分類</th>
+<th>条件</th>
 </tr>
 </thead>
 
@@ -621,7 +525,7 @@ textarea{
 
 <tr>
 <td>二構</td>
-<td>2種類の文字だけ</td>
+<td>2種類以下の文字だけ</td>
 </tr>
 
 <tr>
@@ -675,2988 +579,1019 @@ textarea{
 </tr>
 
 </tbody>
+
 </table>
 
 </div>
 
+
+<div class="card">
+
+<h2>📋 デバッグログ</h2>
+
+<div id="log" class="log"></div>
+
+</div>
+
 </div>
 
 
-<!-- ===================================================== -->
-<!-- UNIX CRYPT -->
-<!-- ===================================================== -->
-
-<script src="./unix-crypt-td.min.js"></script>
-
-
 <script>
-"use strict";
 
+/* =====================================================
+   設定
+===================================================== */
 
-/* =========================================================
-   基本設定
-========================================================= */
-
-/*
- * 複雑化した検索キー用文字セット。
- *
- * 記号
- * 英大文字
- * 英小文字
- * 数字
- *
- * 例：
- *
- * !fa4K{0X
- * @Q7#k2Lm
- * $z8A!p{4
- */
-const CHARSET =
-  "!@#$%^&*()-_=+[]{};:,.?/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
+const WORKER_FILE =
+    "./worker.js";
 
 /*
- * unix crypt が実質的に利用するキー長。
+ * 検索用キー文字セット。
+ *
+ * 同じ文字を連続させないため、
+ * randomKey() で前文字と同じ文字を除外する。
+ *
+ * unix crypt のキーとして使用できる範囲を
+ * 基本的に維持する。
  */
-const KEY_LENGTH = 8;
+const KEY_CHARSET =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "abcdefghijklmnopqrstuvwxyz" +
+    "0123456789" +
+    "./";
 
 
-const RESULT_LIMIT = 10000;
+/* =====================================================
+   状態
+===================================================== */
 
 let workers = [];
-let running = false;
 
-let totalKeys = 0;
+let searching = false;
+
+let totalCount = 0;
 let totalHits = 0;
 
-let uniqueTrips = new Set();
+let startedAt = 0;
+let lastCount = 0;
+let lastTime = 0;
 
-let startTime = 0;
-let lastStatTime = 0;
-let lastStatKeys = 0;
-
-let currentTrip = "◆—";
-
-let workerBlobURL = null;
-
-let conditionCounter = 0;
+let conditionId = 0;
 
 
-/* =========================================================
+/* =====================================================
    DOM
-========================================================= */
+===================================================== */
 
-const $ = id => document.getElementById(id);
-
-const libStatus = $("libStatus");
-const workerStatus = $("workerStatus");
-const cpuStatus = $("cpuStatus");
-
-const generateKey = $("generateKey");
-const generateLength = $("generateLength");
-const generateBtn = $("generateBtn");
-const generateResult = $("generateResult");
-const copyTripBtn = $("copyTripBtn");
-
-const verifyBtn = $("verifyBtn");
-const verifyResult = $("verifyResult");
-
-const conditions = $("conditions");
-const addConditionBtn = $("addConditionBtn");
-
-const specialType = $("specialType");
-const workerCount = $("workerCount");
-
-const startBtn = $("startBtn");
-const stopBtn = $("stopBtn");
-
-const searchStatus = $("searchStatus");
-const keyCount = $("keyCount");
-const hitCount = $("hitCount");
-const speed = $("speed");
-const progressBar = $("progressBar");
-const space = $("space");
-
-const results = $("results");
+const $ = id =>
+    document.getElementById(id);
 
 
-/* =========================================================
-   初期化
-========================================================= */
+/* =====================================================
+   ログ
+===================================================== */
 
-cpuStatus.textContent =
-  (navigator.hardwareConcurrency || 1) + " cores";
+function log(message) {
 
+    const el = $("log");
 
-if(typeof window.unixCryptTD === "function"){
+    const time =
+        new Date().toLocaleTimeString();
 
-  libStatus.textContent = "正常";
-  libStatus.className = "ok";
+    el.textContent +=
+        "[" + time + "] " +
+        message +
+        "\n";
 
-}else{
-
-  libStatus.textContent = "読み込み失敗";
-  libStatus.className = "error";
+    el.scrollTop =
+        el.scrollHeight;
 }
 
 
-/* =========================================================
-   条件追加
-========================================================= */
+/* =====================================================
+   条件
+===================================================== */
 
-function addCondition(value = "", method = "contains"){
+function addCondition() {
 
-  conditionCounter++;
+    const id =
+        ++conditionId;
 
-  const box = document.createElement("div");
+    const div =
+        document.createElement("div");
 
-  box.className = "condition";
+    div.className =
+        "condition";
 
-  box.dataset.id =
-    conditionCounter;
+    div.dataset.id =
+        id;
 
-  box.innerHTML = `
-    <div class="conditionGrid">
+    div.innerHTML = `
+        <div class="row">
 
-      <input
-        class="conditionValue"
-        type="text"
-        placeholder="例：abc / ^abc / abc$"
-        value="${escapeHTML(value)}"
-      >
+            <input
+                type="text"
+                class="conditionText"
+                placeholder="検索文字列">
 
-      <select class="conditionMethod">
+            <select class="conditionMode">
+                <option value="contains">部分一致</option>
+                <option value="starts">前方一致</option>
+                <option value="ends">後方一致</option>
+                <option value="exact">完全一致</option>
+            </select>
 
-        <option value="contains"
-          ${method==="contains" ? "selected" : ""}>
-          部分一致
-        </option>
+            <button
+                type="button"
+                class="secondary deleteCondition">
+                🗑️ この条件を削除
+            </button>
 
-        <option value="starts"
-          ${method==="starts" ? "selected" : ""}>
-          前方一致
-        </option>
+        </div>
+    `;
 
-        <option value="ends"
-          ${method==="ends" ? "selected" : ""}>
-          後方一致
-        </option>
+    $("conditions").appendChild(div);
 
-        <option value="exact"
-          ${method==="exact" ? "selected" : ""}>
-          完全一致
-        </option>
+    div.querySelector(
+        ".deleteCondition"
+    ).addEventListener(
+        "click",
+        () => div.remove()
+    );
+}
 
-      </select>
 
-      <button
-        type="button"
-        class="gray removeCondition">
-        🗑️ この条件を削除
-      </button>
+/* =====================================================
+   条件取得
+===================================================== */
 
-    </div>
-  `;
+function getConditions() {
 
-  box.querySelector(".removeCondition")
-    .addEventListener(
-      "click",
-      () => {
+    const result = [];
 
-        box.remove();
+    document
+        .querySelectorAll(".condition")
+        .forEach(el => {
 
-        if(!conditions.children.length){
-          addCondition();
+            const text =
+                el.querySelector(
+                    ".conditionText"
+                ).value;
+
+            const mode =
+                el.querySelector(
+                    ".conditionMode"
+                ).value;
+
+            if (!text) {
+                return;
+            }
+
+            result.push({
+                text,
+                mode,
+                regex:
+                    $("matchType").value === "regex"
+            });
+        });
+
+    return result;
+}
+
+
+/* =====================================================
+   Worker数
+===================================================== */
+
+function getWorkerCount() {
+
+    const value =
+        $("workerCount").value;
+
+    if (value === "auto") {
+
+        return Math.max(
+            1,
+            navigator.hardwareConcurrency || 1
+        );
+    }
+
+    return Number(value);
+}
+
+
+/* =====================================================
+   Worker作成
+===================================================== */
+
+function createWorker() {
+
+    return new Worker(
+        WORKER_FILE
+    );
+}
+
+
+/* =====================================================
+   Worker準備
+===================================================== */
+
+function prepareWorkers(count) {
+
+    destroyWorkers();
+
+    for (
+        let i = 0;
+        i < count;
+        i++
+    ) {
+
+        const worker =
+            createWorker();
+
+        worker._ready =
+            false;
+
+        worker.onmessage =
+            createWorkerHandler(worker);
+
+        worker.onerror =
+            event => {
+
+                log(
+                    "Worker error: " +
+                    event.message
+                );
+            };
+
+        workers.push(worker);
+    }
+
+    $("workerStatus").textContent =
+        count + " Worker 起動中";
+
+    $("libraryStatus").textContent =
+        "確認中...";
+}
+
+
+/* =====================================================
+   Worker破棄
+===================================================== */
+
+function destroyWorkers() {
+
+    for (const worker of workers) {
+
+        try {
+            worker.terminate();
+        } catch (_) {}
+    }
+
+    workers = [];
+}
+
+
+/* =====================================================
+   Workerメッセージ
+===================================================== */
+
+function createWorkerHandler(worker) {
+
+    return function(event) {
+
+        const data =
+            event.data || {};
+
+        switch (data.type) {
+
+            case "ready":
+
+                worker._ready =
+                    true;
+
+                $("libraryStatus").textContent =
+                    "正常";
+
+                break;
+
+
+            case "test-ok":
+
+                log(
+                    "Worker test: " +
+                    JSON.stringify(data.trip)
+                );
+
+                break;
+
+
+            case "progress":
+
+                totalCount +=
+                    Number(data.count) || 0;
+
+                updateStats();
+
+                break;
+
+
+            case "hit":
+
+                totalHits++;
+
+                /*
+                 * 重要:
+                 *
+                 * Workerから返された
+                 * key と trip をそのまま使う。
+                 *
+                 * index.html側で再計算しない。
+                 *
+                 * これによって
+                 *
+                 *   キーA → トリップA
+                 *
+                 * の対応が崩れない。
+                 */
+
+                addResult(
+                    data.key,
+                    data.trip
+                );
+
+                updateStats();
+
+                break;
+
+
+            case "error":
+
+                log(
+                    "Worker error: " +
+                    data.message
+                );
+
+                break;
+
+
+            case "stopped":
+
+                break;
         }
+    };
+}
 
-      }
+
+/* =====================================================
+   生成用キー
+===================================================== */
+
+function generateComplexKey(length) {
+
+    /*
+     * 暗号学的乱数を使う。
+     *
+     * 同じ文字を連続させない。
+     *
+     * 例:
+     *
+     * !fa4K{0
+     *
+     * のように文字種が偏りにくくなる。
+     */
+
+    const result = [];
+
+    let previous = "";
+
+    while (
+        result.length < length
+    ) {
+
+        const buffer =
+            new Uint8Array(32);
+
+        crypto.getRandomValues(
+            buffer
+        );
+
+        for (
+            let i = 0;
+            i < buffer.length &&
+            result.length < length;
+            i++
+        ) {
+
+            const index =
+                buffer[i] %
+                KEY_CHARSET.length;
+
+            const char =
+                KEY_CHARSET[index];
+
+            if (
+                char === previous
+            ) {
+                continue;
+            }
+
+            result.push(char);
+
+            previous =
+                char;
+        }
+    }
+
+    return result.join("");
+}
+
+
+/* =====================================================
+   ローカルWorkerで生成
+===================================================== */
+
+function generateTripWithWorker(
+    key,
+    length
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const worker =
+                createWorker();
+
+            const timeout =
+                setTimeout(
+                    () => {
+
+                        worker.terminate();
+
+                        reject(
+                            new Error(
+                                "Worker timeout"
+                            )
+                        );
+
+                    },
+                    5000
+                );
+
+            worker.onmessage =
+                event => {
+
+                    const data =
+                        event.data || {};
+
+                    if (
+                        data.type ===
+                        "ready"
+                    ) {
+
+                        worker.postMessage({
+                            type: "generate",
+                            key: key,
+                            length: length
+                        });
+
+                        return;
+                    }
+
+                    if (
+                        data.type ===
+                        "generate-result"
+                    ) {
+
+                        clearTimeout(
+                            timeout
+                        );
+
+                        worker.terminate();
+
+                        resolve(data);
+
+                        return;
+                    }
+
+                    if (
+                        data.type ===
+                        "error"
+                    ) {
+
+                        clearTimeout(
+                            timeout
+                        );
+
+                        worker.terminate();
+
+                        reject(
+                            new Error(
+                                data.message
+                            )
+                        );
+                    }
+                };
+
+            worker.onerror =
+                event => {
+
+                    clearTimeout(
+                        timeout
+                    );
+
+                    worker.terminate();
+
+                    reject(
+                        event.error ||
+                        new Error(
+                            event.message
+                        )
+                    );
+                };
+        }
+    );
+}
+
+
+/* =====================================================
+   Trip表示
+===================================================== */
+
+function renderGeneratedTrip(
+    data
+) {
+
+    const box =
+        $("generatedResult");
+
+    /*
+     * Workerから返された結果だけを
+     * 信頼して表示する。
+     */
+
+    box.innerHTML = `
+        <div class="result">
+
+            <div class="result-title">
+                生成結果
+            </div>
+
+            <div>
+                ◆<span class="trip">
+                    ${escapeHtml(data.trip)}
+                </span>
+            </div>
+
+            <div style="margin-top:8px;">
+                キー：
+                <span class="key">
+                    ${escapeHtml(data.key)}
+                </span>
+            </div>
+
+            ${
+                data.raw
+                ? `
+                <div class="small"
+                     style="margin-top:10px;">
+                    crypt raw：
+                    ${escapeHtml(data.raw)}
+                </div>
+                `
+                : ""
+            }
+
+        </div>
+    `;
+}
+
+
+/* =====================================================
+   検索結果
+===================================================== */
+
+function addResult(
+    key,
+    trip
+) {
+
+    const box =
+        $("results");
+
+    const empty =
+        box.querySelector(
+            ".small"
+        );
+
+    if (empty) {
+        box.innerHTML = "";
+    }
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "result";
+
+    div.innerHTML = `
+        <div>
+            ◆<span class="trip">
+                ${escapeHtml(trip)}
+            </span>
+        </div>
+
+        <div style="margin-top:8px;">
+            キー：
+            <span class="key">
+                ${escapeHtml(key)}
+            </span>
+        </div>
+
+        <div style="margin-top:10px;">
+            <button
+                type="button"
+                class="secondary copyTrip">
+                📋 トリップをコピー
+            </button>
+
+            <button
+                type="button"
+                class="secondary copyKey">
+                🔑 キーをコピー
+            </button>
+        </div>
+    `;
+
+    div.querySelector(
+        ".copyTrip"
+    ).onclick = () => {
+
+        navigator.clipboard.writeText(
+            trip
+        );
+    };
+
+    div.querySelector(
+        ".copyKey"
+    ).onclick = () => {
+
+        navigator.clipboard.writeText(
+            key
+        );
+    };
+
+    box.prepend(div);
+}
+
+
+/* =====================================================
+   検索開始
+===================================================== */
+
+function startSearch() {
+
+    if (searching) {
+        return;
+    }
+
+    const length =
+        Number(
+            $("searchLength").value
+        );
+
+    const conditions =
+        getConditions();
+
+    const special =
+        $("special").value;
+
+    const count =
+        getWorkerCount();
+
+    totalCount = 0;
+    totalHits = 0;
+
+    startedAt =
+        performance.now();
+
+    lastTime =
+        startedAt;
+
+    lastCount = 0;
+
+    searching = true;
+
+    $("startSearch").disabled =
+        true;
+
+    $("stopSearch").disabled =
+        false;
+
+    $("searchState").textContent =
+        "🔎 検索中…";
+
+    $("results").innerHTML = `
+        <div class="small">
+            検索を開始しました。
+        </div>
+    `;
+
+    prepareWorkers(count);
+
+    /*
+     * Workerごとに同じ条件を渡す。
+     *
+     * Worker側がランダムキーを生成するため、
+     * index.html側ではキーを生成しない。
+     */
+
+    for (const worker of workers) {
+
+        worker.postMessage({
+            type: "search",
+
+            length: length,
+
+            conditions:
+                conditions,
+
+            special:
+                special,
+
+            /*
+             * 複雑キー用。
+             */
+            charset:
+                KEY_CHARSET,
+
+            /*
+             * 連続文字禁止。
+             */
+            noRepeat: true
+        });
+    }
+
+    log(
+        "検索開始: " +
+        length +
+        "文字 / " +
+        count +
+        " Worker"
+    );
+}
+
+
+/* =====================================================
+   検索停止
+===================================================== */
+
+function stopSearch() {
+
+    if (!searching) {
+        return;
+    }
+
+    searching = false;
+
+    for (const worker of workers) {
+
+        try {
+
+            worker.postMessage({
+                type: "stop"
+            });
+
+        } catch (_) {}
+    }
+
+    $("startSearch").disabled =
+        false;
+
+    $("stopSearch").disabled =
+        true;
+
+    $("searchState").textContent =
+        "⏹ 停止しました";
+
+    log("検索停止");
+}
+
+
+/* =====================================================
+   統計
+===================================================== */
+
+function updateStats() {
+
+    $("count").textContent =
+        totalCount.toLocaleString();
+
+    $("hitCount").textContent =
+        totalHits.toLocaleString();
+
+    const now =
+        performance.now();
+
+    const elapsed =
+        (now - startedAt) / 1000;
+
+    if (elapsed > 0) {
+
+        const speed =
+            totalCount /
+            elapsed;
+
+        $("speed").textContent =
+            Math.floor(speed)
+                .toLocaleString() +
+            " / 秒";
+    }
+}
+
+
+/* =====================================================
+   自動検証
+===================================================== */
+
+async function verify() {
+
+    $("verifyResult").innerHTML =
+        "検証中...";
+
+    const tests = [
+        "foob",
+        "Jim",
+        "aaaaaaaaaa",
+        "test"
+    ];
+
+    const result = [];
+
+    for (const key of tests) {
+
+        try {
+
+            const data =
+                await generateTripWithWorker(
+                    key,
+                    10
+                );
+
+            result.push(`
+                <div class="result">
+                    <b>${escapeHtml(key)}</b>
+                    →
+                    <span class="trip">
+                        ${escapeHtml(data.raw || data.trip)}
+                    </span>
+                </div>
+            `);
+
+        } catch (e) {
+
+            result.push(`
+                <div class="result">
+                    <span class="status-error">
+                        ${escapeHtml(
+                            key +
+                            " : " +
+                            e.message
+                        )}
+                    </span>
+                </div>
+            `);
+        }
+    }
+
+    $("verifyResult").innerHTML =
+        result.join("");
+}
+
+
+/* =====================================================
+   HTMLエスケープ
+===================================================== */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* =====================================================
+   イベント
+===================================================== */
+
+$("addCondition")
+    .addEventListener(
+        "click",
+        addCondition
     );
 
-  conditions.appendChild(box);
-}
+$("startSearch")
+    .addEventListener(
+        "click",
+        startSearch
+    );
 
+$("stopSearch")
+    .addEventListener(
+        "click",
+        stopSearch
+    );
+
+$("verifyButton")
+    .addEventListener(
+        "click",
+        verify
+    );
+
+
+$("generateButton")
+    .addEventListener(
+        "click",
+        async () => {
+
+            const key =
+                $("generateKey")
+                    .value;
+
+            const length =
+                Number(
+                    $("generateLength")
+                        .value
+                );
+
+            if (!key) {
+
+                alert(
+                    "トリップキーを入力してください。"
+                );
+
+                return;
+            }
+
+            try {
+
+                $("generateButton")
+                    .disabled = true;
+
+                const data =
+                    await generateTripWithWorker(
+                        key,
+                        length
+                    );
+
+                renderGeneratedTrip(
+                    data
+                );
+
+            } catch (e) {
+
+                $("generatedResult")
+                    .innerHTML = `
+                    <div class="result">
+                        <span class="status-error">
+                            ${escapeHtml(
+                                e.message
+                            )}
+                        </span>
+                    </div>
+                `;
+
+            } finally {
+
+                $("generateButton")
+                    .disabled = false;
+            }
+        }
+    );
+
+
+/* =====================================================
+   初期化
+===================================================== */
 
 addCondition();
 
+$("generateKey").value =
+    ".T!!!@]x";
 
-addConditionBtn.addEventListener(
-  "click",
-  () => addCondition()
+log(
+    "初期化完了"
 );
 
-
-/* =========================================================
-   HTML escape
-========================================================= */
-
-function escapeHTML(value){
-
-  return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-
-/* =========================================================
-   複雑キー用 salt
-========================================================= */
-
-function makeSalt(key){
-
-  const saltCharset =
-    "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-  const value =
-    String(key || "A");
-
-
-  let h1 =
-    0x811c9dc5;
-
-  let h2 =
-    0x01000193;
-
-
-  for(
-    let i=0;
-    i<value.length;
-    i++
-  ){
-
-    const c =
-      value.charCodeAt(i);
-
-    h1 ^= c;
-
-    h1 =
-      Math.imul(
-        h1,
-        16777619
-      ) >>> 0;
-
-
-    h2 ^=
-      (c << (i % 8));
-
-    h2 =
-      Math.imul(
-        h2,
-        2246822519
-      ) >>> 0;
-  }
-
-
-  const a =
-    saltCharset[
-      h1 %
-      saltCharset.length
-    ];
-
-  const b =
-    saltCharset[
-      h2 %
-      saltCharset.length
-    ];
-
-
-  return a + b;
-}
-
-
-/* =========================================================
-   10桁トリップ
-========================================================= */
-
-function generate10(key){
-
-  if(typeof window.unixCryptTD !== "function"){
-
-    throw new Error(
-      "unixCryptTD unavailable"
-    );
-  }
-
-
-  const salt =
-    makeSalt(key);
-
-
-  const crypted =
-    window.unixCryptTD(
-      key,
-      salt
-    );
-
-
-  if(typeof crypted !== "string"){
-
-    throw new Error(
-      "unixCryptTD returned invalid value"
-    );
-  }
-
-
-  return crypted.slice(-10);
-}
-
-
-/* =========================================================
-   SHA-1
-========================================================= */
-
-function rotr(x,n){
-
-  return (
-    (x >>> n) |
-    (x << (32-n))
-  ) >>> 0;
-}
-
-
-function sha1Bytes(message){
-
-  const ml =
-    message.length;
-
-  const words = [];
-
-
-  for(
-    let i=0;
-    i<ml;
-    i++
-  ){
-
-    words[i>>2] =
-      (words[i>>2] || 0) |
-      (
-        message[i] <<
-        (24-(i%4)*8)
-      );
-  }
-
-
-  words[ml>>2] =
-    (words[ml>>2] || 0) |
-    (
-      0x80 <<
-      (24-(ml%4)*8)
-    );
-
-
-  const totalWords =
-    (((ml + 8) >> 6) + 1) * 16;
-
-
-  while(
-    words.length <
-    totalWords
-  ){
-
-    words.push(0);
-  }
-
-
-  words[totalWords-1] =
-    ml * 8;
-
-
-  let h0 =
-    0x67452301;
-
-  let h1 =
-    0xEFCDAB89;
-
-  let h2 =
-    0x98BADCFE;
-
-  let h3 =
-    0x10325476;
-
-  let h4 =
-    0xC3D2E1F0;
-
-
-  const w =
-    new Uint32Array(80);
-
-
-  for(
-    let block=0;
-    block<totalWords;
-    block+=16
-  ){
-
-    for(let i=0;i<16;i++){
-
-      w[i] =
-        words[block+i] >>> 0;
-    }
-
-
-    for(let i=16;i<80;i++){
-
-      w[i] =
-        rotr(
-          w[i-3]^
-          w[i-8]^
-          w[i-14]^
-          w[i-16],
-          31
-        );
-    }
-
-
-    let a=h0;
-    let b=h1;
-    let c=h2;
-    let d=h3;
-    let e=h4;
-
-
-    for(let i=0;i<80;i++){
-
-      let f;
-      let k;
-
-
-      if(i<20){
-
-        f =
-          (b & c) |
-          ((~b) & d);
-
-        k =
-          0x5A827999;
-
-      }else if(i<40){
-
-        f =
-          b ^ c ^ d;
-
-        k =
-          0x6ED9EBA1;
-
-      }else if(i<60){
-
-        f =
-          (b & c) |
-          (b & d) |
-          (c & d);
-
-        k =
-          0x8F1BBCDC;
-
-      }else{
-
-        f =
-          b ^ c ^ d;
-
-        k =
-          0xCA62C1D6;
-      }
-
-
-      const temp =
-        (
-          rotr(a,27) +
-          f +
-          e +
-          k +
-          w[i]
-        ) >>> 0;
-
-
-      e=d;
-      d=c;
-      c=rotr(b,2);
-      b=a;
-      a=temp;
-    }
-
-
-    h0 =
-      (h0+a) >>> 0;
-
-    h1 =
-      (h1+b) >>> 0;
-
-    h2 =
-      (h2+c) >>> 0;
-
-    h3 =
-      (h3+d) >>> 0;
-
-    h4 =
-      (h4+e) >>> 0;
-  }
-
-
-  const out =
-    new Uint8Array(20);
-
-
-  const hs=[
-    h0,h1,h2,h3,h4
-  ];
-
-
-  for(
-    let i=0;
-    i<5;
-    i++
-  ){
-
-    out[i*4] =
-      hs[i] >>> 24;
-
-    out[i*4+1] =
-      hs[i] >>> 16;
-
-    out[i*4+2] =
-      hs[i] >>> 8;
-
-    out[i*4+3] =
-      hs[i];
-  }
-
-
-  return out;
-}
-
-
-/* =========================================================
-   Base64
-========================================================= */
-
-function base64Bytes(bytes){
-
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-    "abcdefghijklmnopqrstuvwxyz" +
-    "0123456789+/";
-
-
-  let out="";
-
-
-  for(
-    let i=0;
-    i<bytes.length;
-    i+=3
-  ){
-
-    const a =
-      bytes[i];
-
-    const b =
-      i+1<bytes.length
-      ? bytes[i+1]
-      : 0;
-
-    const c =
-      i+2<bytes.length
-      ? bytes[i+2]
-      : 0;
-
-
-    out += chars[a>>2];
-
-
-    out += chars[
-      ((a&3)<<4) |
-      (b>>4)
-    ];
-
-
-    out +=
-      i+1<bytes.length
-      ? chars[
-          ((b&15)<<2) |
-          (c>>6)
-        ]
-      : "=";
-
-
-    out +=
-      i+2<bytes.length
-      ? chars[c&63]
-      : "=";
-  }
-
-
-  return out;
-}
-
-
-/* =========================================================
-   12桁
-========================================================= */
-
-function generate12(key){
-
-  const enc =
-    new TextEncoder();
-
-
-  const bytes =
-    enc.encode(key);
-
-
-  const hash =
-    sha1Bytes(bytes);
-
-
-  return base64Bytes(hash)
-    .slice(0,12)
-    .replaceAll("+",".");
-}
-
-
-/* =========================================================
-   統一生成
-========================================================= */
-
-function makeTrip(key,length){
-
-  if(length === 10){
-
-    return generate10(key);
-
-  }
-
-  return generate12(key);
-}
-
-
-/* =========================================================
-   生成ボタン
-========================================================= */
-
-generateBtn.addEventListener(
-  "click",
-  () => {
-
-    try{
-
-      const key =
-        generateKey.value;
-
-
-      if(!key){
-
-        alert(
-          "キーを入力してください。"
-        );
-
-        return;
-      }
-
-
-      const length =
-        Number(
-          generateLength.value
-        );
-
-
-      const trip =
-        makeTrip(
-          key,
-          length
-        );
-
-
-      currentTrip =
-        "◆" + trip;
-
-
-      generateResult.textContent =
-        currentTrip;
-
-
-    }catch(err){
-
-      console.error(err);
-
-
-      generateResult.textContent =
-        "❌ " +
-        err.message;
-    }
-  }
-);
-
-
-/* =========================================================
-   コピー
-========================================================= */
-
-copyTripBtn.addEventListener(
-  "click",
-  async () => {
-
-    if(currentTrip === "◆—"){
-      return;
-    }
-
-
-    try{
-
-      await navigator.clipboard.writeText(
-        currentTrip
-      );
-
-
-      copyTripBtn.textContent =
-        "✅ コピーしました";
-
-
-      setTimeout(
-        () => {
-
-          copyTripBtn.textContent =
-            "📋 トリップをコピー";
-
-        },
-        1200
-      );
-
-
-    }catch(e){
-
-      alert(currentTrip);
-    }
-  }
-);
-
-
-/* =========================================================
-   検索条件取得
-========================================================= */
-
-function getConditions(){
-
-  return [
-    ...document.querySelectorAll(
-      ".condition"
-    )
-  ]
-  .map(box => {
-
-    return {
-
-      value:
-        box.querySelector(
-          ".conditionValue"
-        ).value,
-
-      method:
-        box.querySelector(
-          ".conditionMethod"
-        ).value
-
-    };
-
-  })
-  .filter(
-    x => x.value !== ""
-  );
-}
-
-
-/* =========================================================
-   検索設定
-========================================================= */
-
-function getSearchConfig(){
-
-  const length =
-    Number(
-      document.querySelector(
-        'input[name="searchLength"]:checked'
-      ).value
-    );
-
-
-  const mode =
-    document.querySelector(
-      'input[name="matchMode"]:checked'
-    ).value;
-
-
-  return {
-
-    length,
-
-    mode,
-
-    conditions:
-      getConditions(),
-
-    special:
-      specialType.value
-  };
-}
-
-
-/* =========================================================
-   特殊トリップ
-========================================================= */
-
-function checkSpecial(trip,type){
-
-  if(type === "none"){
-    return true;
-  }
-
-
-  if(type === "pure"){
-
-    return /(.)\1{7,}/.test(
-      trip
-    );
-  }
-
-
-  if(type === "semi"){
-
-    return /(.)\1{8,}/i.test(
-      trip
-    );
-  }
-
-
-  if(type === "two"){
-
-    return new Set(
-      trip.split("")
-    ).size === 2;
-  }
-
-
-  if(type === "long"){
-
-    return /^[MmW]+$/.test(
-      trip
-    );
-  }
-
-
-  if(type === "short"){
-
-    return /^[li.]+$/.test(
-      trip
-    );
-  }
-
-
-  if(type === "yakumo"){
-
-    for(
-      let i=0;
-      i+2<trip.length;
-      i+=3
-    ){
-
-      if(
-        trip[i] !== trip[i+1] ||
-        trip[i] !== trip[i+2]
-      ){
-
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-
-  if(type === "mirror"){
-
-    const mirrorPairs = {
-
-      ".":".",
-      "0":"0",
-      "8":"8",
-      "A":"A",
-      "H":"H",
-      "I":"I",
-      "M":"M",
-      "O":"O",
-      "T":"T",
-      "U":"U",
-      "V":"V",
-      "W":"W",
-      "X":"X",
-      "Y":"Y",
-
-      "b":"d",
-      "d":"b",
-      "i":"i",
-      "l":"l",
-      "o":"o",
-      "p":"q",
-      "q":"p",
-      "v":"v",
-      "w":"w",
-      "x":"x"
-    };
-
-
-    for(
-      let i=0;
-      i<trip.length;
-      i++
-    ){
-
-      const a =
-        trip[i];
-
-      const b =
-        trip[
-          trip.length-1-i
-        ];
-
-
-      if(
-        mirrorPairs[a] !== b
-      ){
-
-        return false;
-      }
-    }
-
-
-    return true;
-  }
-
-
-  if(type === "palindrome"){
-
-    for(
-      let i=0;
-      i<trip.length/2;
-      i++
-    ){
-
-      if(
-        trip[i] !==
-        trip[
-          trip.length-1-i
-        ]
-      ){
-
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-
-  if(type === "echo"){
-
-    if(
-      trip.length % 2 !== 0
-    ){
-
-      return false;
-    }
-
-
-    const half =
-      trip.length / 2;
-
-
-    return (
-      trip.slice(0,half) ===
-      trip.slice(half)
-    );
-  }
-
-
-  if(type === "double"){
-
-    for(
-      let i=0;
-      i<trip.length;
-      i+=2
-    ){
-
-      if(
-        trip[i] !==
-        trip[i+1]
-      ){
-
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-
-  if(type === "number"){
-
-    return /^[0-9]+$/.test(
-      trip
-    );
-  }
-
-
-  if(type === "skip"){
-
-    for(
-      let i=1;
-      i<trip.length;
-      i+=2
-    ){
-
-      if(
-        trip[i] !== "." &&
-        trip[i] !== "/"
-      ){
-
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-
-  if(type === "wideSkip"){
-
-    if(trip.length < 2){
-      return false;
-    }
-
-
-    const separator =
-      trip[1];
-
-
-    if(
-      separator === "." ||
-      separator === "/"
-    ){
-
-      for(
-        let i=1;
-        i<trip.length;
-        i+=2
-      ){
-
-        if(
-          trip[i] !== separator
-        ){
-
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-
-    return false;
-  }
-
-
-  return false;
-}
-
-
-/* =========================================================
-   条件判定
-========================================================= */
-
-function checkConditions(
-  trip,
-  config
-){
-
-  for(
-    const condition of
-    config.conditions
-  ){
-
-    const value =
-      condition.value;
-
-
-    if(
-      config.mode === "regex"
-    ){
-
-      let re;
-
-
-      try{
-
-        re =
-          new RegExp(value);
-
-      }catch(e){
-
-        return false;
-      }
-
-
-      if(!re.test(trip)){
-
-        return false;
-      }
-
-
-      continue;
-    }
-
-
-    if(
-      condition.method ===
-      "contains"
-    ){
-
-      if(!trip.includes(value)){
-        return false;
-      }
-
-    }else if(
-      condition.method ===
-      "starts"
-    ){
-
-      if(!trip.startsWith(value)){
-        return false;
-      }
-
-    }else if(
-      condition.method ===
-      "ends"
-    ){
-
-      if(!trip.endsWith(value)){
-        return false;
-      }
-
-    }else if(
-      condition.method ===
-      "exact"
-    ){
-
-      if(trip !== value){
-        return false;
-      }
-    }
-  }
-
-
-  return checkSpecial(
-    trip,
-    config.special
-  );
-}
-
-
-/* =========================================================
-   64進数 → 複雑キー
-========================================================= */
-
-function indexToKey(
-  index,
-  length
-){
-
-  let result =
-    "";
-
-
-  const base =
-    BigInt(
-      CHARSET.length
-    );
-
-
-  for(
-    let i=0;
-    i<length;
-    i++
-  ){
-
-    result =
-      CHARSET[
-        Number(
-          index % base
-        )
-      ] +
-      result;
-
-
-    index =
-      index / base;
-  }
-
-
-  return result;
-}
-
-
-/* =========================================================
-   探索空間
-========================================================= */
-
-function getSpace(
-  keyLength
-){
-
-  return BigInt(
-    CHARSET.length
-  ) ** BigInt(
-    keyLength
-  );
-}
-
-
-/* =========================================================
-   数値表示
-========================================================= */
-
-function formatBigInt(n){
-
-  return n.toLocaleString(
-    "en-US"
-  );
-}
-
-
-/* =========================================================
-   Workerコード生成
-========================================================= */
-
-async function createWorkerURL(){
-
-  const response =
-    await fetch(
-      "./unix-crypt-td.min.js",
-      {
-        cache:"no-store"
-      }
-    );
-
-
-  if(!response.ok){
-
-    throw new Error(
-      "unix-crypt-td.min.js を読み込めません。"
-    );
-  }
-
-
-  const cryptSource =
-    await response.text();
-
-
-  /*
-   * テンプレート文字列内部に
-   * バッククォートが入らないよう、
-   * CHARSETにはバッククォートを使用していない。
-   */
-
-  const workerCode = `
-
-"use strict";
-
-var window = self;
-
-${cryptSource}
-
-var crypt =
-  self.unixCryptTD ||
-  self.window.unixCryptTD;
-
-if(typeof crypt !== "function"){
-
-  throw new Error(
-    "unixCryptTD unavailable"
-  );
-}
-
-
-const CHARSET =
-  "!@#$%^&*()-_=+[]{};:,.?/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-
-function makeSalt(key){
-
-  const saltCharset =
-    "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-  const value =
-    String(key || "A");
-
-  let h1 =
-    0x811c9dc5;
-
-  let h2 =
-    0x01000193;
-
-
-  for(
-    let i=0;
-    i<value.length;
-    i++
-  ){
-
-    const c =
-      value.charCodeAt(i);
-
-    h1 ^= c;
-
-    h1 =
-      Math.imul(
-        h1,
-        16777619
-      ) >>> 0;
-
-
-    h2 ^=
-      (c << (i % 8));
-
-    h2 =
-      Math.imul(
-        h2,
-        2246822519
-      ) >>> 0;
-  }
-
-
-  const a =
-    saltCharset[
-      h1 %
-      saltCharset.length
-    ];
-
-  const b =
-    saltCharset[
-      h2 %
-      saltCharset.length
-    ];
-
-
-  return a + b;
-}
-
-
-function generate10(key){
-
-  const salt =
-    makeSalt(key);
-
-  const result =
-    crypt(
-      key,
-      salt
-    );
-
-  if(
-    typeof result !== "string"
-  ){
-
-    throw new Error(
-      "crypt is not a function"
-    );
-  }
-
-
-  return result.slice(-10);
-}
-
-
-function rotr(x,n){
-
-  return (
-    (x>>>n) |
-    (x<<(32-n))
-  )>>>0;
-}
-
-
-function sha1Bytes(message){
-
-  const ml =
-    message.length;
-
-  const words=[];
-
-
-  for(
-    let i=0;
-    i<ml;
-    i++
-  ){
-
-    words[i>>2]=
-      (words[i>>2]||0) |
-      (
-        message[i] <<
-        (24-(i%4)*8)
-      );
-  }
-
-
-  words[ml>>2]=
-    (words[ml>>2]||0) |
-    (
-      0x80 <<
-      (24-(ml%4)*8)
-    );
-
-
-  const totalWords=
-    (((ml+8)>>6)+1)*16;
-
-
-  while(
-    words.length<totalWords
-  ){
-
-    words.push(0);
-  }
-
-
-  words[totalWords-1]=
-    ml*8;
-
-
-  let h0=0x67452301;
-  let h1=0xEFCDAB89;
-  let h2=0x98BADCFE;
-  let h3=0x10325476;
-  let h4=0xC3D2E1F0;
-
-
-  const w=
-    new Uint32Array(80);
-
-
-  for(
-    let block=0;
-    block<totalWords;
-    block+=16
-  ){
-
-    for(let i=0;i<16;i++){
-
-      w[i]=
-        words[block+i]>>>0;
-    }
-
-
-    for(let i=16;i<80;i++){
-
-      w[i]=
-        rotr(
-          w[i-3]^
-          w[i-8]^
-          w[i-14]^
-          w[i-16],
-          31
-        );
-    }
-
-
-    let a=h0;
-    let b=h1;
-    let c=h2;
-    let d=h3;
-    let e=h4;
-
-
-    for(let i=0;i<80;i++){
-
-      let f,k;
-
-
-      if(i<20){
-
-        f=
-          (b&c) |
-          ((~b)&d);
-
-        k=0x5A827999;
-
-      }else if(i<40){
-
-        f=
-          b^c^d;
-
-        k=0x6ED9EBA1;
-
-      }else if(i<60){
-
-        f=
-          (b&c) |
-          (b&d) |
-          (c&d);
-
-        k=0x8F1BBCDC;
-
-      }else{
-
-        f=
-          b^c^d;
-
-        k=0xCA62C1D6;
-      }
-
-
-      const temp=
-        (
-          rotr(a,27)+
-          f+
-          e+
-          k+
-          w[i]
-        )>>>0;
-
-
-      e=d;
-      d=c;
-      c=rotr(b,2);
-      b=a;
-      a=temp;
-    }
-
-
-    h0=(h0+a)>>>0;
-    h1=(h1+b)>>>0;
-    h2=(h2+c)>>>0;
-    h3=(h3+d)>>>0;
-    h4=(h4+e)>>>0;
-  }
-
-
-  const out=
-    new Uint8Array(20);
-
-
-  const hs=[
-    h0,h1,h2,h3,h4
-  ];
-
-
-  for(
-    let i=0;
-    i<5;
-    i++
-  ){
-
-    out[i*4]=
-      hs[i]>>>24;
-
-    out[i*4+1]=
-      hs[i]>>>16;
-
-    out[i*4+2]=
-      hs[i]>>>8;
-
-    out[i*4+3]=
-      hs[i];
-  }
-
-
-  return out;
-}
-
-
-function base64Bytes(bytes){
-
-  const chars=
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"+
-    "abcdefghijklmnopqrstuvwxyz"+
-    "0123456789+/";
-
-
-  let out="";
-
-
-  for(
-    let i=0;
-    i<bytes.length;
-    i+=3
-  ){
-
-    const a=bytes[i];
-
-    const b=
-      i+1<bytes.length
-      ? bytes[i+1]
-      : 0;
-
-    const c=
-      i+2<bytes.length
-      ? bytes[i+2]
-      : 0;
-
-
-    out+=chars[a>>2];
-
-
-    out+=chars[
-      ((a&3)<<4) |
-      (b>>4)
-    ];
-
-
-    out+=
-      i+1<bytes.length
-      ? chars[
-          ((b&15)<<2) |
-          (c>>6)
-        ]
-      : "=";
-
-
-    out+=
-      i+2<bytes.length
-      ? chars[c&63]
-      : "=";
-  }
-
-
-  return out;
-}
-
-
-function generate12(key){
-
-  const bytes =
-    new TextEncoder().encode(
-      key
-    );
-
-
-  return base64Bytes(
-    sha1Bytes(bytes)
-  )
-  .slice(0,12)
-  .replace(/\\+/g,".");
-}
-
-
-function makeTrip(
-  key,
-  length
-){
-
-  return length===10
-    ? generate10(key)
-    : generate12(key);
-}
-
-
-function indexToKey(
-  index,
-  length
-){
-
-  let result="";
-
-  const base =
-    BigInt(
-      CHARSET.length
-    );
-
-
-  for(
-    let i=0;
-    i<length;
-    i++
-  ){
-
-    result =
-      CHARSET[
-        Number(
-          index % base
-        )
-      ] +
-      result;
-
-
-    index =
-      index / base;
-  }
-
-
-  return result;
-}
-
-
-function checkSpecial(
-  trip,
-  type
-){
-
-  if(type==="none")
-    return true;
-
-
-  if(type==="pure")
-    return /(.)\\\\1{7,}/.test(trip);
-
-
-  if(type==="semi")
-    return /(.)\\\\1{8,}/i.test(trip);
-
-
-  if(type==="two")
-    return new Set(trip).size===2;
-
-
-  if(type==="long")
-    return /^[MmW]+$/.test(trip);
-
-
-  if(type==="short")
-    return /^[li.]+$/.test(trip);
-
-
-  if(type==="yakumo"){
-
-    for(
-      let i=0;
-      i+2<trip.length;
-      i+=3
-    ){
-
-      if(
-        trip[i]!==trip[i+1] ||
-        trip[i]!==trip[i+2]
-      ){
-
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-
-  if(type==="mirror"){
-
-    const mp={
-
-      ".":".",
-      "0":"0",
-      "8":"8",
-
-      "A":"A",
-      "H":"H",
-      "I":"I",
-      "M":"M",
-      "O":"O",
-      "T":"T",
-      "U":"U",
-      "V":"V",
-      "W":"W",
-      "X":"X",
-      "Y":"Y",
-
-      "b":"d",
-      "d":"b",
-
-      "i":"i",
-      "l":"l",
-      "o":"o",
-
-      "p":"q",
-      "q":"p",
-
-      "v":"v",
-      "w":"w",
-      "x":"x"
-    };
-
-
-    for(
-      let i=0;
-      i<trip.length;
-      i++
-    ){
-
-      if(
-        mp[trip[i]] !==
-        trip[
-          trip.length-1-i
-        ]
-      ){
-
-        return false;
-      }
-    }
-
-
-    return true;
-  }
-
-
-  if(type==="palindrome"){
-
-    for(
-      let i=0;
-      i<trip.length/2;
-      i++
-    ){
-
-      if(
-        trip[i] !==
-        trip[
-          trip.length-1-i
-        ]
-      ){
-
-        return false;
-      }
-    }
-
-
-    return true;
-  }
-
-
-  if(type==="echo"){
-
-    if(
-      trip.length%2
-    ){
-
-      return false;
-    }
-
-
-    const half =
-      trip.length/2;
-
-
-    return (
-      trip.slice(0,half)===
-      trip.slice(half)
-    );
-  }
-
-
-  if(type==="double"){
-
-    for(
-      let i=0;
-      i<trip.length;
-      i+=2
-    ){
-
-      if(
-        trip[i]!==trip[i+1]
-      ){
-
-        return false;
-      }
-    }
-
-
-    return true;
-  }
-
-
-  if(type==="number"){
-
-    return /^[0-9]+$/.test(
-      trip
-    );
-  }
-
-
-  if(type==="skip"){
-
-    for(
-      let i=1;
-      i<trip.length;
-      i+=2
-    ){
-
-      if(
-        trip[i]!=="." &&
-        trip[i]!=="/"
-      ){
-
-        return false;
-      }
-    }
-
-
-    return true;
-  }
-
-
-  if(type==="wideSkip"){
-
-    if(trip.length<2)
-      return false;
-
-
-    const sep =
-      trip[1];
-
-
-    if(
-      sep!=="." &&
-      sep!=="/"
-    ){
-
-      return false;
-    }
-
-
-    for(
-      let i=1;
-      i<trip.length;
-      i+=2
-    ){
-
-      if(
-        trip[i]!==sep
-      ){
-
-        return false;
-      }
-    }
-
-
-    return true;
-  }
-
-
-  return false;
-}
-
-
-function checkConditions(
-  trip,
-  config
-){
-
-  for(
-    const condition of
-    config.conditions
-  ){
-
-    if(!condition.value)
-      continue;
-
-
-    if(
-      config.mode==="regex"
-    ){
-
-      let re;
-
-
-      try{
-
-        re=
-          new RegExp(
-            condition.value
-          );
-
-      }catch(e){
-
-        return false;
-      }
-
-
-      if(!re.test(trip))
-        return false;
-
-
-      continue;
-    }
-
-
-    const v =
-      condition.value;
-
-
-    if(
-      condition.method==="contains"
-    ){
-
-      if(!trip.includes(v))
-        return false;
-
-    }else if(
-      condition.method==="starts"
-    ){
-
-      if(!trip.startsWith(v))
-        return false;
-
-    }else if(
-      condition.method==="ends"
-    ){
-
-      if(!trip.endsWith(v))
-        return false;
-
-    }else if(
-      condition.method==="exact"
-    ){
-
-      if(trip!==v)
-        return false;
-    }
-  }
-
-
-  return checkSpecial(
-    trip,
-    config.special
-  );
-}
-
-
-self.onmessage =
-function(event){
-
-  const data =
-    event.data;
-
-
-  if(
-    data.type==="search"
-  ){
-
-    const start =
-      BigInt(data.start);
-
-    const end =
-      BigInt(data.end);
-
-    const keyLength =
-      data.keyLength;
-
-    const tripLength =
-      data.tripLength;
-
-    const config =
-      data.config;
-
-
-    let localCount=0;
-
-
-    for(
-      let i=start;
-      i<end;
-      i++
-    ){
-
-      const key =
-        indexToKey(
-          i,
-          keyLength
-        );
-
-
-      const trip =
-        makeTrip(
-          key,
-          tripLength
-        );
-
-
-      localCount++;
-
-
-      if(
-        checkConditions(
-          trip,
-          config
-        )
-      ){
-
-        self.postMessage({
-
-          type:"hit",
-
-          key:key,
-
-          trip:trip
-        });
-      }
-
-
-      if(
-        (localCount & 4095)===0
-      ){
-
-        self.postMessage({
-
-          type:"progress",
-
-          count:localCount
-        });
-
-
-        localCount=0;
-      }
-    }
-
-
-    if(localCount>0){
-
-      self.postMessage({
-
-        type:"progress",
-
-        count:localCount
-      });
-    }
-
-
-    self.postMessage({
-      type:"done"
-    });
-  }
-
-
-  if(
-    data.type==="verify"
-  ){
-
-    try{
-
-      const tests=[
-
-        {
-          key:"foob",
-          salt:"ar",
-          expected:"arlEKn0OzVJn."
-        },
-
-        {
-          key:"Jim",
-          salt:"Ji"
-        },
-
-        {
-          key:"aaaaaaaaaa",
-          salt:"aa"
-        },
-
-        {
-          key:"test",
-          salt:"te"
-        }
-
-      ];
-
-
-      const output =
-        tests.map(
-          test => {
-
-            const r =
-              crypt(
-                test.key,
-                test.salt
-              );
-
-
-            return {
-
-              key:test.key,
-
-              result:r,
-
-              expected:
-                test.expected || null
-            };
-          }
-        );
-
-
-      self.postMessage({
-
-        type:"verifyResult",
-
-        result:output
-      });
-
-
-    }catch(error){
-
-      self.postMessage({
-
-        type:"verifyError",
-
-        error:String(error)
-      });
-    }
-  }
-};
-`;
-
-
-  const blob =
-    new Blob(
-      [workerCode],
-      {
-        type:
-          "application/javascript"
-      }
-    );
-
-
-  return URL.createObjectURL(
-    blob
-  );
-}
-
-
-/* =========================================================
-   Worker停止
-========================================================= */
-
-function terminateWorkers(){
-
-  for(
-    const worker of workers
-  ){
-
-    try{
-      worker.terminate();
-    }catch(e){}
-  }
-
-
-  workers=[];
-
-
-  $("workerStatus").textContent =
-    "停止中";
-
-
-  running=false;
-}
-
-
-/* =========================================================
-   検索開始
-========================================================= */
-
-startBtn.addEventListener(
-  "click",
-  async () => {
-
-    if(running){
-      return;
-    }
-
-
-    try{
-
-      const config =
-        getSearchConfig();
-
-
-      if(
-        config.mode==="regex"
-      ){
-
-        for(
-          const c of
-          config.conditions
-        ){
-
-          if(c.value){
-
-            try{
-
-              new RegExp(
-                c.value
-              );
-
-            }catch(e){
-
-              alert(
-                "正規表現が不正です：\n"+
-                c.value
-              );
-
-              return;
-            }
-          }
-        }
-      }
-
-
-      const tripLength =
-        config.length;
-
-
-      const keyLength =
-        KEY_LENGTH;
-
-
-      const totalSpace =
-        getSpace(
-          keyLength
-        );
-
-
-      space.textContent =
-        formatBigInt(
-          totalSpace
-        );
-
-
-      terminateWorkers();
-
-
-      uniqueTrips.clear();
-
-      results.innerHTML =
-        "";
-
-
-      totalKeys=0;
-      totalHits=0;
-
-
-      keyCount.textContent =
-        "0";
-
-      hitCount.textContent =
-        "0";
-
-      speed.textContent =
-        "0 / 秒";
-
-
-      progressBar.style.width =
-        "0%";
-
-
-      const url =
-        await createWorkerURL();
-
-
-      workerBlobURL =
-        url;
-
-
-      let count;
-
-
-      if(
-        workerCount.value==="auto"
-      ){
-
-        const cores =
-          navigator.hardwareConcurrency ||
-          4;
-
-
-        count =
-          Math.min(
-            Math.max(
-              1,
-              cores
-            ),
-            8
-          );
-
-      }else{
-
-        count =
-          Number(
-            workerCount.value
-          );
-      }
-
-
-      count =
-        Math.min(
-          Math.max(
-            1,
-            count
-          ),
-          8
-        );
-
-
-      running=true;
-
-
-      searchStatus.textContent =
-        "🔎 検索中…";
-
-
-      $("workerStatus").textContent =
-        count +
-        " Worker 起動中";
-
-
-      startTime =
-        performance.now();
-
-
-      lastStatTime =
-        startTime;
-
-
-      lastStatKeys =
-        0;
-
-
-      const range =
-        totalSpace /
-        BigInt(count);
-
-
-      for(
-        let n=0;
-        n<count;
-        n++
-      ){
-
-        const worker =
-          new Worker(url);
-
-
-        workers.push(
-          worker
-        );
-
-
-        const start =
-          range *
-          BigInt(n);
-
-
-        const end =
-          n===count-1
-          ? totalSpace
-          : range *
-            BigInt(n+1);
-
-
-        worker.onmessage =
-          event => {
-
-            handleWorkerMessage(
-              event,
-              worker
-            );
-          };
-
-
-        worker.onerror =
-          error => {
-
-            console.error(
-              "Worker error:",
-              error
-            );
-
-
-            searchStatus.textContent =
-              "❌ Workerエラー：" +
-              (
-                error.message ||
-                "Worker error"
-              );
-          };
-
-
-        worker.postMessage({
-
-          type:"search",
-
-          start:
-            start.toString(),
-
-          end:
-            end.toString(),
-
-          keyLength,
-
-          tripLength,
-
-          config
-        });
-      }
-
-
-    }catch(error){
-
-      console.error(error);
-
-
-      running=false;
-
-
-      searchStatus.textContent =
-        "❌ " +
-        error.message;
-    }
-  }
-);
-
-
-/* =========================================================
-   Worker message
-========================================================= */
-
-function handleWorkerMessage(
-  event,
-  worker
-){
-
-  const data =
-    event.data;
-
-
-  if(
-    data.type==="progress"
-  ){
-
-    totalKeys +=
-      data.count;
-
-
-    updateStats();
-
-    return;
-  }
-
-
-  if(
-    data.type==="hit"
-  ){
-
-    totalHits++;
-
-
-    if(
-      !uniqueTrips.has(
-        data.trip
-      )
-    ){
-
-      uniqueTrips.add(
-        data.trip
-      );
-
-
-      if(
-        uniqueTrips.size <=
-        RESULT_LIMIT
-      ){
-
-        const row =
-          document.createElement(
-            "div"
-          );
-
-
-        row.className =
-          "result";
-
-
-        row.innerHTML = `
-          <span class="resultTrip">
-            ◆${escapeHTML(data.trip)}
-          </span>
-
-          <span>キー：</span>
-
-          <span class="resultKey">
-            ${escapeHTML(data.key)}
-          </span>
-        `;
-
-
-        results.prepend(
-          row
-        );
-      }
-    }
-
-
-    hitCount.textContent =
-      uniqueTrips.size;
-
-
-    return;
-  }
-
-
-  if(
-    data.type==="done"
-  ){
-
-    worker.__done =
-      true;
-
-
-    if(
-      workers.length &&
-      workers.every(
-        w => w.__done
-      )
-    ){
-
-      running=false;
-
-
-      searchStatus.textContent =
-        "✅ 探索完了";
-
-
-      $("workerStatus").textContent =
-        "停止中";
-
-
-      updateStats();
-    }
-
-
-    return;
-  }
-
-
-  if(
-    data.type==="verifyResult"
-  ){
-
-    const output =
-      data.result;
-
-
-    let ok=true;
-
-
-    for(
-      const item of
-      output
-    ){
-
-      if(
-        item.expected &&
-        item.result !==
-        item.expected
-      ){
-
-        ok=false;
-      }
-    }
-
-
-    verifyResult.innerHTML =
-      ok
-
-      ? `<span class="ok">
-           ✅ 検証成功
-         </span>`
-
-      : `<span class="error">
-           ❌ 検証失敗
-         </span>`;
-
-
-    console.log(
-      "verification:",
-      output
-    );
-
-
-    return;
-  }
-
-
-  if(
-    data.type==="verifyError"
-  ){
-
-    verifyResult.innerHTML =
-      `<span class="error">
-        ❌ ${escapeHTML(
-          data.error
-        )}
-       </span>`;
-
-
-    return;
-  }
-}
-
-
-/* =========================================================
-   統計
-========================================================= */
-
-function updateStats(){
-
-  keyCount.textContent =
-    totalKeys.toLocaleString();
-
-
-  hitCount.textContent =
-    uniqueTrips.size.toLocaleString();
-
-
-  const now =
-    performance.now();
-
-
-  const elapsed =
-    (now-startTime)/1000;
-
-
-  if(elapsed>0){
-
-    const currentSpeed =
-      totalKeys /
-      elapsed;
-
-
-    speed.textContent =
-      Math.floor(
-        currentSpeed
-      ).toLocaleString() +
-      " / 秒";
-  }
-
-
-  const total =
-    getSpace(
-      KEY_LENGTH
-    );
-
-
-  if(total>0){
-
-    const ratio =
-      Number(
-        (
-          BigInt(totalKeys) *
-          10000n
-        ) /
-        total
-      ) / 100;
-
-
-    progressBar.style.width =
-      Math.min(
-        100,
-        ratio
-      ) + "%";
-  }
-}
-
-
-/* =========================================================
-   停止
-========================================================= */
-
-stopBtn.addEventListener(
-  "click",
-  () => {
-
-    if(!running){
-      return;
-    }
-
-
-    terminateWorkers();
-
-
-    searchStatus.textContent =
-      "⏹ 停止しました";
-
-
-    updateStats();
-  }
-);
-
-
-/* =========================================================
-   自動検証
-========================================================= */
-
-verifyBtn.addEventListener(
-  "click",
-  async () => {
-
-    verifyResult.textContent =
-      "検証中…";
-
-
-    try{
-
-      const url =
-        await createWorkerURL();
-
-
-      const worker =
-        new Worker(url);
-
-
-      worker.onmessage =
-        event => {
-
-          const data =
-            event.data;
-
-
-          if(
-            data.type===
-            "verifyResult"
-          ){
-
-            let html="";
-
-
-            for(
-              const item of
-              data.result
-            ){
-
-              const passed =
-                !item.expected ||
-                item.result===
-                item.expected;
-
-
-              html += `
-                <div>
-                  ${
-                    passed
-                    ? "✅"
-                    : "❌"
-                  }
-
-                  ${escapeHTML(
-                    item.key
-                  )}
-
-                  →
-
-                  ${escapeHTML(
-                    item.result
-                  )}
-                </div>
-              `;
-            }
-
-
-            verifyResult.innerHTML =
-              html;
-
-
-            worker.terminate();
-
-
-            URL.revokeObjectURL(
-              url
-            );
-          }
-
-
-          if(
-            data.type===
-            "verifyError"
-          ){
-
-            verifyResult.innerHTML =
-              `<span class="error">
-                ❌ ${escapeHTML(
-                  data.error
-                )}
-               </span>`;
-
-
-            worker.terminate();
-
-
-            URL.revokeObjectURL(
-              url
-            );
-          }
-        };
-
-
-      worker.onerror =
-        error => {
-
-          verifyResult.innerHTML =
-            `<span class="error">
-              ❌ Workerエラー：
-              ${escapeHTML(
-                error.message ||
-                "unknown"
-              )}
-             </span>`;
-
-
-          worker.terminate();
-
-
-          URL.revokeObjectURL(
-            url
-          );
-        };
-
-
-      worker.postMessage({
-        type:"verify"
-      });
-
-
-    }catch(error){
-
-      verifyResult.innerHTML =
-        `<span class="error">
-          ❌ ${escapeHTML(
-            error.message
-          )}
-         </span>`;
-    }
-  }
-);
-
-
-/* =========================================================
-   ページ終了時
-========================================================= */
-
-window.addEventListener(
-  "beforeunload",
-  () => {
-
-    terminateWorkers();
-
-
-    if(workerBlobURL){
-
-      URL.revokeObjectURL(
-        workerBlobURL
-      );
-    }
-  }
+log(
+    "Worker: " +
+    WORKER_FILE
 );
 
 </script>
