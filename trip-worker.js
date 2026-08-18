@@ -5,42 +5,20 @@ let running = false;
 
 
 /* =========================================
-   複雑キー文字セット
-========================================= */
-
-const CHARSET =
-    "!@#$%^&*()-_=+[]{};:,.?/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-
-const KEY_LENGTH = 8;
-
-
-/* =========================================
    初期化
 ========================================= */
 
 try {
 
-    importScripts(
-        "./unix-crypt-td.min.js"
-    );
+    importScripts("./unix-crypt-td.min.js");
 
+    if (typeof self.unixCryptTD === "function") {
 
-    if (
-        typeof self.unixCryptTD ===
-        "function"
-    ) {
+        crypt = self.unixCryptTD;
 
-        crypt =
-            self.unixCryptTD;
+    } else if (typeof self.z === "function") {
 
-    } else if (
-        typeof self.z ===
-        "function"
-    ) {
-
-        crypt =
-            self.z;
+        crypt = self.z;
 
     } else {
 
@@ -49,20 +27,15 @@ try {
         );
     }
 
-
     self.postMessage({
         type: "ready"
     });
 
-
 } catch (e) {
 
     self.postMessage({
-
         type: "error",
-
-        message:
-            e && e.stack
+        message: e && e.stack
             ? e.stack
             : String(e)
     });
@@ -73,16 +46,11 @@ try {
    メッセージ
 ========================================= */
 
-self.onmessage =
-function(event){
+self.onmessage = function (event) {
 
-    const data =
-        event.data || {};
+    const data = event.data || {};
 
-
-    if(
-        data.type === "stop"
-    ){
+    if (data.type === "stop") {
 
         running = false;
 
@@ -90,82 +58,53 @@ function(event){
     }
 
 
-    if(
-        data.type === "test"
-    ){
+    if (data.type === "test") {
 
-        if(
-            typeof crypt !==
-            "function"
-        ){
+        if (typeof crypt !== "function") {
 
             self.postMessage({
-
-                type:"error",
-
-                message:
-                    "crypt is not a function"
+                type: "error",
+                message: "crypt is not a function"
             });
 
             return;
         }
 
-
-        try{
+        try {
 
             const trip =
-                makeTrip(
-                    "!fa4K{0X",
-                    10
-                );
-
+                makeTrip("aaaaaaaaaa");
 
             self.postMessage({
-
-                type:"test-ok",
-
-                trip:trip
+                type: "test-ok",
+                trip: trip
             });
 
-
-        }catch(e){
+        } catch (e) {
 
             self.postMessage({
-
-                type:"error",
-
-                message:
-                    e && e.stack
+                type: "error",
+                message: e && e.stack
                     ? e.stack
                     : String(e)
             });
         }
 
-
         return;
     }
 
 
-    if(
-        data.type === "search"
-    ){
+    if (data.type === "search") {
 
-        if(
-            typeof crypt !==
-            "function"
-        ){
+        if (typeof crypt !== "function") {
 
             self.postMessage({
-
-                type:"error",
-
-                message:
-                    "unixCryptTD unavailable"
+                type: "error",
+                message: "unixCryptTD unavailable"
             });
 
             return;
         }
-
 
         running = true;
 
@@ -177,469 +116,48 @@ function(event){
 
 
 /* =========================================
-   Salt
-========================================= */
-
-function makeSalt(key){
-
-    const saltCharset =
-        "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-
-    const value =
-        String(key || "A");
-
-
-    let h1 =
-        0x811c9dc5;
-
-
-    let h2 =
-        0x01000193;
-
-
-    for(
-        let i=0;
-        i<value.length;
-        i++
-    ){
-
-        const c =
-            value.charCodeAt(i);
-
-
-        h1 ^= c;
-
-
-        h1 =
-            Math.imul(
-                h1,
-                16777619
-            ) >>> 0;
-
-
-        h2 ^=
-            (c << (i % 8));
-
-
-        h2 =
-            Math.imul(
-                h2,
-                2246822519
-            ) >>> 0;
-    }
-
-
-    const a =
-        saltCharset[
-            h1 %
-            saltCharset.length
-        ];
-
-
-    const b =
-        saltCharset[
-            h2 %
-            saltCharset.length
-        ];
-
-
-    return a + b;
-}
-
-
-/* =========================================
    Trip生成
 ========================================= */
 
-function makeTrip(
-    key,
-    length
-){
+function makeTrip(key) {
 
-    if(
-        typeof crypt !==
-        "function"
-    ){
+    if (typeof crypt !== "function") {
 
         throw new Error(
             "unixCryptTD unavailable"
         );
     }
 
+    key = String(key);
 
-    key =
-        String(key);
+    /*
+     * unixCryptTD は先頭2文字をsaltとして使用
+     */
+    let salt =
+        key.substring(0, 2);
 
+    if (salt.length < 2) {
 
-    const salt =
-        makeSalt(key);
-
-
-    if(
-        Number(length) === 12
-    ){
-
-        return generate12(
-            key
-        );
+        salt =
+            (salt + "AA")
+                .substring(0, 2);
     }
 
-
     const result =
-        crypt(
-            key,
-            salt
-        );
+        crypt(key, salt);
 
-
-    if(
-        typeof result !==
-        "string"
-    ){
+    if (typeof result !== "string") {
 
         throw new Error(
             "crypt結果が文字列ではありません"
         );
     }
 
-
-    return result.slice(-10);
-}
-
-
-/* =========================================
-   SHA-1
-========================================= */
-
-function rotr(x,n){
-
-    return (
-        (x >>> n) |
-        (x << (32-n))
-    ) >>> 0;
-}
-
-
-function sha1Bytes(message){
-
-    const ml =
-        message.length;
-
-
-    const words=[];
-
-
-    for(
-        let i=0;
-        i<ml;
-        i++
-    ){
-
-        words[i>>2] =
-            (words[i>>2] || 0) |
-            (
-                message[i] <<
-                (24-(i%4)*8)
-            );
-    }
-
-
-    words[ml>>2] =
-        (words[ml>>2] || 0) |
-        (
-            0x80 <<
-            (24-(ml%4)*8)
-        );
-
-
-    const totalWords =
-        (((ml+8)>>6)+1)*16;
-
-
-    while(
-        words.length <
-        totalWords
-    ){
-
-        words.push(0);
-    }
-
-
-    words[totalWords-1] =
-        ml*8;
-
-
-    let h0 =
-        0x67452301;
-
-    let h1 =
-        0xEFCDAB89;
-
-    let h2 =
-        0x98BADCFE;
-
-    let h3 =
-        0x10325476;
-
-    let h4 =
-        0xC3D2E1F0;
-
-
-    const w =
-        new Uint32Array(80);
-
-
-    for(
-        let block=0;
-        block<totalWords;
-        block+=16
-    ){
-
-        for(
-            let i=0;
-            i<16;
-            i++
-        ){
-
-            w[i] =
-                words[
-                    block+i
-                ] >>> 0;
-        }
-
-
-        for(
-            let i=16;
-            i<80;
-            i++
-        ){
-
-            w[i] =
-                rotr(
-                    w[i-3]^
-                    w[i-8]^
-                    w[i-14]^
-                    w[i-16],
-                    31
-                );
-        }
-
-
-        let a=h0;
-        let b=h1;
-        let c=h2;
-        let d=h3;
-        let e=h4;
-
-
-        for(
-            let i=0;
-            i<80;
-            i++
-        ){
-
-            let f;
-            let k;
-
-
-            if(i<20){
-
-                f =
-                    (b & c) |
-                    ((~b) & d);
-
-                k =
-                    0x5A827999;
-
-            }else if(i<40){
-
-                f =
-                    b ^ c ^ d;
-
-                k =
-                    0x6ED9EBA1;
-
-            }else if(i<60){
-
-                f =
-                    (b & c) |
-                    (b & d) |
-                    (c & d);
-
-                k =
-                    0x8F1BBCDC;
-
-            }else{
-
-                f =
-                    b ^ c ^ d;
-
-                k =
-                    0xCA62C1D6;
-            }
-
-
-            const temp =
-                (
-                    rotr(a,27) +
-                    f +
-                    e +
-                    k +
-                    w[i]
-                ) >>> 0;
-
-
-            e=d;
-            d=c;
-            c=rotr(b,2);
-            b=a;
-            a=temp;
-        }
-
-
-        h0 =
-            (h0+a) >>> 0;
-
-        h1 =
-            (h1+b) >>> 0;
-
-        h2 =
-            (h2+c) >>> 0;
-
-        h3 =
-            (h3+d) >>> 0;
-
-        h4 =
-            (h4+e) >>> 0;
-    }
-
-
-    const out =
-        new Uint8Array(20);
-
-
-    const hs=[
-        h0,
-        h1,
-        h2,
-        h3,
-        h4
-    ];
-
-
-    for(
-        let i=0;
-        i<5;
-        i++
-    ){
-
-        out[i*4] =
-            hs[i] >>> 24;
-
-        out[i*4+1] =
-            hs[i] >>> 16;
-
-        out[i*4+2] =
-            hs[i] >>> 8;
-
-        out[i*4+3] =
-            hs[i];
-    }
-
-
-    return out;
-}
-
-
-/* =========================================
-   Base64
-========================================= */
-
-function base64Bytes(bytes){
-
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-        "abcdefghijklmnopqrstuvwxyz" +
-        "0123456789+/";
-
-
-    let out="";
-
-
-    for(
-        let i=0;
-        i<bytes.length;
-        i+=3
-    ){
-
-        const a =
-            bytes[i];
-
-
-        const b =
-            i+1<bytes.length
-            ? bytes[i+1]
-            : 0;
-
-
-        const c =
-            i+2<bytes.length
-            ? bytes[i+2]
-            : 0;
-
-
-        out +=
-            chars[a>>2];
-
-
-        out +=
-            chars[
-                ((a&3)<<4) |
-                (b>>4)
-            ];
-
-
-        out +=
-            i+1<bytes.length
-            ? chars[
-                ((b&15)<<2) |
-                (c>>6)
-              ]
-            : "=";
-
-
-        out +=
-            i+2<bytes.length
-            ? chars[c&63]
-            : "=";
-    }
-
-
-    return out;
-}
-
-
-/* =========================================
-   12桁
-========================================= */
-
-function generate12(key){
-
-    const bytes =
-        new TextEncoder().encode(
-            key
-        );
-
-
-    return base64Bytes(
-        sha1Bytes(bytes)
-    )
-    .slice(0,12)
-    .replace(
-        /\+/g,
-        "."
-    );
+    /*
+     * unix crypt の先頭2文字はsalt。
+     * Trip本体は10文字使用。
+     */
+    return result.substring(2, 12);
 }
 
 
@@ -647,275 +165,344 @@ function generate12(key){
    検索
 ========================================= */
 
-function search(data){
+function search(data) {
 
-    const tripLength =
-        Number(data.tripLength) === 12
+    const length =
+        Number(data.length) === 12
             ? 12
             : 10;
 
 
-    const keyLength =
-        Number(data.keyLength) ||
-        KEY_LENGTH;
-
-
     const conditions =
-        Array.isArray(
-            data.conditions
-        )
-        ? data.conditions
-        : [];
+        Array.isArray(data.conditions)
+            ? data.conditions
+            : [];
 
 
     const special =
-        data.special ||
-        "none";
+        data.special || "none";
 
+
+    /*
+     * =====================================
+     * 複雑化キー用文字セット
+     * =====================================
+     *
+     * 英大文字
+     * 英小文字
+     * 数字
+     * 記号
+     *
+     * 空白・改行は使用しない。
+     */
 
     const charset =
         data.charset ||
-        CHARSET;
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+        "abcdefghijklmnopqrstuvwxyz" +
+        "0123456789" +
+        "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 
-    const start =
-        data.start !== undefined
-        ? BigInt(data.start)
-        : 0n;
+    let count = 0;
 
 
-    const end =
-        data.end !== undefined
-        ? BigInt(data.end)
-        : null;
+    while (running) {
+
+        /*
+         * 複雑化キー生成
+         */
+        const key =
+            randomComplexKey(
+                charset,
+                length
+            );
 
 
-    let count=0;
+        let trip;
 
 
-    if(end !== null){
+        try {
 
-        for(
-            let index=start;
-            running &&
-            index<end;
-            index++
-        ){
+            trip =
+                makeTrip(key);
 
-            const key =
-                indexToKey(
-                    index,
-                    keyLength,
-                    charset
-                );
+        } catch (e) {
 
+            self.postMessage({
+                type: "error",
+                message: e && e.message
+                    ? e.message
+                    : String(e)
+            });
 
-            let trip;
+            running = false;
 
-
-            try{
-
-                trip =
-                    makeTrip(
-                        key,
-                        tripLength
-                    );
-
-            }catch(e){
-
-                self.postMessage({
-
-                    type:"error",
-
-                    message:
-                        e && e.message
-                        ? e.message
-                        : String(e)
-                });
-
-
-                running=false;
-
-                return;
-            }
-
-
-            count++;
-
-
-            if(
-                matchesConditions(
-                    trip,
-                    conditions
-                ) &&
-                matchesSpecial(
-                    trip,
-                    special
-                )
-            ){
-
-                self.postMessage({
-
-                    type:"hit",
-
-                    key:key,
-
-                    trip:trip
-                });
-            }
-
-
-            if(
-                (count & 4095) === 0
-            ){
-
-                self.postMessage({
-
-                    type:"progress",
-
-                    count:4096
-                });
-
-
-                count=0;
-            }
+            return;
         }
 
-    }else{
 
-        while(running){
-
-            const key =
-                randomKey(
-                    charset,
-                    keyLength
-                );
+        count++;
 
 
-            let trip;
+        /*
+         * 条件判定
+         */
+        if (
 
+            matchesConditions(
+                trip,
+                conditions
+            )
 
-            try{
+            &&
 
-                trip =
-                    makeTrip(
-                        key,
-                        tripLength
-                    );
+            matchesSpecial(
+                trip,
+                special
+            )
 
-            }catch(e){
+        ) {
 
-                self.postMessage({
-
-                    type:"error",
-
-                    message:
-                        e && e.message
-                        ? e.message
-                        : String(e)
-                });
-
-
-                running=false;
-
-                return;
-            }
-
-
-            count++;
-
-
-            if(
-                matchesConditions(
-                    trip,
-                    conditions
-                ) &&
-                matchesSpecial(
-                    trip,
-                    special
-                )
-            ){
-
-                self.postMessage({
-
-                    type:"hit",
-
-                    key:key,
-
-                    trip:trip
-                });
-            }
-
-
-            if(
-                (count & 2047) === 0
-            ){
-
-                self.postMessage({
-
-                    type:"progress",
-
-                    count:2048
-                });
-            }
+            self.postMessage({
+                type: "hit",
+                key: key,
+                trip: trip
+            });
         }
-    }
 
 
-    if(count>0){
+        /*
+         * 2048回ごとに進捗送信
+         */
+        if (
+            (count & 2047) === 0
+        ) {
 
-        self.postMessage({
-
-            type:"progress",
-
-            count:count
-        });
+            self.postMessage({
+                type: "progress",
+                count: 2048
+            });
+        }
     }
 
 
     self.postMessage({
-        type:"stopped"
+        type: "stopped"
     });
 }
 
 
 /* =========================================
-   完全探索用キー生成
+   複雑化ランダムキー
 ========================================= */
 
-function indexToKey(
-    index,
-    length,
-    charset
-){
+function randomComplexKey(
+    charset,
+    length
+) {
 
-    let result="";
-
-
-    const base =
-        BigInt(
-            charset.length
-        );
+    length =
+        Number(length);
 
 
-    for(
-        let i=0;
-        i<length;
+    if (
+        !Number.isFinite(length) ||
+        length < 1
+    ) {
+
+        length = 10;
+    }
+
+
+    /*
+     * 文字カテゴリ
+     */
+
+    const upper =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    const lower =
+        "abcdefghijklmnopqrstuvwxyz";
+
+    const numbers =
+        "0123456789";
+
+    const symbols =
+        "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+
+
+    /*
+     * 結果
+     */
+
+    const result = [];
+
+
+    /*
+     * =====================================
+     * まず各カテゴリから最低1文字
+     * =====================================
+     *
+     * 10文字キーなら
+     *
+     * 大文字
+     * 小文字
+     * 数字
+     * 記号
+     *
+     * を最低1文字ずつ含める。
+     */
+
+    const pools = [
+
+        upper,
+        lower,
+        numbers,
+        symbols
+
+    ];
+
+
+    for (
+        let i = 0;
+
+        i < pools.length &&
+        result.length < length;
+
         i++
-    ){
+    ) {
+
+        result.push(
+
+            randomCharExcept(
+
+                pools[i],
+
+                result.length > 0
+                    ? result[
+                        result.length - 1
+                    ]
+                    : null
+            )
+        );
+    }
+
+
+    /*
+     * =====================================
+     * 残りを生成
+     * =====================================
+     *
+     * 直前と同じ文字は禁止。
+     */
+
+    while (
+        result.length < length
+    ) {
+
+        const previous =
+            result[
+                result.length - 1
+            ];
+
+
+        result.push(
+
+            randomCharExcept(
+                charset,
+                previous
+            )
+        );
+    }
+
+
+    /*
+     * =====================================
+     * Fisher-Yatesシャッフル
+     * =====================================
+     *
+     * 特定のカテゴリが
+     * 特定位置に固定されないようにする。
+     */
+
+    shuffleArray(result);
+
+
+    /*
+     * =====================================
+     * 同一文字連続チェック
+     * =====================================
+     *
+     * シャッフルによって
+     * 同じ文字が隣り合う可能性があるため、
+     * 連続がなくなるまでシャッフルする。
+     */
+
+    let attempts = 0;
+
+
+    while (
+        hasConsecutiveCharacters(result) &&
+        attempts < 100
+    ) {
+
+        shuffleArray(result);
+
+        attempts++;
+    }
+
+
+    /*
+     * 100回やってもダメなら
+     * 最初から作り直す。
+     */
+
+    if (
+        hasConsecutiveCharacters(result)
+    ) {
+
+        return randomComplexKey(
+            charset,
+            length
+        );
+    }
+
+
+    return result.join("");
+}
+
+
+/* =========================================
+   指定文字以外からランダム選択
+========================================= */
+
+function randomCharExcept(
+    chars,
+    exclude
+) {
+
+    if (
+        chars.length <= 1
+    ) {
+
+        return chars[0];
+    }
+
+
+    let result;
+
+
+    do {
 
         result =
-            charset[
-                Number(
-                    index % base
-                )
-            ] +
-            result;
+            chars[
+                randomInt(chars.length)
+            ];
 
-
-        index =
-            index / base;
-    }
+    } while (
+        result === exclude
+    );
 
 
     return result;
@@ -923,69 +510,116 @@ function indexToKey(
 
 
 /* =========================================
-   ランダムキー
+   配列シャッフル
 ========================================= */
 
-function randomKey(
-    charset,
-    length
-){
+function shuffleArray(array) {
 
-    const result=[];
+    for (
+        let i = array.length - 1;
+        i > 0;
+        i--
+    ) {
 
-
-    const size =
-        charset.length;
-
-
-    const max =
-        256 -
-        (256 % size);
+        const j =
+            randomInt(i + 1);
 
 
-    while(
-        result.length <
-        length
-    ){
+        const tmp =
+            array[i];
 
-        const buffer =
-            new Uint8Array(64);
+        array[i] =
+            array[j];
 
+        array[j] =
+            tmp;
+    }
+}
+
+
+/* =========================================
+   同じ文字の連続チェック
+========================================= */
+
+function hasConsecutiveCharacters(
+    array
+) {
+
+    for (
+        let i = 1;
+        i < array.length;
+        i++
+    ) {
+
+        if (
+            array[i] ===
+            array[i - 1]
+        ) {
+
+            return true;
+        }
+    }
+
+
+    return false;
+}
+
+
+/* =========================================
+   暗号学的乱数
+========================================= */
+
+function randomInt(max) {
+
+    if (
+        !Number.isInteger(max) ||
+        max <= 0
+    ) {
+
+        return 0;
+    }
+
+
+    /*
+     * Uint32の範囲
+     */
+    const range =
+        4294967296;
+
+
+    /*
+     * modulo biasを避けるため、
+     * maxの倍数になる範囲だけ使用。
+     */
+
+    const limit =
+        Math.floor(
+            range / max
+        ) * max;
+
+
+    const buffer =
+        new Uint32Array(1);
+
+
+    let value;
+
+
+    do {
 
         crypto.getRandomValues(
             buffer
         );
 
+        value =
+            buffer[0];
 
-        for(
-            let i=0;
-            i<buffer.length &&
-            result.length<length;
-            i++
-        ){
-
-            const value =
-                buffer[i];
+    } while (
+        value >= limit
+    );
 
 
-            if(
-                value >= max
-            ){
-
-                continue;
-            }
-
-
-            result.push(
-                charset[
-                    value % size
-                ]
-            );
-        }
-    }
-
-
-    return result.join("");
+    return value % max;
 }
 
 
@@ -996,51 +630,48 @@ function randomKey(
 function matchesConditions(
     trip,
     conditions
-){
+) {
 
-    for(
-        const condition of
-        conditions
-    ){
+    for (
+        const condition of conditions
+    ) {
 
-        if(!condition){
+        if (!condition) {
             continue;
         }
 
 
         const text =
             String(
-                condition.text ||
-                condition.value ||
-                ""
+                condition.text || ""
             );
 
 
-        if(!text){
+        if (!text) {
             continue;
         }
 
 
-        if(
-            condition.regex
-        ){
+        /*
+         * 正規表現
+         */
 
-            try{
+        if (condition.regex) {
+
+            try {
 
                 const re =
-                    new RegExp(
-                        text
-                    );
+                    new RegExp(text);
 
 
-                if(
+                if (
                     !re.test(trip)
-                ){
+                ) {
 
                     return false;
                 }
 
-            }catch(e){
+            } catch (e) {
 
                 return false;
             }
@@ -1052,41 +683,40 @@ function matchesConditions(
 
         const mode =
             condition.mode ||
-            condition.method ||
             "contains";
 
 
-        if(
+        if (
             mode === "contains" &&
             !trip.includes(text)
-        ){
+        ) {
 
             return false;
         }
 
 
-        if(
+        if (
             mode === "starts" &&
             !trip.startsWith(text)
-        ){
+        ) {
 
             return false;
         }
 
 
-        if(
+        if (
             mode === "ends" &&
             !trip.endsWith(text)
-        ){
+        ) {
 
             return false;
         }
 
 
-        if(
+        if (
             mode === "exact" &&
             trip !== text
-        ){
+        ) {
 
             return false;
         }
@@ -1104,9 +734,9 @@ function matchesConditions(
 function matchesSpecial(
     s,
     type
-){
+) {
 
-    switch(type){
+    switch (type) {
 
         case "none":
         case "":
@@ -1117,7 +747,7 @@ function matchesSpecial(
             return pureN(s);
 
 
-        case "semi":
+        case "quasi":
             return quasiN(s);
 
 
@@ -1125,11 +755,11 @@ function matchesSpecial(
             return twoKind(s);
 
 
-        case "long":
+        case "longest":
             return /^[MmW]+$/.test(s);
 
 
-        case "short":
+        case "shortest":
             return /^[li.]+$/.test(s);
 
 
@@ -1153,15 +783,15 @@ function matchesSpecial(
             return doublePair(s);
 
 
-        case "number":
+        case "numbers":
             return /^[0-9]+$/.test(s);
 
 
-        case "skip":
+        case "tobiishi":
             return tobiishi(s);
 
 
-        case "wideSkip":
+        case "kakutobi":
             return kakutobi(s);
 
 
@@ -1173,37 +803,38 @@ function matchesSpecial(
 
 /* =========================================
    純n連
+   同じ文字8文字以上
 ========================================= */
 
-function pureN(s){
+function pureN(s) {
 
-    let count=1;
+    let count = 1;
 
 
-    for(
-        let i=1;
-        i<s.length;
+    for (
+        let i = 1;
+        i < s.length;
         i++
-    ){
+    ) {
 
-        if(
+        if (
             s[i] ===
-            s[i-1]
-        ){
+            s[i - 1]
+        ) {
 
             count++;
 
 
-            if(
+            if (
                 count >= 8
-            ){
+            ) {
 
                 return true;
             }
 
-        }else{
+        } else {
 
-            count=1;
+            count = 1;
         }
     }
 
@@ -1214,37 +845,40 @@ function pureN(s){
 
 /* =========================================
    準n連
+   大文字小文字無視で9文字以上
 ========================================= */
 
-function quasiN(s){
+function quasiN(s) {
 
-    let count=1;
+    let count = 1;
 
 
-    for(
-        let i=1;
-        i<s.length;
+    for (
+        let i = 1;
+        i < s.length;
         i++
-    ){
+    ) {
 
-        if(
+        if (
+
             s[i].toLowerCase() ===
-            s[i-1].toLowerCase()
-        ){
+            s[i - 1].toLowerCase()
+
+        ) {
 
             count++;
 
 
-            if(
+            if (
                 count >= 9
-            ){
+            ) {
 
                 return true;
             }
 
-        }else{
+        } else {
 
-            count=1;
+            count = 1;
         }
     }
 
@@ -1257,7 +891,7 @@ function quasiN(s){
    二構
 ========================================= */
 
-function twoKind(s){
+function twoKind(s) {
 
     return new Set(s).size <= 2;
 }
@@ -1265,17 +899,26 @@ function twoKind(s){
 
 /* =========================================
    八雲
+   3文字ずつ同じ
 ========================================= */
 
-function yakumo(s){
+function yakumo(s) {
 
-    if(
+    if (
         s.length < 6
-    ){
+    ) {
 
         return false;
     }
 
+
+    /*
+     * 10桁なら
+     *
+     * AAA BBB CCC X
+     *
+     * のように最後1文字は自由
+     */
 
     const groups =
         Math.floor(
@@ -1283,24 +926,31 @@ function yakumo(s){
         );
 
 
-    if(
+    if (
         groups < 2
-    ){
+    ) {
 
         return false;
     }
 
 
-    for(
-        let i=0;
-        i<groups*3;
-        i+=3
-    ){
+    for (
+        let i = 0;
+        i < groups * 3;
+        i += 3
+    ) {
 
-        if(
-            s[i] !== s[i+1] ||
-            s[i] !== s[i+2]
-        ){
+        if (
+
+            s[i] !==
+            s[i + 1]
+
+            ||
+
+            s[i] !==
+            s[i + 2]
+
+        ) {
 
             return false;
         }
@@ -1315,47 +965,46 @@ function yakumo(s){
    鏡
 ========================================= */
 
-function mirror(s){
+function mirror(s) {
 
-    const pair={
+    const pair = {
 
-        ".":".",
-        "0":"0",
-        "8":"8",
+        ".": ".",
+        "0": "0",
+        "8": "8",
 
-        "A":"A",
-        "H":"H",
-        "I":"I",
-        "M":"M",
-        "O":"O",
-        "T":"T",
-        "U":"U",
-        "V":"V",
-        "W":"W",
-        "X":"X",
-        "Y":"Y",
+        "A": "A",
+        "H": "H",
+        "I": "I",
+        "M": "M",
+        "O": "O",
+        "T": "T",
+        "U": "U",
+        "V": "V",
+        "W": "W",
+        "X": "X",
+        "Y": "Y",
 
-        "b":"d",
-        "d":"b",
+        "b": "d",
+        "d": "b",
 
-        "i":"i",
-        "l":"l",
-        "o":"o",
+        "i": "i",
+        "l": "l",
+        "o": "o",
 
-        "p":"q",
-        "q":"p",
+        "p": "q",
+        "q": "p",
 
-        "v":"v",
-        "w":"w",
-        "x":"x"
+        "v": "v",
+        "w": "w"
     };
 
 
-    for(
-        let i=0;
-        i<s.length;
+    for (
+        let i = 0;
+        i < s.length;
         i++
-    ){
+    ) {
 
         const left =
             s[i];
@@ -1363,14 +1012,15 @@ function mirror(s){
 
         const right =
             s[
-                s.length-1-i
+                s.length -
+                1 -
+                i
             ];
 
 
-        if(
-            pair[left] !==
-            right
-        ){
+        if (
+            pair[left] !== right
+        ) {
 
             return false;
         }
@@ -1385,20 +1035,26 @@ function mirror(s){
    回文
 ========================================= */
 
-function palindrome(s){
+function palindrome(s) {
 
-    for(
-        let i=0;
-        i<Math.floor(s.length/2);
+    for (
+        let i = 0;
+        i < Math.floor(
+            s.length / 2
+        );
         i++
-    ){
+    ) {
 
-        if(
+        if (
+
             s[i] !==
             s[
-                s.length-1-i
+                s.length -
+                1 -
+                i
             ]
-        ){
+
+        ) {
 
             return false;
         }
@@ -1413,11 +1069,11 @@ function palindrome(s){
    山彦
 ========================================= */
 
-function echo(s){
+function echo(s) {
 
-    if(
+    if (
         s.length % 2 !== 0
-    ){
+    ) {
 
         return false;
     }
@@ -1428,8 +1084,18 @@ function echo(s){
 
 
     return (
-        s.substring(0,half) ===
-        s.substring(half)
+
+        s.substring(
+            0,
+            half
+        )
+
+        ===
+
+        s.substring(
+            half
+        )
+
     );
 }
 
@@ -1438,26 +1104,26 @@ function echo(s){
    双連
 ========================================= */
 
-function doublePair(s){
+function doublePair(s) {
 
-    if(
+    if (
         s.length % 2 !== 0
-    ){
+    ) {
 
         return false;
     }
 
 
-    for(
-        let i=0;
-        i<s.length;
-        i+=2
-    ){
+    for (
+        let i = 0;
+        i < s.length;
+        i += 2
+    ) {
 
-        if(
+        if (
             s[i] !==
-            s[i+1]
-        ){
+            s[i + 1]
+        ) {
 
             return false;
         }
@@ -1469,21 +1135,34 @@ function doublePair(s){
 
 
 /* =========================================
-   飛石
+   全数
 ========================================= */
 
-function tobiishi(s){
+function numbers(s) {
 
-    for(
-        let i=1;
-        i<s.length;
-        i+=2
-    ){
+    return /^[0-9]+$/.test(s);
+}
 
-        if(
+
+/* =========================================
+   飛石
+   1文字ごとに . または /
+========================================= */
+
+function tobiishi(s) {
+
+    for (
+        let i = 1;
+        i < s.length;
+        i += 2
+    ) {
+
+        if (
+
             s[i] !== "." &&
             s[i] !== "/"
-        ){
+
+        ) {
 
             return false;
         }
@@ -1496,13 +1175,14 @@ function tobiishi(s){
 
 /* =========================================
    拡飛
+   1文字ごとに同じ区切り文字
 ========================================= */
 
-function kakutobi(s){
+function kakutobi(s) {
 
-    if(
+    if (
         s.length < 2
-    ){
+    ) {
 
         return false;
     }
@@ -1512,24 +1192,26 @@ function kakutobi(s){
         s[1];
 
 
-    if(
+    if (
+
         separator !== "." &&
         separator !== "/"
-    ){
+
+    ) {
 
         return false;
     }
 
 
-    for(
-        let i=1;
-        i<s.length;
-        i+=2
-    ){
+    for (
+        let i = 1;
+        i < s.length;
+        i += 2
+    ) {
 
-        if(
+        if (
             s[i] !== separator
-        ){
+        ) {
 
             return false;
         }
