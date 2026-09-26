@@ -217,13 +217,42 @@ td {
     .dualGrid { grid-template-columns: 1fr; }
 }
 
+
+/* ===== Wolf Online Portal ===== */
+.portal-nav{position:sticky;top:0;z-index:50;background:rgba(10,12,18,.96);backdrop-filter:blur(12px);border:1px solid #2a2f3a;border-radius:14px;padding:10px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.portal-brand{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px 12px}.portal-brand b{font-size:20px}.portal-brand small{color:#8d96a8}.portal-tabs{display:flex;flex-wrap:wrap;gap:7px}.portal-tab{border:1px solid #343b49;background:#171b24;color:#dbe1ea;border-radius:9px;padding:8px 11px;cursor:pointer}.portal-tab.active{background:#28354a;border-color:#5b8bd9;color:#fff}.portal-panel{display:none}.portal-panel.active{display:block}.portal-card{background:#11151d;border:1px solid #2b313d;border-radius:12px;padding:16px;margin-bottom:14px}.portal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.portal-stat{padding:14px;border-radius:10px;background:#181d27;border:1px solid #303746}.portal-stat strong{font-size:25px;display:block;margin-top:5px}.portal-table{width:100%;border-collapse:collapse}.portal-table th,.portal-table td{padding:9px;border-bottom:1px solid #292f3b;text-align:left}.portal-table th{color:#9fa9ba}.portal-input,.portal-select,.portal-textarea{width:100%;background:#0d1118;color:#e9edf4;border:1px solid #394150;border-radius:8px;padding:9px}.portal-btn{border:0;background:#3b70c9;color:white;padding:9px 13px;border-radius:8px;cursor:pointer}.portal-btn.secondary{background:#303746}.portal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.portal-muted{color:#929bab}.portal-badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#273246;color:#bcd2ff;font-size:12px}.search-container.portal-search-hidden{display:none!important}.notice{padding:10px;border-left:3px solid #557dcc;background:#171c26;border-radius:6px;color:#b8c2d3}.mini-bar{height:8px;background:#272d38;border-radius:99px;overflow:hidden}.mini-bar i{display:block;height:100%;background:#5d8ddd}.rel{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #292f3b}
+@media(max-width:650px){.portal-brand{align-items:flex-start;flex-direction:column}.portal-tabs{overflow:auto;flex-wrap:nowrap}.portal-tab{white-space:nowrap}.portal-table{font-size:13px}}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div id="portalShell" class="container">
+  <div class="portal-nav">
+    <div class="portal-brand"><div><b>🐺 人狼オンライン データベース</b><br><small>トリップ検索・戦績解析・ランキング・ゲーム解析</small></div><span id="dbStatus" class="portal-badge">ローカルDB</span></div>
+    <div class="portal-tabs" id="portalTabs">
+      <button class="portal-tab active" data-tab="about">概要</button><button class="portal-tab" data-tab="search">🔍 トリップ検索</button><button class="portal-tab" data-tab="player">📊 個人戦績</button><button class="portal-tab" data-tab="ranking">🏆 ランキング</button><button class="portal-tab" data-tab="relations">👥 同村関係</button><button class="portal-tab" data-tab="games">🏘️ ゲーム解析</button><button class="portal-tab" data-tab="ai">🤖 プレイヤー解析</button><button class="portal-tab" data-tab="profile">👤 プロフィール</button><button class="portal-tab" data-tab="wiki">📝 Wiki</button><button class="portal-tab" data-tab="board">💬 掲示板</button><button class="portal-tab" data-tab="data">💾 データ管理</button>
+    </div>
+  </div>
+  <div id="portalPanels">
+    <section class="portal-panel active" data-panel="about">
+      <div class="portal-card"><h1>🐺 人狼オンライン データベース</h1><p>トリップ検索を中心に、戦績・ランキング・同村関係・ゲームログ・プレイヤー解析・Wiki・掲示板を1ページにまとめた総合ツールです。</p><div class="notice">現在はブラウザ内DB（localStorage）で動作します。データ管理からJSONを取り込めば、別端末にも同じデータを移せます。サーバーDB/APIを接続する場合も、このUIをそのまま土台にできます。</div></div>
+      <div class="portal-grid"><div class="portal-stat">登録プレイヤー<strong id="statPlayers">0</strong></div><div class="portal-stat">ゲーム数<strong id="statGames">0</strong></div><div class="portal-stat">総参戦数<strong id="statParticipations">0</strong></div><div class="portal-stat">掲示板投稿<strong id="statPosts">0</strong></div></div>
+      <div class="portal-card"><h2>機能</h2><p>🔍 高速トリップ検索（正規表現・二重検索） ／ 📊 個人戦績 ／ 🏆 ランキング ／ 👥 同村関係 ／ 🏘️ ゲーム解析 ／ 🤖 発言スタイル解析 ／ 👤 プロフィール ／ 📝 Wiki ／ 💬 掲示板 ／ 💾 JSON入出力</p></div>
+    </section>
+    <section class="portal-panel" data-panel="player"><div class="portal-card"><h2>📊 個人戦績</h2><div class="portal-grid"><input id="playerQuery" class="portal-input" placeholder="名前・トリップで検索"><select id="playerMode" class="portal-select"><option value="all">すべて</option><option value="name">名前</option><option value="trip">トリップ</option></select></div><div class="portal-actions"><button class="portal-btn" id="playerSearchBtn">検索</button></div></div><div id="playerResult"></div></section>
+    <section class="portal-panel" data-panel="ranking"><div class="portal-card"><h2>🏆 ランキング</h2><div class="portal-grid"><select id="rankMetric" class="portal-select"><option value="games">参戦数</option><option value="wins">勝利数</option><option value="rate">勝率</option><option value="speech">発言数</option><option value="rm">RM回数</option></select><select id="rankPeriod" class="portal-select"><option value="all">通算</option><option value="month">今月</option><option value="year">今年</option></select></div></div><div class="portal-card"><table class="portal-table"><thead><tr><th>#</th><th>プレイヤー</th><th>トリップ</th><th>戦数</th><th>勝利</th><th>勝率</th><th>発言</th></tr></thead><tbody id="rankingBody"></tbody></table></div></section>
+    <section class="portal-panel" data-panel="relations"><div class="portal-card"><h2>👥 同村・関係解析</h2><input id="relationQuery" class="portal-input" placeholder="プレイヤー名またはトリップ"><div class="portal-actions"><button class="portal-btn" id="relationBtn">解析</button></div></div><div id="relationResult"></div></section>
+    <section class="portal-panel" data-panel="games"><div class="portal-card"><h2>🏘️ ゲームログ解析</h2><input id="gameQuery" class="portal-input" placeholder="ゲームID・村名・プレイヤー・トリップ"><div class="portal-actions"><button class="portal-btn" id="gameSearchBtn">検索</button></div></div><div id="gameResult"></div></section>
+    <section class="portal-panel" data-panel="ai"><div class="portal-card"><h2>🤖 プレイヤー解析</h2><p class="portal-muted">発言量・質問・他者言及・根拠語などをログから機械集計する簡易版です。勝敗から人格や実力を断定するものではありません。</p><input id="aiQuery" class="portal-input" placeholder="プレイヤー名・トリップ"><div class="portal-actions"><button class="portal-btn" id="aiBtn">解析</button></div></div><div id="aiResult"></div></section>
+    <section class="portal-panel" data-panel="profile"><div class="portal-card"><h2>👤 プロフィール</h2><input id="profileTrip" class="portal-input" placeholder="トリップ"><input id="profileName" class="portal-input" placeholder="表示名"><textarea id="profileIntro" class="portal-textarea" rows="5" placeholder="自己紹介"></textarea><input id="profileX" class="portal-input" placeholder="X ID（任意）"><div class="portal-actions"><button class="portal-btn" id="profileSave">保存</button></div></div></section>
+    <section class="portal-panel" data-panel="wiki"><div class="portal-card"><h2>📝 Wiki</h2><input id="wikiTrip" class="portal-input" placeholder="トリップ"><textarea id="wikiText" class="portal-textarea" rows="10" placeholder="人物メモ・Wiki"></textarea><div class="portal-actions"><button class="portal-btn" id="wikiSave">保存</button></div></div><div id="wikiList"></div></section>
+    <section class="portal-panel" data-panel="board"><div class="portal-card"><h2>💬 掲示板</h2><input id="postName" class="portal-input" placeholder="名前"><input id="postTrip" class="portal-input" placeholder="トリップ"><textarea id="postText" class="portal-textarea" rows="4" placeholder="投稿内容"></textarea><div class="portal-actions"><button class="portal-btn" id="postBtn">投稿</button></div></div><div id="boardList"></div></section>
+    <section class="portal-panel" data-panel="data"><div class="portal-card"><h2>💾 データ管理</h2><p class="portal-muted">このサイトの戦績データ・プロフィール・Wiki・掲示板をJSONで保存/復元できます。</p><div class="portal-actions"><button class="portal-btn" id="exportBtn">JSONを書き出す</button><label class="portal-btn secondary" for="importFile">JSONを読み込む</label><input id="importFile" type="file" accept="application/json" hidden><button class="portal-btn secondary" id="seedBtn">サンプルデータ追加</button><button class="portal-btn secondary" id="clearBtn">ローカルデータ初期化</button></div></div><div class="portal-card"><h3>データ形式</h3><p>players / games / posts / profiles / wiki を持つJSONです。将来PHP・Node・PostgreSQL等のAPIへ移行できます。</p></div></section>
+  </div>
+</div>
 
+<div id="searchPanel" class="container search-container portal-search-hidden">
 <h1>🐺 人狼オンライン トリップ検索機</h1>
 
 
@@ -1466,6 +1495,45 @@ setInterval(
     },
     500
 );
+
+
+
+/* ===== Portal database / dashboard ===== */
+const DB_KEY='wolf_online_portal_db_v1';
+const defaultDB={players:[],games:[],posts:[],profiles:{},wiki:{}};
+let db=loadDB();
+function loadDB(){try{return Object.assign({},defaultDB,JSON.parse(localStorage.getItem(DB_KEY)||'{}'));}catch(e){return structuredClone(defaultDB)}}
+function saveDB(){localStorage.setItem(DB_KEY,JSON.stringify(db));renderAll()}
+function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function seedDB(){
+ const names=['サンプル狼','雪兎','夜桜','観測者','初心者A','銀河']; const trips=['◆SampleAAA','◆SnowBBB','◆YozakuraC','◆ObserveD','◆BeginnerE','◆GalaxyFF'];
+ db.players=[]; for(let i=0;i<names.length;i++) db.players.push({id:'p'+i,name:names[i],trip:trips[i],games:8+i*3,wins:3+i,speech:120+i*31,rm:i%3,roles:{村人:4,占い師:2,人狼:2},style:{speech:400+i*70,question:300+i*55,mention:250+i*60,evidence:500+i*45}});
+ db.games=[...Array(12)].map((_,i)=>({id:'G2026-'+String(i+1).padStart(3,'0'),name:(i%2?'夜村':'普通村')+' #'+(i+1),date:`2026-09-${String(10+i).padStart(2,'0')}`,players:db.players.slice(0,3+(i%4)).map(p=>p.id),winner:i%2?'狼':'村',mvp:db.players[i%db.players.length].id,log:'議論ログのサンプルです。投票・質問・根拠発言などを保存できます。'}));
+ db.posts=[{name:'管理人',trip:'◆Admin',text:'サイトへようこそ。',date:new Date().toISOString()}]; saveDB();}
+function renderAll(){
+ document.getElementById('statPlayers').textContent=db.players.length;document.getElementById('statGames').textContent=db.games.length;document.getElementById('statParticipations').textContent=db.players.reduce((a,p)=>a+(p.games||0),0);document.getElementById('statPosts').textContent=db.posts.length;
+ renderRanking();renderBoard();renderWiki();
+}
+function playerStats(p){const g=p.games||0,w=p.wins||0;return `<div class="portal-card"><h3>${esc(p.name)} <span class="portal-badge">${esc(p.trip)}</span></h3><div class="portal-grid"><div class="portal-stat">参戦数<strong>${g}</strong></div><div class="portal-stat">勝利<strong>${w}</strong></div><div class="portal-stat">勝率<strong>${g?Math.round(w/g*100):0}%</strong></div><div class="portal-stat">発言数<strong>${p.speech||0}</strong></div><div class="portal-stat">RM<strong>${p.rm||0}</strong></div></div><h4>役職別</h4><table class="portal-table"><tbody>${Object.entries(p.roles||{}).map(([r,n])=>`<tr><td>${esc(r)}</td><td>${n}戦</td></tr>`).join('')}</tbody></table></div>`}
+function findPlayers(q,mode='all'){q=q.trim().toLowerCase();return db.players.filter(p=>!q||(mode==='name'?p.name:mode==='trip'?p.trip:p.name+' '+p.trip).toLowerCase().includes(q))}
+function renderPlayer(){const q=document.getElementById('playerQuery').value,m=document.getElementById('playerMode').value;const ps=findPlayers(q,m);document.getElementById('playerResult').innerHTML=ps.length?ps.map(playerStats).join(''):'<div class="portal-card">該当するプレイヤーがありません。</div>'}
+function renderRanking(){const metric=document.getElementById('rankMetric')?.value||'games';let ps=[...db.players];ps.sort((a,b)=>metric==='rate'?((b.wins/b.games)-(a.wins/a.games)):((b[metric]||0)-(a[metric]||0)));document.getElementById('rankingBody').innerHTML=ps.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.trip)}</td><td>${p.games||0}</td><td>${p.wins||0}</td><td>${p.games?Math.round(p.wins/p.games*100):0}%</td><td>${p.speech||0}</td></tr>`).join('')||'<tr><td colspan="7">データなし</td></tr>'}
+function renderRelations(){const q=document.getElementById('relationQuery').value.trim();const ps=findPlayers(q);if(!ps[0]){document.getElementById('relationResult').innerHTML='<div class="portal-card">対象プレイヤーが見つかりません。</div>';return}const target=ps[0];const counts={};db.games.forEach(g=>{if(g.players.includes(target.id))g.players.forEach(id=>{if(id!==target.id)counts[id]=(counts[id]||0)+1})});const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([id,n])=>{const p=db.players.find(x=>x.id===id);return `<div class="rel"><span>${esc(p?.name||id)} <small>${esc(p?.trip||'')}</small></span><b>${n}回</b></div>`}).join('');document.getElementById('relationResult').innerHTML=`<div class="portal-card"><h3>${esc(target.name)} の同村ランキング</h3>${rows||'同村データなし'}</div>`}
+function renderGames(){const q=document.getElementById('gameQuery').value.trim().toLowerCase();const gs=db.games.filter(g=>!q||(g.id+' '+g.name+' '+g.players.map(id=>db.players.find(p=>p.id===id)?.name||'').join(' ')).toLowerCase().includes(q));document.getElementById('gameResult').innerHTML=gs.map(g=>`<div class="portal-card"><h3>${esc(g.name)} <span class="portal-badge">${esc(g.id)}</span></h3><p>${esc(g.date)} / 勝利陣営: ${esc(g.winner)} / MVP: ${esc(db.players.find(p=>p.id===g.mvp)?.name||'—')}</p><p>${esc(g.log)}</p></div>`).join('')||'<div class="portal-card">ゲームなし</div>'}
+function renderAI(){const ps=findPlayers(document.getElementById('aiQuery').value.trim());document.getElementById('aiResult').innerHTML=ps.map(p=>{const s=p.style||{};return `<div class="portal-card"><h3>${esc(p.name)}</h3>${[['発言量',s.speech||0],['質問',s.question||0],['他者言及',s.mention||0],['根拠語',s.evidence||0]].map(x=>`<p>${x[0]}: ${x[1]}<div class="mini-bar"><i style="width:${Math.min(100,x[1]/10)}%"></i></div></p>`).join('')}<p class="portal-muted">ログからの機械集計指標です。</p></div>`}).join('')||'<div class="portal-card">対象プレイヤーなし</div>'}
+function renderBoard(){document.getElementById('boardList').innerHTML=[...db.posts].reverse().map(x=>`<div class="portal-card"><b>${esc(x.name)}</b> <span class="portal-badge">${esc(x.trip)}</span><small class="portal-muted"> ${new Date(x.date).toLocaleString('ja-JP')}</small><p>${esc(x.text)}</p></div>`).join('')||'<div class="portal-card">投稿なし</div>'}
+function renderWiki(){document.getElementById('wikiList').innerHTML=Object.entries(db.wiki).map(([k,v])=>`<div class="portal-card"><h3>${esc(k)}</h3><p>${esc(v)}</p></div>`).join('')||'<div class="portal-card">Wikiなし</div>'}
+function bindPortal(){
+ document.querySelectorAll('.portal-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.portal-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const t=b.dataset.tab;document.querySelectorAll('.portal-panel').forEach(x=>x.classList.toggle('active',x.dataset.panel===t));document.getElementById('searchPanel').classList.toggle('portal-search-hidden',t!=='search');if(t==='ranking')renderRanking();if(t==='games')renderGames();if(t==='ai')renderAI();});
+ document.getElementById('playerSearchBtn').onclick=renderPlayer;document.getElementById('rankMetric').onchange=renderRanking;document.getElementById('relationBtn').onclick=renderRelations;document.getElementById('gameSearchBtn').onclick=renderGames;document.getElementById('aiBtn').onclick=renderAI;
+ document.getElementById('profileSave').onclick=()=>{const t=document.getElementById('profileTrip').value.trim();if(!t)return;db.profiles[t]={name:document.getElementById('profileName').value,intro:document.getElementById('profileIntro').value,x:document.getElementById('profileX').value};saveDB();alert('プロフィールを保存しました。')};
+ document.getElementById('wikiSave').onclick=()=>{const t=document.getElementById('wikiTrip').value.trim();if(!t)return;db.wiki[t]=document.getElementById('wikiText').value;saveDB();alert('Wikiを保存しました。')};
+ document.getElementById('postBtn').onclick=()=>{const text=document.getElementById('postText').value.trim();if(!text)return;db.posts.push({name:document.getElementById('postName').value||'名無し',trip:document.getElementById('postTrip').value||'',text,date:new Date().toISOString()});document.getElementById('postText').value='';saveDB()};
+ document.getElementById('seedBtn').onclick=seedDB;document.getElementById('clearBtn').onclick=()=>{if(confirm('ローカルDBを初期化しますか？')){db=structuredClone(defaultDB);saveDB()}};
+ document.getElementById('exportBtn').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='wolf-online-data.json';a.click()};
+ document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=Object.assign({},defaultDB,JSON.parse(r.result));saveDB();alert('読み込みました。')}catch(x){alert('JSONが不正です。')}};r.readAsText(f)};
+}
+bindPortal();renderAll();
 
 </script>
 
