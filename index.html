@@ -196,6 +196,27 @@ td {
     color: #4caf50;
 }
 
+
+.dualGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+.dualPanel {
+    background: #151515;
+    border: 1px solid #3b3b3b;
+    border-radius: 10px;
+    padding: 14px;
+}
+.dualPanel h3 { margin-top: 0; }
+.dualPanel h4 { margin-bottom: 8px; }
+.dualPanel .condition { margin-bottom: 10px; }
+.buttonRow { margin-top: 16px; }
+@media (max-width: 760px) {
+    .dualGrid { grid-template-columns: 1fr; }
+}
+
 </style>
 </head>
 
@@ -354,265 +375,102 @@ td {
 
 <section>
 
-<h2>🔎 トリップ検索</h2>
+<h2>🔎 トリップ検索（二重検索）</h2>
 
 <p class="muted">
-
-複数条件を追加した場合、
-<b>すべての条件</b>に一致するものを検索します。
-
-停止ボタンを押すまで検索を続けます。
-
+検索①と検索②を<strong>完全に独立して同時実行</strong>します。
+それぞれ別の条件・一致方式・特殊トリップを指定できます。
+停止ボタンで両方を停止します。
 </p>
 
-
 <div class="grid">
-
 <div>
-
-<label>
-探索するトリップ長
-</label>
-
+<label>探索するトリップ長</label>
 <select id="searchLength">
-
-<option value="10">
-10文字
-</option>
-
-<option value="12">
-12文字
-</option>
-
+<option value="10">10文字</option>
+<option value="12">12文字</option>
 </select>
-
 </div>
 
-
 <div>
-
-<label>
-一致方式
-</label>
-
-<select id="searchMode">
-
-<option value="normal">
-通常検索
-</option>
-
-<option value="regex">
-🔥 正規表現
-</option>
-
-</select>
-
-</div>
-
-
-<div>
-
-<label>
-Worker数
-</label>
-
+<label>Worker数（各検索）</label>
 <select id="workerCount">
-
-<option value="0">
-自動
-</option>
-
-<option value="1">
-1 Worker
-</option>
-
-<option value="2">
-2 Workers
-</option>
-
-<option value="4">
-4 Workers
-</option>
-
-<option value="6">
-6 Workers
-</option>
-
-<option value="8">
-8 Workers
-</option>
-
+<option value="0">自動</option>
+<option value="1">1 Worker</option>
+<option value="2">2 Workers</option>
+<option value="4">4 Workers</option>
+<option value="6">6 Workers</option>
+<option value="8">8 Workers</option>
 </select>
-
+</div>
 </div>
 
+<div class="dualGrid">
+  <div class="dualPanel">
+    <h3>🔎 検索①</h3>
+    <label>一致方式</label>
+    <select id="searchMode1">
+      <option value="normal">通常検索</option>
+      <option value="regex">🔥 正規表現</option>
+    </select>
+    <h4>一致条件</h4>
+    <div id="conditions1"></div>
+    <button id="addCondition1">＋ 条件を追加</button>
+    <label>⭐ 特殊トリップ</label>
+    <select id="special1">
+      <option value="none">指定なし</option>
+      <option value="pure">純n連（純8連以上）</option>
+      <option value="quasi">準n連（準9連以上）</option>
+      <option value="two">二構</option>
+      <option value="longest">最長</option>
+      <option value="shortest">最短</option>
+      <option value="yakumo">八雲</option>
+      <option value="mirror">鏡</option>
+      <option value="palindrome">回文</option>
+      <option value="echo">エコー</option>
+      <option value="double">二重</option>
+      <option value="numbers">数字のみ</option>
+      <option value="tobiishi">飛石</option>
+      <option value="kakutobi">拡飛</option>
+    </select>
+  </div>
+
+  <div class="dualPanel">
+    <h3>🔎 検索②</h3>
+    <label>一致方式</label>
+    <select id="searchMode2">
+      <option value="normal">通常検索</option>
+      <option value="regex">🔥 正規表現</option>
+    </select>
+    <h4>一致条件</h4>
+    <div id="conditions2"></div>
+    <button id="addCondition2">＋ 条件を追加</button>
+    <label>⭐ 特殊トリップ</label>
+    <select id="special2">
+      <option value="none">指定なし</option>
+      <option value="pure">純n連（純8連以上）</option>
+      <option value="quasi">準n連（準9連以上）</option>
+      <option value="two">二構</option>
+      <option value="longest">最長</option>
+      <option value="shortest">最短</option>
+      <option value="yakumo">八雲</option>
+      <option value="mirror">鏡</option>
+      <option value="palindrome">回文</option>
+      <option value="echo">エコー</option>
+      <option value="double">二重</option>
+      <option value="numbers">数字のみ</option>
+      <option value="tobiishi">飛石</option>
+      <option value="kakutobi">拡飛</option>
+    </select>
+  </div>
 </div>
 
-
-<h3>一致条件</h3>
-
-<div id="conditions"></div>
-
-<button id="addCondition">
-＋ 条件を追加
-</button>
-
-
-<h3>⭐ 特殊トリップ</h3>
-
-<select id="special">
-
-<option value="none">
-指定なし
-</option>
-
-<option value="pure">
-純n連（純8連以上）
-</option>
-
-<option value="quasi">
-準n連（準9連以上）
-</option>
-
-<option value="two">
-二構
-</option>
-
-<option value="longest">
-最長
-</option>
-
-<option value="shortest">
-最短
-</option>
-
-<option value="yakumo">
-八雲
-</option>
-
-<option value="mirror">
-鏡
-</option>
-
-<option value="palindrome">
-回文
-</option>
-
-<option value="echo">
-山彦
-</option>
-
-<option value="double">
-双連
-</option>
-
-<option value="numbers">
-全数
-</option>
-
-<option value="tobiishi">
-飛石
-</option>
-
-<option value="kakutobi">
-拡飛
-</option>
-
-</select>
-
-
-<div>
-
-<button
-    id="startSearch"
-    class="primary"
->
-🔍 検索開始
-</button>
-
-<button
-    id="stopSearch"
-    class="danger"
->
-⏹ 検索停止
-</button>
-
-</div>
-
-
-<div class="status">
-
-<div class="statusBox">
-
-状態
-
-<div
-    id="searchState"
-    class="statusValue"
->
-停止中
-</div>
-
-</div>
-
-<div class="statusBox">
-
-試行キー
-
-<div
-    id="attemptCount"
-    class="statusValue"
->
-0
-</div>
-
-</div>
-
-<div class="statusBox">
-
-ヒット
-
-<div
-    id="hitCount"
-    class="statusValue"
->
-0
-</div>
-
-</div>
-
-<div class="statusBox">
-
-速度
-
-<div
-    id="speed"
-    class="statusValue"
->
-0 / 秒
-</div>
-
-</div>
-
+<div class="buttonRow">
+<button id="startSearch" class="primary">🔎 二重検索開始</button>
+<button id="stopSearch" class="danger">⛔ 両方の検索を停止</button>
 </div>
 
 </section>
-
-
-<!-- =========================================
-     RESULTS
-========================================= -->
-
-<section>
-
-<h2>🎯 検索結果</h2>
-
-<div id="results">
-検索結果はありません。
-</div>
-
-</section>
-
 
 <!-- =========================================
      SPECIAL
@@ -864,71 +722,32 @@ function getJapaneseType(value) {
    条件警告
 ========================================= */
 
-function validateConditions(showAlert = true) {
+function validateConditions(containerId, showAlert = true) {
 
-    const elements =
-        document.querySelectorAll(
-            ".condition"
-        );
+    const container = $(containerId);
+    if (!container) return true;
 
-
+    const elements = container.querySelectorAll('.condition');
     let valid = true;
 
-
     for (const element of elements) {
+        const input = element.querySelector('.conditionText');
+        if (!input) continue;
 
-        const input =
-            element.querySelector(
-                ".conditionText"
-            );
-
-
-        if (!input) {
-            continue;
-        }
-
-
-        const text =
-            input.value;
-
-
-        element.classList.remove(
-            "invalid"
-        );
-
-
-        if (!text) {
-            continue;
-        }
-
+        const text = input.value;
+        element.classList.remove('invalid');
+        if (!text) continue;
 
         if (containsJapanese(text)) {
-
             valid = false;
-
-            element.classList.add(
-                "invalid"
-            );
-
-
+            element.classList.add('invalid');
             if (showAlert) {
-
-                alert(
-                    "検索条件に" +
-                    getJapaneseType(text) +
-                    "が含まれています。\n\n" +
-                    "数字・アルファベット・記号で検索条件を入力してください。"
-                );
-
+                alert('検索条件に' + getJapaneseType(text) + 'が含まれています。\n\n数字・アルファベット・記号で検索条件を入力してください。');
                 input.focus();
             }
-
-
             break;
         }
     }
-
-
     return valid;
 }
 
@@ -960,7 +779,7 @@ function terminateWorkers() {
    Worker作成
 ========================================= */
 
-function createWorker(index) {
+function createWorker(index, searchId) {
 
     const worker =
         new Worker(WORKER_FILE);
@@ -968,6 +787,9 @@ function createWorker(index) {
 
     worker.__index =
         index;
+
+    worker.__searchId =
+        searchId || null;
 
 
     worker.onmessage =
@@ -1012,7 +834,7 @@ function handleWorkerMessage(
         case "ready":
 
             log(
-                `Worker #${worker.__index}: ready`
+                `${worker.__searchId ? `検索${worker.__searchId} ` : ''}Worker #${worker.__index}: ready`
             );
 
             $("libraryStatus").textContent =
@@ -1123,7 +945,8 @@ function handleWorkerMessage(
 
             addResult(
                 data.trip,
-                data.key
+                data.key,
+                worker.__searchId
             );
 
 
@@ -1141,7 +964,7 @@ function handleWorkerMessage(
         case "error":
 
             log(
-                `Worker #${worker.__index}: ` +
+                `${worker.__searchId ? `検索${worker.__searchId} ` : ''}Worker #${worker.__index}: ` +
                 data.message
             );
 
@@ -1382,188 +1205,61 @@ function renderTests(results) {
 
 
 /* =========================================
-   Conditions
+   Conditions（二重検索）
 ========================================= */
 
-function addCondition() {
-
-    const div =
-        document.createElement("div");
-
-
-    div.className =
-        "condition";
-
-
-    div.innerHTML =
-        `
+function addCondition(containerId) {
+    const container = $(containerId);
+    const div = document.createElement('div');
+    div.className = 'condition';
+    div.innerHTML = `
         <div class="grid">
-
             <div>
-
-                <label>
-                    一致文字列
-                </label>
-
-                <input
-                    class="conditionText"
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-
+                <label>一致文字列</label>
+                <input class="conditionText" autocomplete="off" spellcheck="false">
             </div>
-
-
             <div>
-
-                <label>
-                    一致方式
-                </label>
-
+                <label>一致方式</label>
                 <select class="conditionMode">
-
-                    <option value="contains">
-                        部分一致
-                    </option>
-
-                    <option value="starts">
-                        前方一致
-                    </option>
-
-                    <option value="ends">
-                        後方一致
-                    </option>
-
-                    <option value="exact">
-                        完全一致
-                    </option>
-
+                    <option value="contains">部分一致</option>
+                    <option value="starts">前方一致</option>
+                    <option value="ends">後方一致</option>
+                    <option value="exact">完全一致</option>
                 </select>
-
             </div>
-
         </div>
+        <button class="deleteCondition danger">🗑️ この条件を削除</button>`;
 
-        <button
-            class="deleteCondition danger"
-        >
-            🗑️ この条件を削除
-        </button>
-        `;
-
-
-    const input =
-        div.querySelector(
-            ".conditionText"
-        );
-
-
-    /*
-     * 入力時にも日本語を検出
-     */
-
-    input.addEventListener(
-        "input",
-        function() {
-
-            if (
-                containsJapanese(
-                    input.value
-                )
-            ) {
-
-                div.classList.add(
-                    "invalid"
-                );
-
-            } else {
-
-                div.classList.remove(
-                    "invalid"
-                );
-            }
-        }
-    );
-
-
-    div.querySelector(
-        ".deleteCondition"
-    ).addEventListener(
-        "click",
-        function() {
-
-            div.remove();
-        }
-    );
-
-
-    $("conditions")
-        .appendChild(div);
+    const input = div.querySelector('.conditionText');
+    input.addEventListener('input', function() {
+        div.classList.toggle('invalid', containsJapanese(input.value));
+    });
+    div.querySelector('.deleteCondition').addEventListener('click', function() {
+        div.remove();
+    });
+    container.appendChild(div);
 }
 
+$('addCondition1').addEventListener('click', () => addCondition('conditions1'));
+$('addCondition2').addEventListener('click', () => addCondition('conditions2'));
+addCondition('conditions1');
+addCondition('conditions2');
 
-$("addCondition")
-    .addEventListener(
-        "click",
-        addCondition
-    );
-
-
-addCondition();
-addCondition();
-
-
-/* =========================================
-   Get conditions
-========================================= */
-
-function getConditions() {
-
-    const mode =
-        $("searchMode").value;
-
-
-    const elements =
-        document.querySelectorAll(
-            ".condition"
-        );
-
-
+function getConditions(containerId, modeId) {
+    const mode = $(modeId).value;
+    const elements = $(containerId).querySelectorAll('.condition');
     const conditions = [];
-
-
     for (const element of elements) {
-
-        const text =
-            element.querySelector(
-                ".conditionText"
-            ).value;
-
-
-        if (!text) {
-            continue;
-        }
-
-
+        const text = element.querySelector('.conditionText').value;
+        if (!text) continue;
         conditions.push({
-
-            text: text,
-
-            mode:
-                element.querySelector(
-                    ".conditionMode"
-                ).value,
-
-            regex:
-                mode === "regex"
-
+            text,
+            mode: element.querySelector('.conditionMode').value,
+            regex: mode === 'regex'
         });
     }
-
-
     return conditions;
 }
-
 
 /* =========================================
    Worker count
@@ -1593,206 +1289,77 @@ function getWorkerCount() {
 
 
 /* =========================================
-   Start search
+   Start search（二重検索）
 ========================================= */
 
-$("startSearch")
-    .addEventListener(
-        "click",
-        startSearch
-    );
-
+$('startSearch').addEventListener('click', startSearch);
 
 function startSearch() {
+    if (searching) return;
 
-    if (searching) {
-        return;
-    }
-
-
-    /*
-     * ★日本語チェック
-     *
-     * ここで止める。
-     */
-
-    if (!validateConditions(true)) {
-
-        log(
-            "検索開始を中止: " +
-            "検索条件に日本語文字が含まれています"
-        );
-
-        return;
-    }
-
+    if (!validateConditions('conditions1', true)) return;
+    if (!validateConditions('conditions2', true)) return;
 
     stopSearch(false);
 
-
-    const count =
-        getWorkerCount();
-
-
-    const length =
-        Number(
-            $("searchLength").value
-        );
-
-
-    const conditions =
-        getConditions();
-
-
-    const special =
-        $("special").value;
-
+    const count = getWorkerCount();
+    const length = Number($('searchLength').value);
+    const searches = [
+        { id: 1, conditions: getConditions('conditions1', 'searchMode1'), special: $('special1').value },
+        { id: 2, conditions: getConditions('conditions2', 'searchMode2'), special: $('special2').value }
+    ];
 
     totalAttempts = 0;
-
     totalHits = 0;
-
-
-    startTime =
-        performance.now();
-
-
-    $("attemptCount").textContent =
-        "0";
-
-
-    $("hitCount").textContent =
-        "0";
-
-
-    $("speed").textContent =
-        "0 / 秒";
-
-
-    $("results").innerHTML =
-        "";
-
-
+    startTime = performance.now();
+    $('attemptCount').textContent = '0';
+    $('hitCount').textContent = '0';
+    $('speed').textContent = '0 / 秒';
+    $('results').innerHTML = '';
     searching = true;
+    $('searchState').textContent = '🔎 二重検索中...';
+    $('workerStatus').textContent = `${count * 2} Worker 起動中（検索① ${count} / 検索② ${count}）`;
 
+    log(`二重検索開始: ${length}文字 / 各${count} Worker`);
 
-    $("searchState").textContent =
-        "🔎 検索中...";
-
-
-    $("workerStatus").textContent =
-        `${count} Worker 起動中`;
-
-
-    log(
-        `検索開始: ${length}文字 / ${count} Worker`
-    );
-
-
-    for (
-        let i = 0;
-        i < count;
-        i++
-    ) {
-
-        const worker =
-            createWorker(i + 1);
-
-
-        workers.push(worker);
-
-
-        worker.postMessage({
-
-            type: "search",
-
-            length: length,
-
-            conditions: conditions,
-
-            special: special,
-
-            charset: SEARCH_CHARSET
-
-        });
+    for (const job of searches) {
+        log(`検索${job.id} 開始: ${job.conditions.length ? job.conditions.map(c => c.text).join(' AND ') : '条件なし'} / 特殊=${job.special}`);
+        for (let i = 0; i < count; i++) {
+            const worker = createWorker(i + 1, job.id);
+            workers.push(worker);
+            worker.postMessage({
+                type: 'search',
+                length,
+                conditions: job.conditions,
+                special: job.special,
+                charset: SEARCH_CHARSET
+            });
+        }
     }
 }
-
 
 /* =========================================
    Stop search
 ========================================= */
 
-$("stopSearch")
-    .addEventListener(
-        "click",
-        function() {
-
-            stopSearch(true);
-        }
-    );
-
+$('stopSearch').addEventListener('click', () => stopSearch(true));
 
 function stopSearch(writeLog) {
-
-    if (
-        !searching &&
-        workers.length === 0
-    ) {
-
-        return;
-    }
-
+    if (!searching && workers.length === 0) return;
 
     searching = false;
-
-
-    const oldWorkers =
-        workers.slice();
-
-
+    const oldWorkers = workers.slice();
     workers = [];
 
-
-    for (
-        const worker of oldWorkers
-    ) {
-
-        try {
-
-            worker.postMessage({
-                type: "stop"
-            });
-
-        } catch (e) {
-        }
-
-
-        try {
-
-            worker.terminate();
-
-        } catch (e) {
-        }
+    for (const worker of oldWorkers) {
+        try { worker.postMessage({ type: 'stop' }); } catch (e) {}
+        try { worker.terminate(); } catch (e) {}
     }
 
-
-    $("workerStatus").textContent =
-        "待機";
-
-
-    $("searchState").textContent =
-        "停止中";
-
-
-    if (writeLog) {
-
-        log(
-            "検索停止"
-        );
-    }
+    $('workerStatus').textContent = '待機';
+    $('searchState').textContent = '停止中';
+    if (writeLog) log('二重検索停止');
 }
-
 
 /* =========================================
    Statistics
@@ -1831,7 +1398,8 @@ function updateStatistics() {
 
 function addResult(
     trip,
-    key
+    key,
+    searchId
 ) {
 
     const result =
@@ -1839,13 +1407,13 @@ function addResult(
 
 
     result.className =
-        "result";
+        `result searchResult${searchId === 2 ? ' search2' : ' search1'}`;
 
 
     result.innerHTML =
         `
         <div class="trip">
-            ◇${escapeHtml(trip)}
+            ${searchId === 2 ? '② ' : '① '}◇${escapeHtml(trip)}
         </div>
 
         <div class="key">
