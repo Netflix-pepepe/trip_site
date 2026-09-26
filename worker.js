@@ -34,9 +34,18 @@ let running = false;
 
 try {
 
-    importScripts(
-        "./unix-crypt-td.min.js"
-    );
+    // ローカル版を優先。配布先でファイルが欠落している場合は
+    // 公式npmパッケージのjsDelivr版をフォールバックとして読み込む。
+    try {
+        importScripts("./unix-crypt-td.min.js");
+    } catch (_) {
+        importScripts("https://cdn.jsdelivr.net/npm/unix-crypt-td-js@1.1.4/unix-crypt-td.min.js");
+    }
+
+    // ローカルファイルがHTML等に置き換わっていた場合もフォールバック。
+    if (typeof self.unixCryptTD !== "function" && typeof self.z !== "function") {
+        importScripts("https://cdn.jsdelivr.net/npm/unix-crypt-td-js@1.1.4/unix-crypt-td.min.js");
+    }
 
 
     if (
