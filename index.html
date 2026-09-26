@@ -238,9 +238,9 @@ td {
     <section class="portal-panel active" data-panel="about">
       <div class="portal-card"><h1>🐺 人狼オンライン データベース</h1><p>トリップ検索を中心に、戦績・ランキング・同村関係・ゲームログ・プレイヤー解析・Wiki・掲示板を1ページにまとめた総合ツールです。</p><div class="notice">現在はブラウザ内DB（localStorage）で動作します。データ管理からJSONを取り込めば、別端末にも同じデータを移せます。サーバーDB/APIを接続する場合も、このUIをそのまま土台にできます。</div></div>
       <div class="portal-grid"><div class="portal-stat">登録プレイヤー<strong id="statPlayers">0</strong></div><div class="portal-stat">ゲーム数<strong id="statGames">0</strong></div><div class="portal-stat">総参戦数<strong id="statParticipations">0</strong></div><div class="portal-stat">掲示板投稿<strong id="statPosts">0</strong></div></div>
-      <div class="portal-card"><h2>機能</h2><p>🔍 高速トリップ検索（正規表現・二重検索） ／ 📊 個人戦績 ／ 🏆 ランキング ／ 👥 同村関係 ／ 🏘️ ゲーム解析 ／ 🤖 発言スタイル解析 ／ 👤 プロフィール ／ 📝 Wiki ／ 💬 掲示板 ／ 💾 JSON入出力</p></div>
+      <div class="portal-card"><h2>機能</h2><p>🔍 高速トリップ検索（正規表現・二重検索） ／ 📊 個人戦績 ／ 🏆 ランキング ／ 👥 同村関係 ／ 🏘️ ゲーム解析 ／ 🤖 発言スタイル解析 ／ 👤 プロフィール ／ 📝 Wiki ／ 💬 掲示板 ／ 💾 JSON入出力（サンプルデータは生成しません）</p></div>
     </section>
-    <section class="portal-panel" data-panel="player"><div class="portal-card"><h2>📊 個人戦績</h2><div class="portal-grid"><input id="playerQuery" class="portal-input" placeholder="名前・トリップで検索"><select id="playerMode" class="portal-select"><option value="all">すべて</option><option value="name">名前</option><option value="trip">トリップ</option></select></div><div class="portal-actions"><button class="portal-btn" id="playerSearchBtn">検索</button></div></div><div id="playerResult"></div></section>
+    <section class="portal-panel" data-panel="player"><div class="portal-card"><h2>📊 個人戦績</h2><p class="portal-muted">公開ログ検索APIから実データを取得します。サンプル戦績は表示しません。</p><div class="portal-grid"><input id="playerQuery" class="portal-input" placeholder="名前またはトリップ（例：サプリ / ◆SuppleLohk）"><select id="playerMode" class="portal-select"><option value="name">名前</option><option value="trip">トリップ</option></select></div><div class="portal-actions"><button class="portal-btn" id="playerSearchBtn">🔎 実データを検索</button></div><div id="playerRemoteStatus" class="portal-muted"></div></div><div id="playerResult"></div></section>
     <section class="portal-panel" data-panel="ranking"><div class="portal-card"><h2>🏆 ランキング</h2><div class="portal-grid"><select id="rankMetric" class="portal-select"><option value="games">参戦数</option><option value="wins">勝利数</option><option value="rate">勝率</option><option value="speech">発言数</option><option value="rm">RM回数</option></select><select id="rankPeriod" class="portal-select"><option value="all">通算</option><option value="month">今月</option><option value="year">今年</option></select></div></div><div class="portal-card"><table class="portal-table"><thead><tr><th>#</th><th>プレイヤー</th><th>トリップ</th><th>戦数</th><th>勝利</th><th>勝率</th><th>発言</th></tr></thead><tbody id="rankingBody"></tbody></table></div></section>
     <section class="portal-panel" data-panel="relations"><div class="portal-card"><h2>👥 同村・関係解析</h2><input id="relationQuery" class="portal-input" placeholder="プレイヤー名またはトリップ"><div class="portal-actions"><button class="portal-btn" id="relationBtn">解析</button></div></div><div id="relationResult"></div></section>
     <section class="portal-panel" data-panel="games"><div class="portal-card"><h2>🏘️ ゲームログ解析</h2><input id="gameQuery" class="portal-input" placeholder="ゲームID・村名・プレイヤー・トリップ"><div class="portal-actions"><button class="portal-btn" id="gameSearchBtn">検索</button></div></div><div id="gameResult"></div></section>
@@ -248,7 +248,7 @@ td {
     <section class="portal-panel" data-panel="profile"><div class="portal-card"><h2>👤 プロフィール</h2><input id="profileTrip" class="portal-input" placeholder="トリップ"><input id="profileName" class="portal-input" placeholder="表示名"><textarea id="profileIntro" class="portal-textarea" rows="5" placeholder="自己紹介"></textarea><input id="profileX" class="portal-input" placeholder="X ID（任意）"><div class="portal-actions"><button class="portal-btn" id="profileSave">保存</button></div></div></section>
     <section class="portal-panel" data-panel="wiki"><div class="portal-card"><h2>📝 Wiki</h2><input id="wikiTrip" class="portal-input" placeholder="トリップ"><textarea id="wikiText" class="portal-textarea" rows="10" placeholder="人物メモ・Wiki"></textarea><div class="portal-actions"><button class="portal-btn" id="wikiSave">保存</button></div></div><div id="wikiList"></div></section>
     <section class="portal-panel" data-panel="board"><div class="portal-card"><h2>💬 掲示板</h2><input id="postName" class="portal-input" placeholder="名前"><input id="postTrip" class="portal-input" placeholder="トリップ"><textarea id="postText" class="portal-textarea" rows="4" placeholder="投稿内容"></textarea><div class="portal-actions"><button class="portal-btn" id="postBtn">投稿</button></div></div><div id="boardList"></div></section>
-    <section class="portal-panel" data-panel="data"><div class="portal-card"><h2>🌐 自動戦績取得</h2><p class="portal-muted">PHPバックエンドから人狼Onlineの終了村を取得し、戦績DBへ同期します。</p><div class="portal-grid"><input id="statsApiUrl" class="portal-input" placeholder="https://example.com/backend/api.php"><input id="statsApiToken" class="portal-input" placeholder="APIトークン（任意）"></div><div class="portal-actions"><button class="portal-btn" id="statsSyncBtn">🔄 今すぐ同期</button><button class="portal-btn secondary" id="statsStatusBtn">接続確認</button></div><div id="statsSyncStatus" class="portal-muted">未接続</div></div><div class="portal-card"><h2>💾 データ管理</h2><p class="portal-muted">このサイトの戦績データ・プロフィール・Wiki・掲示板をJSONで保存/復元できます。</p><div class="portal-actions"><button class="portal-btn" id="exportBtn">JSONを書き出す</button><label class="portal-btn secondary" for="importFile">JSONを読み込む</label><input id="importFile" type="file" accept="application/json" hidden><button class="portal-btn secondary" id="seedBtn">サンプルデータ追加</button><button class="portal-btn secondary" id="clearBtn">ローカルデータ初期化</button></div></div><div class="portal-card"><h3>データ形式</h3><p>players / games / posts / profiles / wiki を持つJSONです。将来PHP・Node・PostgreSQL等のAPIへ移行できます。</p></div></section>
+    <section class="portal-panel" data-panel="data"><div class="portal-card"><h2>🌐 自動戦績取得</h2><p class="portal-muted">PHPバックエンドから人狼Onlineの終了村を取得し、戦績DBへ同期します。</p><div class="portal-grid"><input id="statsApiUrl" class="portal-input" placeholder="https://example.com/backend/api.php"><input id="statsApiToken" class="portal-input" placeholder="APIトークン（任意）"></div><div class="portal-actions"><button class="portal-btn" id="statsSyncBtn">🔄 今すぐ同期</button><button class="portal-btn secondary" id="statsStatusBtn">接続確認</button></div><div id="statsSyncStatus" class="portal-muted">未接続</div></div><div class="portal-card"><h2>💾 データ管理</h2><p class="portal-muted">このサイトの戦績データ・プロフィール・Wiki・掲示板をJSONで保存/復元できます。</p><div class="portal-actions"><button class="portal-btn" id="exportBtn">JSONを書き出す</button><label class="portal-btn secondary" for="importFile">JSONを読み込む</label><input id="importFile" type="file" accept="application/json" hidden><button class="portal-btn secondary" id="clearBtn">ローカルデータ初期化</button></div></div><div class="portal-card"><h3>データ形式</h3><p>players / games / posts / profiles / wiki を持つJSONです。将来PHP・Node・PostgreSQL等のAPIへ移行できます。</p></div></section>
   </div>
 </div>
 
@@ -1499,7 +1499,7 @@ setInterval(
 
 
 /* ===== Portal database / dashboard ===== */
-const DB_KEY='wolf_online_portal_db_v2';
+const DB_KEY='wolf_online_portal_db_v3';
 const defaultDB={players:[],games:[],posts:[],profiles:{},wiki:{}};
 let db=loadDB();
 function clone(o){return JSON.parse(JSON.stringify(o));}
@@ -1507,19 +1507,6 @@ function loadDB(){try{const raw=JSON.parse(localStorage.getItem(DB_KEY)||localSt
 function saveDB(){localStorage.setItem(DB_KEY,JSON.stringify(db));renderAll()}
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function normalizeTrip(t){t=String(t||'').trim();return t.startsWith('◆')||t.startsWith('◇')?t:'◆'+t}
-function seedDB(){
- const defs=[['サンプル狼','SampleAAA'],['雪兎','SnowBBB'],['夜桜','YozakuraC'],['観測者','ObserveD'],['初心者A','BeginnerE'],['銀河','GalaxyFF']];
- db.players=defs.map((x,i)=>({id:'p'+i,name:x[0],trip:'◆'+x[1],rm:i%3===0}));
- const roles=['村人','占い師','霊能者','狩人','人狼','狂人'];
- db.games=[];
- for(let i=0;i<18;i++){
-   const winner=i%3===0?'狼':'村'; const ids=db.players.map(p=>p.id).filter((_,j)=>j<4+(i%3));
-   const participants=ids.map((id,j)=>{const role=roles[(i+j)%roles.length];const side=['人狼','狂人'].includes(role)?'狼':'村';return {id,role,side,result:side===winner?'win':'lose',speech:12+i+j*3,questions:(i+j)%5,mentions:5+(i*2+j)%12};});
-   db.games.push({id:'G2026-'+String(i+1).padStart(3,'0'),name:(i%2?'夜村':'普通村')+' #'+(i+1),date:`2026-09-${String(8+i).padStart(2,'0')}`,winner,players:participants.map(x=>x.id),participants,mvp:participants[i%participants.length].id,rm:participants[0].id,log:'サンプルゲームログ。参加者・役職・勝敗・発言集計を含みます。'});
- }
- db.posts=[{name:'管理人',trip:'◆Admin',text:'サイトへようこそ。戦績データはデータ管理からJSONで保存・復元できます。',date:new Date().toISOString()}];
- rebuildPlayers(); saveDB();
-}
 function rebuildPlayers(){
  const byId={}; db.players.forEach(p=>byId[p.id]=Object.assign({},p));
  db.games.forEach(g=>{
@@ -1539,8 +1526,7 @@ function rebuildPlayers(){
  db.players=Object.values(byId);
 }
 function migrateOldDB(){
- if(!db.players.length && !db.games.length){seedDB();return;}
- db.players=db.players.map(p=>Object.assign({},p,{trip:normalizeTrip(p.trip)}));
+  db.players=db.players.map(p=>Object.assign({},p,{trip:normalizeTrip(p.trip)}));
  if(db.games.length && db.games.some(g=>!Array.isArray(g.participants))){db.games=db.games.map(g=>Object.assign({},g,{participants:(g.participants||g.players||[]).map((x,j)=>typeof x==='string'?{id:x,role:['村人','占い師','人狼'][j%3],side:['村人','占い師'].includes(['村人','占い師','人狼'][j%3])?'村':'狼',result:((['村人','占い師'].includes(['村人','占い師','人狼'][j%3])?'村':'狼')===g.winner?'win':'lose'),speech:10+j*2,questions:j%3,mentions:j+2}:x)}));}
  rebuildPlayers();
 }
@@ -1558,7 +1544,26 @@ function playerStats(p){
  return `<div class="portal-card"><h3>${esc(p.name)} <span class="portal-badge">${esc(p.trip)}</span></h3><div class="portal-grid"><div class="portal-stat">参戦数<strong>${g}</strong></div><div class="portal-stat">勝利<strong>${w}</strong></div><div class="portal-stat">勝率<strong>${rate}%</strong></div><div class="portal-stat">発言数<strong>${p.speech||0}</strong></div><div class="portal-stat">RM<strong>${p.rm||0}</strong></div></div><h4>役職別戦績</h4><table class="portal-table"><thead><tr><th>役職</th><th>戦数</th><th>勝利</th><th>勝率</th></tr></thead><tbody>${roles||'<tr><td colspan="4">役職データなし</td></tr>'}</tbody></table><h4>最近の参戦</h4><table class="portal-table"><thead><tr><th>日付</th><th>村</th><th>役職</th><th>結果</th></tr></thead><tbody>${recent||'<tr><td colspan="4">参戦履歴なし</td></tr>'}</tbody></table></div>`;
 }
 function findPlayers(q,mode='all'){q=String(q||'').trim().toLowerCase();return db.players.filter(p=>!q||(mode==='name'?p.name:mode==='trip'?p.trip:p.name+' '+p.trip).toLowerCase().includes(q))}
-function renderPlayer(){const q=document.getElementById('playerQuery').value,m=document.getElementById('playerMode').value;const ps=findPlayers(q,m);document.getElementById('playerResult').innerHTML=ps.length?ps.map(playerStats).join(''):'<div class="portal-card">該当するプレイヤーがありません。名前またはトリップを入力してください。</div>'}
+function renderPlayer(){const q=document.getElementById('playerQuery').value.trim();document.getElementById('playerResult').innerHTML=q?'<div class="portal-card">検索ボタンを押すと公開ログから取得します。</div>':'<div class="portal-card">名前またはトリップを入力してください。</div>'}
+function remotePlayerStats(logs, target, mode){
+ const rows=[]; let player=null;
+ for(const g of (logs||[])){
+   const ps=Array.isArray(g.players)?g.players:[];
+   const hit=ps.find(p=>mode==='trip'?String(p.trip||'').replace(/^◆/,'')===target.replace(/^◆/,''):String(p.name||'')===target);
+   if(hit){ if(!player) player={name:hit.name||target,trip:hit.trip||'',games:0,wins:0,speech:0,roles:{},roleWins:{},logs:[]};
+     player.games++; player.speech+=Number(hit.mes||0); const role=hit.job||'未設定'; player.roles[role]=(player.roles[role]||0)+1;
+     const side=(/人狼|狂人|狂信者|黒猫/.test(role)?'狼':/妖狐|背徳|恋人/.test(role)?'第三':'村'); const winner=String(g.winner||''); const win=(winner.includes('人狼')&&side==='狼')||(winner.includes('妖狐')&&side==='第三')||(winner.includes('村')&&side==='村'); if(win){player.wins++;player.roleWins[role]=(player.roleWins[role]||0)+1;}
+     player.logs.push({date:g.date||'',room:g.room_name||('ゲーム#'+g.id),role,result:win?'勝利':'敗北',id:g.id});
+   }
+ }
+ if(!player)return '<div class="portal-card">実データが見つかりませんでした。名前/トリップの表記を確認してください。</div>';
+ const rate=player.games?(player.wins/player.games*100).toFixed(1):'0.0';
+ const roles=Object.keys(player.roles).sort().map(r=>`<tr><td>${esc(r)}</td><td>${player.roles[r]}</td><td>${player.roleWins[r]||0}</td><td>${(((player.roleWins[r]||0)/player.roles[r])*100).toFixed(1)}%</td></tr>`).join('');
+ const recent=player.logs.slice().reverse().slice(0,30).map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.room)}</td><td>${esc(x.role)}</td><td>${x.result}</td><td>${esc(String(x.id))}</td></tr>`).join('');
+ return `<div class="portal-card"><h3>${esc(player.name)} <span class="portal-badge">${esc(normalizeTrip(player.trip||''))}</span></h3><div class="portal-grid"><div class="portal-stat">参戦数<strong>${player.games}</strong></div><div class="portal-stat">勝利<strong>${player.wins}</strong></div><div class="portal-stat">勝率<strong>${rate}%</strong></div><div class="portal-stat">発言数<strong>${player.speech}</strong></div></div><h4>配役/役職別勝敗</h4><table class="portal-table"><thead><tr><th>役職</th><th>戦数</th><th>勝利</th><th>勝率</th></tr></thead><tbody>${roles||'<tr><td colspan="4">役職データなし</td></tr>'}</tbody></table><h4>参戦ログ</h4><table class="portal-table"><thead><tr><th>日時</th><th>村</th><th>役職</th><th>結果</th><th>ID</th></tr></thead><tbody>${recent}</tbody></table></div>`;
+}
+async function searchRemotePlayer(){const q=document.getElementById('playerQuery').value.trim();const mode=document.getElementById('playerMode').value;const status=document.getElementById('playerRemoteStatus');if(!q){status.textContent='名前またはトリップを入力してください。';return;}const api=(localStorage.getItem('wolf_stats_api')||'').trim();if(!api){status.textContent='先に「データ管理」でバックエンドAPI URLを設定してください。';document.getElementById('playerResult').innerHTML='<div class="portal-card">API未設定です。データ管理 → 自動戦績取得 → API URL を設定してください。</div>';return;}status.textContent='公開ログを検索中…';try{const param=mode==='trip'?'trip':'name';const u=api+'?action=search&'+param+'='+encodeURIComponent(q);const r=await fetch(u,{cache:'no-store'});const j=await r.json();if(!j.ok)throw new Error(j.error||'API error');const data=j.data||{};if(data.error)throw new Error(data.error);const logs=data.log_data||[];status.textContent=`取得 ${logs.length}ゲーム`;document.getElementById('playerResult').innerHTML=remotePlayerStats(logs,q,mode);}catch(e){status.textContent='取得エラー: '+e.message;document.getElementById('playerResult').innerHTML='<div class="portal-card">公開ログAPIから取得できませんでした。バックエンドURLとサーバーの外部通信を確認してください。</div>';}}
+
 function renderRanking(){const metric=document.getElementById('rankMetric')?.value||'games';let ps=[...db.players];ps.sort((a,b)=>metric==='rate'?((b.games?b.wins/b.games:0)-(a.games?a.wins/a.games:0)):((b[metric]||0)-(a[metric]||0)));document.getElementById('rankingBody').innerHTML=ps.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.trip)}</td><td>${p.games||0}</td><td>${p.wins||0}</td><td>${p.games?((p.wins/p.games)*100).toFixed(1):'0.0'}%</td><td>${p.speech||0}</td></tr>`).join('')||'<tr><td colspan="7">データなし</td></tr>'}
 function renderRelations(){const q=document.getElementById('relationQuery').value.trim();const ps=findPlayers(q);if(!ps[0]){document.getElementById('relationResult').innerHTML='<div class="portal-card">対象プレイヤーが見つかりません。</div>';return}const target=ps[0],counts={};db.games.forEach(g=>{if((g.players||[]).includes(target.id))g.players.forEach(id=>{if(id!==target.id)counts[id]=(counts[id]||0)+1})});const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([id,n])=>{const p=db.players.find(x=>x.id===id);return `<div class="rel"><span>${esc(p?.name||id)} <small>${esc(p?.trip||'')}</small></span><b>${n}回</b></div>`}).join('');document.getElementById('relationResult').innerHTML=`<div class="portal-card"><h3>${esc(target.name)} の同村ランキング</h3>${rows||'同村データなし'}</div>`}
 function renderGames(){const q=document.getElementById('gameQuery').value.trim().toLowerCase();const gs=db.games.filter(g=>!q||(g.id+' '+g.name+' '+(g.players||[]).map(id=>db.players.find(p=>p.id===id)?.name||'').join(' ')).toLowerCase().includes(q));document.getElementById('gameResult').innerHTML=gs.map(g=>`<div class="portal-card"><h3>${esc(g.name)} <span class="portal-badge">${esc(g.id)}</span></h3><p>${esc(g.date)} / 勝利陣営: ${esc(g.winner)} / MVP: ${esc(db.players.find(p=>p.id===g.mvp)?.name||'—')}</p><p>${esc(g.log)}</p></div>`).join('')||'<div class="portal-card">ゲームなし</div>'}
@@ -1570,12 +1575,12 @@ async function checkStatsApi(){const url=(document.getElementById('statsApiUrl')
 function restoreStatsApiSettings(){const u=localStorage.getItem('wolf_stats_api')||'';const t=localStorage.getItem('wolf_stats_token')||'';if(document.getElementById('statsApiUrl'))document.getElementById('statsApiUrl').value=u;if(document.getElementById('statsApiToken'))document.getElementById('statsApiToken').value=t;}
 function bindPortal(){
  document.querySelectorAll('.portal-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.portal-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const t=b.dataset.tab;document.querySelectorAll('.portal-panel').forEach(x=>x.classList.toggle('active',x.dataset.panel===t));document.getElementById('searchPanel').classList.toggle('portal-search-hidden',t!=='search');if(t==='player')renderPlayer();if(t==='ranking')renderRanking();if(t==='games')renderGames();if(t==='ai')renderAI();});
- document.getElementById('playerSearchBtn').onclick=renderPlayer;document.getElementById('rankMetric').onchange=renderRanking;document.getElementById('relationBtn').onclick=renderRelations;document.getElementById('gameSearchBtn').onclick=renderGames;document.getElementById('aiBtn').onclick=renderAI;
+ document.getElementById('playerSearchBtn').onclick=searchRemotePlayer;document.getElementById('rankMetric').onchange=renderRanking;document.getElementById('relationBtn').onclick=renderRelations;document.getElementById('gameSearchBtn').onclick=renderGames;document.getElementById('aiBtn').onclick=renderAI;
  document.getElementById('profileSave').onclick=()=>{const t=document.getElementById('profileTrip').value.trim();if(!t)return;db.profiles[t]={name:document.getElementById('profileName').value,intro:document.getElementById('profileIntro').value,x:document.getElementById('profileX').value};saveDB();alert('プロフィールを保存しました。')};
  document.getElementById('wikiSave').onclick=()=>{const t=document.getElementById('wikiTrip').value.trim();if(!t)return;db.wiki[t]=document.getElementById('wikiText').value;saveDB();alert('Wikiを保存しました。')};
  document.getElementById('postBtn').onclick=()=>{const text=document.getElementById('postText').value.trim();if(!text)return;db.posts.push({name:document.getElementById('postName').value||'名無し',trip:document.getElementById('postTrip').value||'',text,date:new Date().toISOString()});document.getElementById('postText').value='';saveDB()};
  document.getElementById('statsSyncBtn').onclick=syncRemoteStats;document.getElementById('statsStatusBtn').onclick=checkStatsApi;restoreStatsApiSettings();
- document.getElementById('seedBtn').onclick=seedDB;document.getElementById('clearBtn').onclick=()=>{if(confirm('ローカルDBを初期化しますか？')){db=clone(defaultDB);localStorage.removeItem(DB_KEY);renderAll();renderPlayer()}};
+ document.getElementById('clearBtn').onclick=()=>{if(confirm('ローカルDBを初期化しますか？')){db=clone(defaultDB);localStorage.removeItem(DB_KEY);renderAll();renderPlayer()}};
  document.getElementById('exportBtn').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='wolf-online-data.json';a.click()};
  document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=Object.assign(clone(defaultDB),JSON.parse(r.result));rebuildPlayers();saveDB();alert('読み込みました。')}catch(x){alert('JSONが不正です。')}};r.readAsText(f)};
 }
