@@ -240,15 +240,15 @@ td {
       <div class="portal-grid"><div class="portal-stat">登録プレイヤー<strong id="statPlayers">0</strong></div><div class="portal-stat">ゲーム数<strong id="statGames">0</strong></div><div class="portal-stat">総参戦数<strong id="statParticipations">0</strong></div><div class="portal-stat">掲示板投稿<strong id="statPosts">0</strong></div></div>
       <div class="portal-card"><h2>機能</h2><p>🔍 高速トリップ検索（正規表現・二重検索） ／ 📊 個人戦績 ／ 🏆 ランキング ／ 👥 同村関係 ／ 🏘️ ゲーム解析 ／ 🤖 発言スタイル解析 ／ 👤 プロフィール ／ 📝 Wiki ／ 💬 掲示板 ／ 💾 JSON入出力（サンプルデータは生成しません）</p></div>
     </section>
-    <section class="portal-panel" data-panel="player"><div class="portal-card"><h2>📊 個人戦績</h2><p class="portal-muted">公開ログ検索APIから実データを取得します。サンプル戦績は表示しません。</p><div class="portal-grid"><input id="playerQuery" class="portal-input" placeholder="名前またはトリップ（例：サプリ / ◆SuppleLohk）"><select id="playerMode" class="portal-select"><option value="name">名前</option><option value="trip">トリップ</option></select></div><div class="portal-actions"><button class="portal-btn" id="playerSearchBtn">🔎 実データを検索</button></div><div id="playerRemoteStatus" class="portal-muted"></div></div><div id="playerResult"></div></section>
-    <section class="portal-panel" data-panel="ranking"><div class="portal-card"><h2>🏆 ランキング</h2><p class="portal-muted">実データを同期するまで架空のプレイヤーは表示しません。</p><div class="portal-grid"><select id="rankMetric" class="portal-select"><option value="games">参戦数</option><option value="wins">勝利数</option><option value="rate">勝率</option><option value="speech">発言数</option><option value="rm">RM回数</option></select><select id="rankPeriod" class="portal-select"><option value="all">通算</option><option value="month">今月</option><option value="year">今年</option></select></div></div><div class="portal-card"><table class="portal-table"><thead><tr><th>#</th><th>プレイヤー</th><th>トリップ</th><th>戦数</th><th>勝利</th><th>勝率</th><th>発言</th></tr></thead><tbody id="rankingBody"></tbody></table></div></section>
+    <section class="portal-panel" data-panel="player"><div class="portal-card"><h2>📊 個人戦績</h2><p class="portal-muted">公開ログ検索APIから実データを取得します。サンプル戦績は一切表示しません。GitHub Pagesでは直接接続し、CORSで拒否された場合だけ自動プロキシを試します。</p><div class="portal-grid"><input id="playerQuery" class="portal-input" placeholder="名前またはトリップ（例：サプリ / ◇SuppleLohk）"><select id="playerMode" class="portal-select"><option value="name">名前</option><option value="trip">トリップ</option></select></div><div class="portal-actions"><button class="portal-btn" id="playerSearchBtn">🔎 実データを検索</button></div><div id="playerRemoteStatus" class="portal-muted"></div></div><div id="playerResult"></div></section>
+    <section class="portal-panel" data-panel="ranking"><div class="portal-card"><h2>🏆 ランキング</h2><p class="portal-muted">検索で取得した実ログだけを集計します。架空のプレイヤーは表示しません。検索対象を増やすほどランキングが蓄積されます。</p><div class="portal-grid"><select id="rankMetric" class="portal-select"><option value="games">参戦数</option><option value="wins">勝利数</option><option value="rate">勝率</option><option value="speech">発言数</option><option value="rm">RM回数</option></select><select id="rankPeriod" class="portal-select"><option value="all">通算</option><option value="month">今月</option><option value="year">今年</option></select></div></div><div class="portal-card"><table class="portal-table"><thead><tr><th>#</th><th>プレイヤー</th><th>トリップ</th><th>戦数</th><th>勝利</th><th>勝率</th><th>発言</th></tr></thead><tbody id="rankingBody"></tbody></table></div></section>
     <section class="portal-panel" data-panel="relations"><div class="portal-card"><h2>👥 同村・関係解析</h2><input id="relationQuery" class="portal-input" placeholder="プレイヤー名またはトリップ"><div class="portal-actions"><button class="portal-btn" id="relationBtn">解析</button></div></div><div id="relationResult"></div></section>
     <section class="portal-panel" data-panel="games"><div class="portal-card"><h2>🏘️ ゲームログ解析</h2><input id="gameQuery" class="portal-input" placeholder="ゲームID・村名・プレイヤー・トリップ"><div class="portal-actions"><button class="portal-btn" id="gameSearchBtn">検索</button></div></div><div id="gameResult"></div></section>
     <section class="portal-panel" data-panel="ai"><div class="portal-card"><h2>🤖 プレイヤー解析</h2><p class="portal-muted">発言量・質問・他者言及・根拠語などをログから機械集計する簡易版です。勝敗から人格や実力を断定するものではありません。</p><input id="aiQuery" class="portal-input" placeholder="プレイヤー名・トリップ"><div class="portal-actions"><button class="portal-btn" id="aiBtn">解析</button></div></div><div id="aiResult"></div></section>
     <section class="portal-panel" data-panel="profile"><div class="portal-card"><h2>👤 プロフィール</h2><input id="profileTrip" class="portal-input" placeholder="トリップ"><input id="profileName" class="portal-input" placeholder="表示名"><textarea id="profileIntro" class="portal-textarea" rows="5" placeholder="自己紹介"></textarea><input id="profileX" class="portal-input" placeholder="X ID（任意）"><div class="portal-actions"><button class="portal-btn" id="profileSave">保存</button></div></div></section>
     <section class="portal-panel" data-panel="wiki"><div class="portal-card"><h2>📝 Wiki</h2><input id="wikiTrip" class="portal-input" placeholder="トリップ"><textarea id="wikiText" class="portal-textarea" rows="10" placeholder="人物メモ・Wiki"></textarea><div class="portal-actions"><button class="portal-btn" id="wikiSave">保存</button></div></div><div id="wikiList"></div></section>
     <section class="portal-panel" data-panel="board"><div class="portal-card"><h2>💬 掲示板</h2><input id="postName" class="portal-input" placeholder="名前"><input id="postTrip" class="portal-input" placeholder="トリップ"><textarea id="postText" class="portal-textarea" rows="4" placeholder="投稿内容"></textarea><div class="portal-actions"><button class="portal-btn" id="postBtn">投稿</button></div></div><div id="boardList"></div></section>
-    <section class="portal-panel" data-panel="data"><div class="portal-card"><h2>🌐 自動戦績取得</h2><p class="portal-muted">このサイト自身のバックエンドが自動接続します。URLやAPIキーの設定は不要です。</p><div class="portal-actions"><button class="portal-btn" id="statsSyncBtn">🔄 今すぐ同期</button><button class="portal-btn secondary" id="statsStatusBtn">接続確認</button></div><div id="statsSyncStatus" class="portal-muted">未接続</div></div><div class="portal-card"><h2>💾 データ管理</h2><p class="portal-muted">このサイトの戦績データ・プロフィール・Wiki・掲示板をJSONで保存/復元できます。</p><div class="portal-actions"><button class="portal-btn" id="exportBtn">JSONを書き出す</button><label class="portal-btn secondary" for="importFile">JSONを読み込む</label><input id="importFile" type="file" accept="application/json" hidden><button class="portal-btn secondary" id="clearBtn">ローカルデータ初期化</button></div></div><div class="portal-card"><h3>データ形式</h3><p>players / games / posts / profiles / wiki を持つJSONです。将来PHP・Node・PostgreSQL等のAPIへ移行できます。</p></div></section>
+    <section class="portal-panel" data-panel="data"><div class="portal-card"><h2>🌐 公開ログAPI</h2><p class="portal-muted">API URLやAPIキーの設定は不要です。GitHub Pagesから公開ログAPIへ接続します。取得した実データはこのブラウザ内だけに保存します。</p><div class="portal-actions"><button class="portal-btn" id="statsStatusBtn">接続確認</button><button class="portal-btn secondary" id="clearRemoteBtn">取得済みログを消去</button></div><div id="statsSyncStatus" class="portal-muted">未接続</div></div><div class="portal-card"><h2>💾 データ管理</h2><p class="portal-muted">このサイトの戦績データ・プロフィール・Wiki・掲示板をJSONで保存/復元できます。</p><div class="portal-actions"><button class="portal-btn" id="exportBtn">JSONを書き出す</button><label class="portal-btn secondary" for="importFile">JSONを読み込む</label><input id="importFile" type="file" accept="application/json" hidden><button class="portal-btn secondary" id="clearBtn">ローカルデータ初期化</button></div></div><div class="portal-card"><h3>データ形式</h3><p>players / games / posts / profiles / wiki を持つJSONです。GitHub Pagesだけで動作するため、PHP設定は不要です。</p></div></section>
   </div>
 </div>
 
@@ -1499,16 +1499,21 @@ setInterval(
 
 
 /* ===== Portal database / dashboard ===== */
-const DB_KEY='wolf_online_portal_db_real_v1';
+const DB_KEY='wolf_online_portal_db_real_v2';
 const defaultDB={players:[],games:[],posts:[],profiles:{},wiki:{}};
 // 旧版のサンプルDBを一切引き継がない
-['wolf_online_portal_db_v1','wolf_online_portal_db_v2','wolf_online_portal_db_v3'].forEach(k=>localStorage.removeItem(k));
+['wolf_online_portal_db_v1','wolf_online_portal_db_v2','wolf_online_portal_db_v3','wolf_online_portal_db_real_v1'].forEach(k=>localStorage.removeItem(k));
 let db=loadDB();
+const REMOTE_KEY='wolf_online_remote_logs_v1';
+let remoteLogs=loadRemoteLogs();
+function loadRemoteLogs(){try{const v=JSON.parse(localStorage.getItem(REMOTE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
+function saveRemoteLogs(){localStorage.setItem(REMOTE_KEY,JSON.stringify(remoteLogs));}
+function mergeRemoteLogs(logs){const m=new Map(remoteLogs.map(g=>[String(g.id),g]));(logs||[]).forEach(g=>{if(g&&g.id!=null)m.set(String(g.id),g)});remoteLogs=[...m.values()];saveRemoteLogs();}
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function loadDB(){try{const raw=JSON.parse(localStorage.getItem(DB_KEY)||'null');return raw&&typeof raw==='object'?Object.assign(clone(defaultDB),raw):clone(defaultDB);}catch(e){return clone(defaultDB)}}
 function saveDB(){localStorage.setItem(DB_KEY,JSON.stringify(db));renderAll()}
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function normalizeTrip(t){t=String(t||'').trim();return t.startsWith('◆')||t.startsWith('◇')?t:'◆'+t}
+function normalizeTrip(t){t=String(t||'').trim();return t.startsWith('◆')||t.startsWith('◇')?'◇'+t.slice(1):'◇'+t}
 function rebuildPlayers(){
  const byId={}; db.players.forEach(p=>byId[p.id]=Object.assign({},p));
  db.games.forEach(g=>{
@@ -1551,7 +1556,7 @@ function remotePlayerStats(logs, target, mode){
  const rows=[]; let player=null;
  for(const g of (logs||[])){
    const ps=Array.isArray(g.players)?g.players:[];
-   const hit=ps.find(p=>mode==='trip'?String(p.trip||'').replace(/^◆/,'')===target.replace(/^◆/,''):String(p.name||'')===target);
+   const hit=ps.find(p=>mode==='trip'?String(p.trip||'').replace(/^[◆◇]/,'')===target.replace(/^[◆◇]/,''):String(p.name||'')===target);
    if(hit){ if(!player) player={name:hit.name||target,trip:hit.trip||'',games:0,wins:0,speech:0,roles:{},roleWins:{},logs:[]};
      player.games++; player.speech+=Number(hit.mes||0); const role=hit.job||'未設定'; player.roles[role]=(player.roles[role]||0)+1;
      const side=(/人狼|狂人|狂信者|黒猫/.test(role)?'狼':/妖狐|背徳|恋人/.test(role)?'第三':'村'); const winner=String(g.winner||''); const win=(winner.includes('人狼')&&side==='狼')||(winner.includes('妖狐')&&side==='第三')||(winner.includes('村')&&side==='村'); if(win){player.wins++;player.roleWins[role]=(player.roleWins[role]||0)+1;}
@@ -1564,31 +1569,74 @@ function remotePlayerStats(logs, target, mode){
  const recent=player.logs.slice().reverse().slice(0,30).map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.room)}</td><td>${esc(x.role)}</td><td>${x.result}</td><td>${esc(String(x.id))}</td></tr>`).join('');
  return `<div class="portal-card"><h3>${esc(player.name)} <span class="portal-badge">${esc(normalizeTrip(player.trip||''))}</span></h3><div class="portal-grid"><div class="portal-stat">参戦数<strong>${player.games}</strong></div><div class="portal-stat">勝利<strong>${player.wins}</strong></div><div class="portal-stat">勝率<strong>${rate}%</strong></div><div class="portal-stat">発言数<strong>${player.speech}</strong></div></div><h4>配役/役職別勝敗</h4><table class="portal-table"><thead><tr><th>役職</th><th>戦数</th><th>勝利</th><th>勝率</th></tr></thead><tbody>${roles||'<tr><td colspan="4">役職データなし</td></tr>'}</tbody></table><h4>参戦ログ</h4><table class="portal-table"><thead><tr><th>日時</th><th>村</th><th>役職</th><th>結果</th><th>ID</th></tr></thead><tbody>${recent}</tbody></table></div>`;
 }
-async function searchRemotePlayer(){const q=document.getElementById('playerQuery').value.trim();const mode=document.getElementById('playerMode').value;const status=document.getElementById('playerRemoteStatus');if(!q){status.textContent='名前またはトリップを入力してください。';return;}const api='backend/api.php';if(!api){status.textContent='このサイトのバックエンドを確認してください。';document.getElementById('playerResult').innerHTML='<div class="portal-card">バックエンドに接続できません。PHP対応サーバーにこのZIPをそのまま配置してください。</div>';return;}status.textContent='公開ログを検索中…';try{const param=mode==='trip'?'trip':'name';const u=api+'?action=search&'+param+'='+encodeURIComponent(q);const r=await fetch(u,{cache:'no-store'});const j=await r.json();if(!j.ok)throw new Error(j.error||'API error');const data=j.data||{};if(data.error)throw new Error(data.error);const logs=data.log_data||[];status.textContent=`取得 ${logs.length}ゲーム`;document.getElementById('playerResult').innerHTML=remotePlayerStats(logs,q,mode);}catch(e){status.textContent='取得エラー: '+e.message;document.getElementById('playerResult').innerHTML='<div class="portal-card">公開ログAPIから取得できませんでした。バックエンドURLとサーバーの外部通信を確認してください。</div>';}}
+const PUBLIC_LOG_API='https://ss1.xrea.com/zinrostats.s205.xrea.com/log_search';
+const CORS_PROXIES=[
+  u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+  u=>'https://corsproxy.io/?url='+encodeURIComponent(u)
+];
+async function fetchJsonWithFallback(url){
+  const attempts=[url,...CORS_PROXIES.map(f=>f(url))];
+  let last='接続できません';
+  for(const u of attempts){
+    try{
+      const r=await fetch(u,{cache:'no-store'});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j=await r.json();
+      return j;
+    }catch(e){last=e.message||String(e)}
+  }
+  throw new Error(last);
+}
+async function searchRemotePlayer(){
+ const q=document.getElementById('playerQuery').value.trim();
+ const mode=document.getElementById('playerMode').value;
+ const status=document.getElementById('playerRemoteStatus');
+ if(!q){status.textContent='名前またはトリップを入力してください。';return;}
+ status.textContent='公開ログを検索中…';
+ try{
+   const param=mode==='trip'?'trip':'name';
+   const u=PUBLIC_LOG_API+'?'+param+'='+encodeURIComponent(q);
+   const data=await fetchJsonWithFallback(u);
+   if(data?.error) throw new Error(data.error);
+   const logs=Array.isArray(data?.log_data)?data.log_data:[];
+   mergeRemoteLogs(logs);
+   status.textContent=`取得 ${logs.length}ゲーム（実データ）`;
+   document.getElementById('playerResult').innerHTML=remotePlayerStats(logs,q,mode);
+   renderRanking();
+ }catch(e){
+   status.textContent='取得エラー: '+e.message;
+   document.getElementById('playerResult').innerHTML='<div class="portal-card"><b>公開ログAPIに接続できませんでした。</b><p class="portal-muted">GitHub Pagesからの直接接続と自動CORSプロキシの両方を試しました。API側の停止・CORS制限・一時的な通信障害の可能性があります。</p></div>';
+ }
+}
 
 async function renderRanking(){
  const metric=document.getElementById('rankMetric')?.value||'games';
  const period=document.getElementById('rankPeriod')?.value||'all';
  const body=document.getElementById('rankingBody');
- body.innerHTML='<tr><td colspan="7">実データを集計中…</td></tr>';
- const api='backend/api.php';
- try{
-   const u=api+'?action=ranking&metric='+encodeURIComponent(metric)+'&period='+encodeURIComponent(period);
-   const r=await fetch(u,{cache:'no-store'}); const j=await r.json();
-   if(!j.ok) throw new Error(j.error||'API error');
-   const rows=j.rows||[];
-   body.innerHTML=rows.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.trip||'')}</td><td>${p.games||0}</td><td>${p.wins||0}</td><td>${Number(p.rate||0).toFixed(1)}%</td><td>${p.speech||0}</td></tr>`).join('')||'<tr><td colspan="7">実データがまだありません。先にサーバー側で戦績更新を実行してください。</td></tr>';
- }catch(e){
-   body.innerHTML='<tr><td colspan="7">ランキングAPIに接続できません。backend/api.php を設置して同期してください。</td></tr>';
+ const cutoff=period==='month'?new Date(new Date().getFullYear(),new Date().getMonth(),1):period==='year'?new Date(new Date().getFullYear(),0,1):null;
+ const map=new Map();
+ for(const g of remoteLogs){
+   const dt=new Date(g.date||0); if(cutoff && (!dt.getTime()||dt<cutoff)) continue;
+   for(const p of (Array.isArray(g.players)?g.players:[])){
+     const key=String(p.name||'')+'\n'+String(p.trip||''); if(!p.name) continue;
+     let x=map.get(key); if(!x){x={name:p.name,trip:p.trip||'',games:0,wins:0,speech:0,rm:0};map.set(key,x)}
+     x.games++; x.speech+=Number(p.mes||0);
+     const role=String(p.job||''); const side=/人狼|狂人|狂信者|黒猫/.test(role)?'狼':/妖狐|背徳|恋人/.test(role)?'第三':'村';
+     const winner=String(g.winner||'');
+     if((winner.includes('人狼')&&side==='狼')||(winner.includes('妖狐')&&side==='第三')||(winner.includes('村')&&side==='村'))x.wins++;
+   }
  }
+ const rows=[...map.values()].map(x=>Object.assign(x,{rate:x.games?x.wins/x.games*100:0}));
+ rows.sort((a,b)=>(metric==='wins'?b.wins-a.wins:metric==='rate'?b.rate-a.rate:metric==='speech'?b.speech-a.speech:b.games-a.games)||a.name.localeCompare(b.name,'ja'));
+ body.innerHTML=rows.slice(0,100).map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(normalizeTrip(p.trip||''))}</td><td>${p.games}</td><td>${p.wins}</td><td>${p.rate.toFixed(1)}%</td><td>${p.speech}</td></tr>`).join('')||'<tr><td colspan="7">まだ実データがありません。個人戦績で名前またはトリップを検索してください。</td></tr>';
 }
 function renderRelations(){const q=document.getElementById('relationQuery').value.trim();const ps=findPlayers(q);if(!ps[0]){document.getElementById('relationResult').innerHTML='<div class="portal-card">対象プレイヤーが見つかりません。</div>';return}const target=ps[0],counts={};db.games.forEach(g=>{if((g.players||[]).includes(target.id))g.players.forEach(id=>{if(id!==target.id)counts[id]=(counts[id]||0)+1})});const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([id,n])=>{const p=db.players.find(x=>x.id===id);return `<div class="rel"><span>${esc(p?.name||id)} <small>${esc(p?.trip||'')}</small></span><b>${n}回</b></div>`}).join('');document.getElementById('relationResult').innerHTML=`<div class="portal-card"><h3>${esc(target.name)} の同村ランキング</h3>${rows||'同村データなし'}</div>`}
 function renderGames(){const q=document.getElementById('gameQuery').value.trim().toLowerCase();const gs=db.games.filter(g=>!q||(g.id+' '+g.name+' '+(g.players||[]).map(id=>db.players.find(p=>p.id===id)?.name||'').join(' ')).toLowerCase().includes(q));document.getElementById('gameResult').innerHTML=gs.map(g=>`<div class="portal-card"><h3>${esc(g.name)} <span class="portal-badge">${esc(g.id)}</span></h3><p>${esc(g.date)} / 勝利陣営: ${esc(g.winner)} / MVP: ${esc(db.players.find(p=>p.id===g.mvp)?.name||'—')}</p><p>${esc(g.log)}</p></div>`).join('')||'<div class="portal-card">ゲームなし</div>'}
 function renderAI(){const ps=findPlayers(document.getElementById('aiQuery').value.trim());document.getElementById('aiResult').innerHTML=ps.map(p=>{const s=p.style||{};return `<div class="portal-card"><h3>${esc(p.name)}</h3>${[['発言量',s.speech||0],['質問',s.question||0],['他者言及',s.mention||0],['根拠語',s.evidence||0]].map(x=>`<p>${x[0]}: ${x[1]}<div class="mini-bar"><i style="width:${Math.min(100,(x[1]||0)/10)}%"></i></div></p>`).join('')}<p class="portal-muted">ゲーム参加データからの集計です。</p></div>`}).join('')||'<div class="portal-card">対象プレイヤーなし</div>'}
 function renderBoard(){document.getElementById('boardList').innerHTML=[...db.posts].reverse().map(x=>`<div class="portal-card"><b>${esc(x.name)}</b> <span class="portal-badge">${esc(x.trip)}</span><small class="portal-muted"> ${new Date(x.date).toLocaleString('ja-JP')}</small><p>${esc(x.text)}</p></div>`).join('')||'<div class="portal-card">投稿なし</div>'}
 function renderWiki(){document.getElementById('wikiList').innerHTML=Object.entries(db.wiki).map(([k,v])=>`<div class="portal-card"><h3>${esc(k)}</h3><p>${esc(v)}</p></div>`).join('')||'<div class="portal-card">Wikiなし</div>'}
-async function syncRemoteStats(){const url='backend/api.php';const token='';const out=document.getElementById('statsSyncStatus');if(!url){out.textContent='API URLを入力してください。';return;}localStorage.setItem('wolf_stats_api',url);if(token)localStorage.setItem('wolf_stats_token',token);out.textContent='同期中…';try{const r=await fetch(url+'?action=sync&limit=80',{headers:token?{'X-API-Token':token}:{},cache:'no-store'});const j=await r.json();if(!j.ok)throw new Error(j.error||'API error');out.textContent=`同期完了：ゲーム ${j.sync.games_updated}件 / プレイヤー ${j.players.length}人 / ${j.sync.time}`;const snap=j.snapshot||{players:[],games:[]};const mp=new Map(db.players.map(p=>[p.id,p]));(snap.players||[]).forEach(p=>mp.set(p.id,Object.assign(mp.get(p.id)||{},p,{trip:normalizeTrip(p.trip||'')})));db.players=[...mp.values()];const gm=new Map(db.games.map(g=>[g.id,g]));(snap.games||[]).forEach(g=>gm.set(g.id,g));db.games=[...gm.values()];rebuildPlayers();localStorage.setItem(DB_KEY,JSON.stringify(db));renderAll();renderPlayer();}catch(e){out.textContent='同期エラー: '+e.message;}}
-async function checkStatsApi(){const url='backend/api.php';const out=document.getElementById('statsSyncStatus');if(!url){out.textContent='API URLを入力してください。';return;}try{const j=await (await fetch(url+'?action=status',{cache:'no-store'})).json();out.textContent=j.ok?`接続OK：DB ${j.games}ゲーム / ${j.players}プレイヤー / ${j.time}`:'接続失敗';}catch(e){out.textContent='接続エラー: '+e.message;}}
+async function checkStatsApi(){const out=document.getElementById('statsSyncStatus');out.textContent='公開ログAPIを確認中…';try{const data=await fetchJsonWithFallback(PUBLIC_LOG_API+'?name='+encodeURIComponent('__wolf_pages_probe__'));out.textContent=`接続OK：実データ取得経路が利用できます（保存ゲーム ${remoteLogs.length}件）`;}catch(e){out.textContent='接続確認失敗：'+e.message;}}
+
 function restoreStatsApiSettings(){}
 function bindPortal(){
  document.querySelectorAll('.portal-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.portal-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const t=b.dataset.tab;document.querySelectorAll('.portal-panel').forEach(x=>x.classList.toggle('active',x.dataset.panel===t));document.getElementById('searchPanel').classList.toggle('portal-search-hidden',t!=='search');if(t==='player')renderPlayer();if(t==='ranking')renderRanking();if(t==='games')renderGames();if(t==='ai')renderAI();});
@@ -1596,7 +1644,7 @@ function bindPortal(){
  document.getElementById('profileSave').onclick=()=>{const t=document.getElementById('profileTrip').value.trim();if(!t)return;db.profiles[t]={name:document.getElementById('profileName').value,intro:document.getElementById('profileIntro').value,x:document.getElementById('profileX').value};saveDB();alert('プロフィールを保存しました。')};
  document.getElementById('wikiSave').onclick=()=>{const t=document.getElementById('wikiTrip').value.trim();if(!t)return;db.wiki[t]=document.getElementById('wikiText').value;saveDB();alert('Wikiを保存しました。')};
  document.getElementById('postBtn').onclick=()=>{const text=document.getElementById('postText').value.trim();if(!text)return;db.posts.push({name:document.getElementById('postName').value||'名無し',trip:document.getElementById('postTrip').value||'',text,date:new Date().toISOString()});document.getElementById('postText').value='';saveDB()};
- document.getElementById('statsSyncBtn').onclick=syncRemoteStats;document.getElementById('statsStatusBtn').onclick=checkStatsApi;restoreStatsApiSettings();
+ document.getElementById('statsStatusBtn').onclick=checkStatsApi;document.getElementById('clearRemoteBtn').onclick=()=>{remoteLogs=[];saveRemoteLogs();renderRanking();document.getElementById('statsSyncStatus').textContent='取得済みログを消去しました。';};
  document.getElementById('clearBtn').onclick=()=>{if(confirm('ローカルDBを初期化しますか？')){db=clone(defaultDB);localStorage.removeItem(DB_KEY);renderAll();renderPlayer()}};
  document.getElementById('exportBtn').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='wolf-online-data.json';a.click()};
  document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=Object.assign(clone(defaultDB),JSON.parse(r.result));rebuildPlayers();saveDB();alert('読み込みました。')}catch(x){alert('JSONが不正です。')}};r.readAsText(f)};
