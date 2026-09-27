@@ -7,7 +7,11 @@ header('Access-Control-Allow-Methods: GET, OPTIONS');
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') { http_response_code(204); exit; }
 $c=cfg(); if($c['api_token']!=='' && ($_SERVER['HTTP_X_API_TOKEN']??'')!==$c['api_token']){http_response_code(403);echo json_encode(['ok'=>false,'error'=>'forbidden'],JSON_UNESCAPED_UNICODE);exit;}
 $a=$_GET['action']??'status'; try{
- if($a==='ranking'){ echo json_encode(['ok'=>true,'rows'=>ranking_rows($_GET['metric']??'games',$_GET['period']??'all')],JSON_UNESCAPED_UNICODE); }
+ if($a==='ranking'){
+   $pc=(int)db()->query('SELECT COUNT(*) FROM players')->fetchColumn();
+   if($pc===0){ try { collect(80); } catch(Throwable $ignore){} }
+   echo json_encode(['ok'=>true,'rows'=>ranking_rows($_GET['metric']??'games',$_GET['period']??'all')],JSON_UNESCAPED_UNICODE);
+ }
  elseif($a==='search'){
    $q=[];
    foreach(['name','trip','room_name','jobset','s_date','e_date','totsushi','one_night','word_wolf'] as $k){ if(isset($_GET[$k]) && $_GET[$k]!=='') $q[$k]=$_GET[$k]; }
