@@ -229,7 +229,7 @@ td {
 
 <div id="portalShell" class="container">
   <div class="portal-nav">
-    <div class="portal-brand"><div><b>🐺 人狼オンライン データベース</b><br><small>トリップ検索・戦績解析・ランキング・ゲーム解析</small></div><span id="dbStatus" class="portal-badge">ローカルDB</span></div>
+    <div class="portal-brand"><div><b>🐺 人狼オンライン データベース</b><br><small>トリップ検索・戦績解析・ランキング・ゲーム解析</small></div><span id="dbStatus" class="portal-badge">実データ連携</span></div>
     <div class="portal-tabs" id="portalTabs">
       <button class="portal-tab active" data-tab="about">概要</button><button class="portal-tab" data-tab="search">🔍 トリップ検索</button><button class="portal-tab" data-tab="player">📊 個人戦績</button><button class="portal-tab" data-tab="ranking">🏆 ランキング</button><button class="portal-tab" data-tab="relations">👥 同村関係</button><button class="portal-tab" data-tab="games">🏘️ ゲーム解析</button><button class="portal-tab" data-tab="ai">🤖 プレイヤー解析</button><button class="portal-tab" data-tab="profile">👤 プロフィール</button><button class="portal-tab" data-tab="wiki">📝 Wiki</button><button class="portal-tab" data-tab="board">💬 掲示板</button><button class="portal-tab" data-tab="data">💾 データ管理</button>
     </div>
@@ -241,7 +241,7 @@ td {
       <div class="portal-card"><h2>機能</h2><p>🔍 高速トリップ検索（正規表現・二重検索） ／ 📊 個人戦績 ／ 🏆 ランキング ／ 👥 同村関係 ／ 🏘️ ゲーム解析 ／ 🤖 発言スタイル解析 ／ 👤 プロフィール ／ 📝 Wiki ／ 💬 掲示板 ／ 💾 JSON入出力（サンプルデータは生成しません）</p></div>
     </section>
     <section class="portal-panel" data-panel="player"><div class="portal-card"><h2>📊 個人戦績</h2><p class="portal-muted">公開ログ検索APIから実データを取得します。サンプル戦績は表示しません。</p><div class="portal-grid"><input id="playerQuery" class="portal-input" placeholder="名前またはトリップ（例：サプリ / ◆SuppleLohk）"><select id="playerMode" class="portal-select"><option value="name">名前</option><option value="trip">トリップ</option></select></div><div class="portal-actions"><button class="portal-btn" id="playerSearchBtn">🔎 実データを検索</button></div><div id="playerRemoteStatus" class="portal-muted"></div></div><div id="playerResult"></div></section>
-    <section class="portal-panel" data-panel="ranking"><div class="portal-card"><h2>🏆 ランキング</h2><div class="portal-grid"><select id="rankMetric" class="portal-select"><option value="games">参戦数</option><option value="wins">勝利数</option><option value="rate">勝率</option><option value="speech">発言数</option><option value="rm">RM回数</option></select><select id="rankPeriod" class="portal-select"><option value="all">通算</option><option value="month">今月</option><option value="year">今年</option></select></div></div><div class="portal-card"><table class="portal-table"><thead><tr><th>#</th><th>プレイヤー</th><th>トリップ</th><th>戦数</th><th>勝利</th><th>勝率</th><th>発言</th></tr></thead><tbody id="rankingBody"></tbody></table></div></section>
+    <section class="portal-panel" data-panel="ranking"><div class="portal-card"><h2>🏆 ランキング</h2><p class="portal-muted">実データを同期するまで架空のプレイヤーは表示しません。</p><div class="portal-grid"><select id="rankMetric" class="portal-select"><option value="games">参戦数</option><option value="wins">勝利数</option><option value="rate">勝率</option><option value="speech">発言数</option><option value="rm">RM回数</option></select><select id="rankPeriod" class="portal-select"><option value="all">通算</option><option value="month">今月</option><option value="year">今年</option></select></div></div><div class="portal-card"><table class="portal-table"><thead><tr><th>#</th><th>プレイヤー</th><th>トリップ</th><th>戦数</th><th>勝利</th><th>勝率</th><th>発言</th></tr></thead><tbody id="rankingBody"></tbody></table></div></section>
     <section class="portal-panel" data-panel="relations"><div class="portal-card"><h2>👥 同村・関係解析</h2><input id="relationQuery" class="portal-input" placeholder="プレイヤー名またはトリップ"><div class="portal-actions"><button class="portal-btn" id="relationBtn">解析</button></div></div><div id="relationResult"></div></section>
     <section class="portal-panel" data-panel="games"><div class="portal-card"><h2>🏘️ ゲームログ解析</h2><input id="gameQuery" class="portal-input" placeholder="ゲームID・村名・プレイヤー・トリップ"><div class="portal-actions"><button class="portal-btn" id="gameSearchBtn">検索</button></div></div><div id="gameResult"></div></section>
     <section class="portal-panel" data-panel="ai"><div class="portal-card"><h2>🤖 プレイヤー解析</h2><p class="portal-muted">発言量・質問・他者言及・根拠語などをログから機械集計する簡易版です。勝敗から人格や実力を断定するものではありません。</p><input id="aiQuery" class="portal-input" placeholder="プレイヤー名・トリップ"><div class="portal-actions"><button class="portal-btn" id="aiBtn">解析</button></div></div><div id="aiResult"></div></section>
@@ -1499,11 +1499,13 @@ setInterval(
 
 
 /* ===== Portal database / dashboard ===== */
-const DB_KEY='wolf_online_portal_db_v3';
+const DB_KEY='wolf_online_portal_db_real_v1';
 const defaultDB={players:[],games:[],posts:[],profiles:{},wiki:{}};
+// 旧版のサンプルDBを一切引き継がない
+['wolf_online_portal_db_v1','wolf_online_portal_db_v2','wolf_online_portal_db_v3'].forEach(k=>localStorage.removeItem(k));
 let db=loadDB();
 function clone(o){return JSON.parse(JSON.stringify(o));}
-function loadDB(){try{const raw=JSON.parse(localStorage.getItem(DB_KEY)||localStorage.getItem('wolf_online_portal_db_v1')||'null');return raw&&typeof raw==='object'?Object.assign(clone(defaultDB),raw):clone(defaultDB);}catch(e){return clone(defaultDB)}}
+function loadDB(){try{const raw=JSON.parse(localStorage.getItem(DB_KEY)||'null');return raw&&typeof raw==='object'?Object.assign(clone(defaultDB),raw):clone(defaultDB);}catch(e){return clone(defaultDB)}}
 function saveDB(){localStorage.setItem(DB_KEY,JSON.stringify(db));renderAll()}
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function normalizeTrip(t){t=String(t||'').trim();return t.startsWith('◆')||t.startsWith('◇')?t:'◆'+t}
