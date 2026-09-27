@@ -64,3 +64,25 @@ function snapshot(){
  foreach($gs as $g){$parts=[];$q=$pdo->prepare("SELECT pa.*,p.name,p.trip FROM participations pa JOIN players p ON p.id=pa.player_id WHERE pa.game_id=?");$q->execute([$g['id']]);foreach($q as $r)$parts[]=['id'=>'srv:'.$r['player_id'],'name'=>$r['name'],'trip'=>$r['trip'],'role'=>$r['role'],'side'=>$r['side'],'result'=>$r['result'],'speech'=>(int)$r['speech'],'questions'=>(int)$r['questions'],'mentions'=>(int)$r['mentions']];$games[]=['id'=>'srvgame:'.$g['id'],'name'=>$g['room_name'],'date'=>$g['game_date'],'winner'=>$g['winner_side'],'players'=>array_column($parts,'id'),'participants'=>$parts,'log'=>'公開ログから自動解析','source'=>$g['source_url']];}
  return ['players'=>array_map(fn($p)=>['id'=>'srv:'.$p['id'],'name'=>$p['name'],'trip'=>$p['trip']],$players),'games'=>$games];
 }
+
+function ranking_rows($metric='games',$period='all'){
+ $pdo=db();
+ $where=''; $args=[];
+ if($period==='month') $where=" AND substr(g.game_date,1,7)=?";
+ elseif($period==='year') $where=" AND substr(g.game_date,1,4)=?";
+ if($period==='month') $args[]=gmdate('Y-m');
+ elseif($period==='year') $args[]=gmdate('Y');
+ $sql="SELECT p.name,p.trip,COUNT(*) games,
+   SUM(CASE WHEN pa.result='win' THEN 1 ELSE 0 END) wins,
+   SUM(COALESCE(pa.speech,0)) speech
+   FROM participations pa JOIN players p ON p.id=pa.player_id JOIN games g ON g.id=pa.game_id
+   WHERE 1=1 $where GROUP BY p.id ORDER BY ";
+ if($metric==='wins') $sql.='wins DESC, games DESC';
+ elseif($metric==='rate') $sql.='(CAST(SUM(CASE WHEN pa.result=\'win\' THEN 1 ELSE 0 END) AS REAL)/NULLIF(COUNT(*),0)) DESC, games DESC';
+ elseif($metric==='speech') $sql.='speech DESC, games DESC';
+ else $sql.='games DESC, wins DESC';
+ $sql.=' LIMIT 200';
+ $st=$pdo->prepare($sql);$st->execute($args);$rows=$st->fetchAll();
+ foreach($rows as &$r){$r['games']=(int)$r['games'];$r['wins']=(int)$r['wins'];$r['speech']=(int)$r['speech'];$r['rate']=$r['games']?($r['wins']/$r['games']*100):0;}
+ return $rows;
+}
